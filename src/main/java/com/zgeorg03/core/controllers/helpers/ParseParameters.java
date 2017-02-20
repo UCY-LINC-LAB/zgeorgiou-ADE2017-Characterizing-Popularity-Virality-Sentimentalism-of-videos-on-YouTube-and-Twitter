@@ -69,11 +69,29 @@ public class ParseParameters {
         String param = request.params(id);
         if(param==null)
             return x;
-        try {
-            x=param;
-            if(!validation.test(x))
-                result.addError(errorMsg);
-        }catch (NumberFormatException e){ result.addError(id + " parameter should be an integer"); }
+        x=param;
+        if(!validation.test(x))
+            result.addError(errorMsg);
+        return x;
+    }
+    /**
+     *
+     * @param request
+     * @param result
+     * @param id
+     * @param defaultValue
+     * @param validation
+     * @param errorMsg
+     * @return
+     */
+    public static String parseStringQueryParam(final Request request, final JsonResult result, String id, String defaultValue, Predicate<String> validation, String errorMsg){
+        String x=defaultValue;
+        String param = request.queryParams(id);
+        if(param==null)
+            return x;
+        x=param;
+        if(!validation.test(x))
+            result.addError(errorMsg);
         return x;
     }
     /**

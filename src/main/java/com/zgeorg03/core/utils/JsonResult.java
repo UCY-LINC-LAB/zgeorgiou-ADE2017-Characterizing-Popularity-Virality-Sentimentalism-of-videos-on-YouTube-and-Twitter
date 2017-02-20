@@ -19,6 +19,9 @@ public class JsonResult {
     public JsonResult addNumber(String key, Number value){ data.addProperty(key,value); return this; }
     public JsonResult addBoolean(String key, Boolean value){ data.addProperty(key,value); return this; }
 
+    public void setData(JsonObject data){
+        this.data=data;
+    }
     public String build(){
         JsonObject result = new JsonObject();
         result.add("errors", errors);
