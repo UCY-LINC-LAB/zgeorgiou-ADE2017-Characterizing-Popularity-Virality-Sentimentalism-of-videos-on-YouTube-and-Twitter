@@ -14,5 +14,6 @@ public @interface Parameter {
 
     boolean required() default false;
     String description() default "";
+    String defaultValue() default "";
     String[] extendedDescription() default {};
 }

@@ -7,12 +7,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 2/20/17.
  */
-public class VideoRecords extends HashMap<String,VideoRecord>{
+public class VideoRecords extends ConcurrentHashMap<String,VideoRecord>{
     private static final Logger logger = LoggerFactory.getLogger(VideoRecords.class);
 
 
@@ -109,29 +110,5 @@ public class VideoRecords extends HashMap<String,VideoRecord>{
     }
 
 
-    //TODO Need to move to another class
-    public Map<Integer,Double> averageViewsPerDay(List<VideoRecord> videoRecords,int lbl_wnd){
-        if(videoRecords.size()==0)
-            return new HashMap<>();
-
-        List<List<Day>> list = videoRecords.stream().map(VideoRecord::getDayList).collect(Collectors.toList());
-        int min = list.stream().mapToInt(x -> x.size()).min().getAsInt();
-        int records = list.size();
-        int accumulator[] = new int[min];
-        for(List<Day> days : list){
-            for(int i=lbl_wnd-1;i<min;i++){
-                try{
-                    final Day day = days.get(i);
-                    accumulator[i]+=day.getViews();
-                }catch (IndexOutOfBoundsException ex){ }
-            }
-        }
-        Map<Integer,Double>res = new HashMap<>();
-        if(records==0)
-            return res;
-        for(int i=lbl_wnd-1;i<min;i++)
-            res.put(i,(double) (accumulator[i]/records));
-        return res;
-    }
 
 }

@@ -31,13 +31,16 @@ public abstract class GetRequest {
             return result.addError("Token needed!").build();
 
 
-        help = ParseParameters.parseIntegerQueryParam(request,result,"help", 0,x->x==0||x==1 ,"Should be 0 or 1");
+        help = ParseParameters.parseIntegerQueryParam(request,result,"help", 0,x->x==0||x==1 || x==2 ,"Should be 0 or 1 or 2");
 
         handleParams(request,response,result);
 
-        if(result.hasError() || help==1)
-            return result.addElement("parameters",ParameterController.getRequestParameters(this.getClass())).build();
-
+        if(result.hasError() || help==1 || help==2) {
+            if(result.hasError() || help==1)
+                return result.addElement("parameters", ParameterController.getRequestParameters(this.getClass()).get("params")).build();
+            if (help == 2)
+                return result.addElement("parameters", ParameterController.getRequestParameters(this.getClass()).get("markdown")).build();
+        }
         return execute(request,response,result);
 
     }

@@ -38,7 +38,6 @@ public class DataInputHandler {
 
             String video_id = toks[0];
             if(videoRecords.containsKey(video_id)) {
-                logger.info("Video is already found!");
                 duplicates++;
                 continue;
             }
@@ -150,6 +149,22 @@ public class DataInputHandler {
         return 6;//Others
     }
 
+    public static String getArtificialCategoryName(int category){
+        if(category == 1) // Music
+            return "Music";
+        if(category == 2)
+            return "Games";
+        if(category == 3)
+            return "People & Blogs";
+        if(category == 4)
+            return "Entertainment";
+        if(category == 5)
+            return "News & Politics";
+
+        return "Others";
+
+
+    }
     /**
      * //TODO Spam may needed or not?//
      * @param videoRecord

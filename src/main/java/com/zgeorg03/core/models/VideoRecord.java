@@ -74,9 +74,6 @@ public class VideoRecord implements JsonModel {
         this.toalHashtags = toalHashtags;
         this.dayList = dayList;
         experimentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(experiment_timestamp));
-
-        if(dayList.size()<=13)
-            System.out.println("INFO: " + this);
     }
 
     public int getTotalTweetsInEnglish() {
@@ -212,6 +209,10 @@ public class VideoRecord implements JsonModel {
     @Override
     public JsonElement toJson(Map<String, Integer> map) {
         JsonObject object = new JsonObject();
+
+        int img = map.getOrDefault("img",-1);
+        if(img!=-1)
+            object.addProperty("img","http://img.youtube.com/vi/"+video_id+"/0.jpg");
 
         if(map.getOrDefault("video_id",1)==1)
             object.addProperty("video_id",video_id);
