@@ -19,19 +19,19 @@ target/
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/dist
-/tmp
+yttresearch-frontend/dist
+yttresearch-frontend/tmp
 
 # dependencies
-/node_modules
+yttresearch-frontend/node_modules
 
 # IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
+yttresearch-frontend/.idea
+yttresearch-frontend.project
+yttresearch-frontend.classpath
+yttresearch-frontend.c9/
+yttresearch-frontend*.launch
+yttresearch-frontend.settings/
 
 # IDE - VSCode
 .vscode/*
@@ -41,18 +41,18 @@ target/
 !.vscode/extensions.json
 
 # misc
-/.sass-cache
-/connect.lock
-/coverage/*
-/libpeerconnection.log
-npm-debug.log
-testem.log
-/typings
+yttresearch-frontend/.sass-cache
+yttresearch-frontend/connect.lock
+yttresearch-frontend/coverage/*
+yttresearch-frontend/libpeerconnection.log
+yttresearch-frontend/npm-debug.log
+yttresearch-frontendtestem.log
+yttresearch-frontend/typings
 
 # e2e
-/e2e/*.js
-/e2e/*.map
+yttresearch-frontend/e2e/*.js
+yttresearch-frontend/e2e/*.map
 
 #System Files
-.DS_Store
-Thumbs.db
+yttresearch-frontend/.DS_Store
+yttresearch-frontend/Thumbs.db
