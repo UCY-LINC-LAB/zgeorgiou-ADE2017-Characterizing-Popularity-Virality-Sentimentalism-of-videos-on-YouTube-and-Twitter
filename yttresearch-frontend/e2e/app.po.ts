@@ -1,6 +1,6 @@
 import { browser, element, by } from 'protractor';
 
-export class YttresearchFrontendPage {
+export class FrontendPage {
   navigateTo() {
     return browser.get('/');
   }

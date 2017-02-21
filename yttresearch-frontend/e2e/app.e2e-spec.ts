@@ -1,10 +1,10 @@
-import { YttresearchFrontendPage } from './app.po';
+import { FrontendPage } from './app.po';
 
-describe('yttresearch-frontend App', function() {
-  let page: YttresearchFrontendPage;
+describe('frontend App', () => {
+  let page: FrontendPage;
 
   beforeEach(() => {
-    page = new YttresearchFrontendPage();
+    page = new FrontendPage();
   });
 
   it('should display message saying app works', () => {
