@@ -1,4 +1,5 @@
-export class VideoCategories {
+import {Graph} from '../../utils/graph-interface';
+export class VideoCategories implements Graph {
 
     private options = {};
 

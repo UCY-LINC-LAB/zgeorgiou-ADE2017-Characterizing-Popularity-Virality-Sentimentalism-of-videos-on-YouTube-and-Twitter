@@ -99,34 +99,56 @@ public class VideosService {
      * @param artificialCategory
      * @return
      */
-    public JsonArray getRecentVideos(int limit, int range, Random rnd, int artificialCategory){
-        JsonArray array = new JsonArray();
+    public JsonObject getRecentVideos(boolean statsEnabled,int lbl_wnd,int limit, int range, Random rnd, int artificialCategory){
+        JsonObject object = new JsonObject();
+        JsonArray videos = new JsonArray();
         Map<String,Integer> view = new HashMap<>();
         view.put("video_id",1);
+        view.put("totalTweetsInLabelWnd",lbl_wnd);
         view.put("totalTweets",1);
+        view.put("totalViewsInLabelWnd",lbl_wnd);
         view.put("totalViews",1);
+        view.put("img",1);
         List<VideoRecord> records = videoRecords.getRecentVideos(limit,range,rnd,artificialCategory);
 
 
-        records.forEach(x -> array.add(x.toJson(view)));
-        return  array;
+        records.forEach(x -> videos.add(x.toJson(view)));
+        object.addProperty("total_videos",videos.size());
+
+        if(statsEnabled) {
+            JsonObject stats = getStats(records, lbl_wnd);
+            object.add("stats", stats);
+        }
+        return  object;
     }
     /**
-     * Get random videos
+     * Get random  videos
      * @param limit
+     * @param range
      * @param rnd
      * @param artificialCategory
      * @return
      */
-    public JsonArray getRandomVideos(int limit,Random rnd, int artificialCategory){
-        JsonArray array = new JsonArray();
+    public JsonObject getRandomVideos(boolean statsEnabled,int lbl_wnd,int limit, int range, Random rnd, int artificialCategory){
+        JsonObject object = new JsonObject();
+        JsonArray videos = new JsonArray();
         Map<String,Integer> view = new HashMap<>();
         view.put("video_id",1);
+        view.put("totalTweetsInLabelWnd",lbl_wnd);
         view.put("totalTweets",1);
+        view.put("totalViewsInLabelWnd",lbl_wnd);
         view.put("totalViews",1);
+        view.put("img",1);
         List<VideoRecord> records = videoRecords.getRandomVideos(limit,rnd,artificialCategory);
-        records.forEach(x -> array.add(x.toJson(view)));
-        return  array;
+
+        records.forEach(x -> videos.add(x.toJson(view)));
+        object.addProperty("total_videos",videos.size());
+
+        if(statsEnabled) {
+            JsonObject stats = getStats(records, lbl_wnd);
+            object.add("stats", stats);
+        }
+        return  object;
     }
     /**
      * Get total number of videos

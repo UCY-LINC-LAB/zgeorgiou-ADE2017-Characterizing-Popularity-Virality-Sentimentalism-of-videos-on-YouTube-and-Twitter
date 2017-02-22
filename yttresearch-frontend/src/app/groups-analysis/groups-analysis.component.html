@@ -1,7 +1,12 @@
 
 <div class="container">
       <div class="row">
-            <app-groups-analysis-form (data)="getData($event)"> </app-groups-analysis-form>
-            <app-groups-graph [loading]="graphLoading" [error]="error" > </app-groups-graph>
+            <app-groups-analysis-form (error)="getError($event)" (data)="getData($event)"> </app-groups-analysis-form>
+            <div *ngIf="!error">
+                  <app-groups-graph [loading]="graphLoading" [error]="error" [chart]="chart"> </app-groups-graph>
+            </div>
+            <div *ngIf="error" >
+                  <small> {{errorMsg}} </small>
+            </div>
       </div>
 </div>

@@ -28,8 +28,8 @@ export class EndpointsService {
   /**
    * Load Videos endpoint
    */
-  public loadPopularGroup() : Observable<any>{
-    let url = `${this.HOST}/videos/popular`;
+  public loadGroup(group:string,category:number,lblWnd:number,percentage:number) : Observable<any>{
+    let url = `${this.HOST}/videos/${group}?category=${category}&lbl_wnd=${lblWnd}&percentage=${percentage}`;
     return this.http.get(url)
         .map(this.extractData)
         .catch(this.handleError);
@@ -37,10 +37,16 @@ export class EndpointsService {
 
   private extractData(res:Response){
     let body = res.json();
+    if(body.errors.length!=0){
+      throw new Error (body.errors[0]);
+    }
     return body.data || {};
   }
   private handleError(error: Response | any) {
     let errMsg: string;
+    console.log(error)
+    return Observable.throw(error);
+    /*
     if (error instanceof Response) {
       const body = error.json() || '';
       const err = body.errors[0] || JSON.stringify(body);
@@ -48,6 +54,6 @@ export class EndpointsService {
     } else {
       errMsg = error.message ? error.message : error.toString();
     }
-    return Observable.throw(errMsg);
+    return Observable.throw(errMsg);*/
   }
 }

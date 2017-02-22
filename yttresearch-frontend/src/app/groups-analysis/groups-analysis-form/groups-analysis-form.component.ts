@@ -10,31 +10,50 @@ import {EndpointsService} from '../../utils/endpoints.service';
 })
 export class GroupsAnalysisFormComponent implements OnInit {
 
-  private error = false;
-
   private categories = [];
   private category : number;
   private lblWnd : number;
   private percentage : number;
 
+  private groups = [
+    {name:"Popular Videos", value:"popular"},
+    {name:"Viral Videos", value:"viral"},
+    {name:"Recent Videos", value:"recent"},
+    {name:"Random Videos", value:"random"},
+  ];
+  private group : string;
   constructor(private endpointsSerice:EndpointsService) { }
 
   ngOnInit() {
     this.lblWnd = 3;
     this.percentage = 2.5;
     this.category = 0;
+    this.group = "popular";
 
     this.loadCategories();
   }
 
   private submit(){
-    this.endpointsSerice.loadPopularGroup()
+    let lblWnd = Number(this.lblWnd)
+    if (lblWnd<=0 || lblWnd>14) {
+      this.error.emit("Label window must be between 1 and 14");
+      return ;
+    }
+    
+    let perc = Number(this.percentage) / 100;
+    console.log(perc)
+    if (!perc || perc>=1 || perc<=0) {
+      this.error.emit("Percentage must be a float number between 0 and 1");
+      return ;
+    }
+    this.endpointsSerice.loadGroup(this.group,this.category,this.lblWnd,perc)
       .subscribe(data=>{
         this.data.emit(data);
-      },error => this.error=true);
+      },error => this.error.emit(error.message));
 
   }
   @Output() data : EventEmitter<any> = new EventEmitter(); 
+  @Output() error : EventEmitter<string> = new EventEmitter(); 
 
   
   private loadCategories(){
@@ -49,11 +68,10 @@ export class GroupsAnalysisFormComponent implements OnInit {
                 i++;
                 this.categories.push({name:category['name'],id:i});
               }
-              console.log(data);
 
 
             },
-            err => { this.error=true; }
+            err => { this.error.emit(err.message)}
     );
   }
 }

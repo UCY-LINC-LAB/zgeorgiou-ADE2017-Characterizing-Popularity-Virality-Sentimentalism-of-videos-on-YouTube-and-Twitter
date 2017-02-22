@@ -32,6 +32,7 @@ public class VideosController {
 
                 JsonArray array = videosService.getCategories();
                 result.addNumber("total_videos",videosService.getTotalVideos());
+                result.addNumber("min_days",videosService.getVideoRecords().getMinDays(0));
                 result.addElement("categories",array);
 
                 return result.build();
@@ -45,7 +46,7 @@ public class VideosController {
 
         new GetRequest("/videos/popular"){
 
-            @Parameter(description = "Label window indicates the starting period for measuring the attributes. Default is 3", defaultValue = "3")
+            @Parameter(description = "Label window indicates the starting day for measuring the attributes. Default is 3", defaultValue = "3")
             public int lbl_wnd;
 
             @Parameter(description = "Category of the videos.",defaultValue = "0")
@@ -85,9 +86,10 @@ public class VideosController {
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>0 && x<=minDays,"Labeling wnd must be in the range of collected data");
                 limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"Limit must be positive");
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0 && x<1,"Percentage must be in the range of 0 and 1");
-                stats = ParseParameters.parseIntegerQueryParam(request,result,"stats",1,x->x== 0 || x==1,"Must be 0 or 1");
 
+                stats = ParseParameters.parseIntegerQueryParam(request,result,"stats",1,x->x== 0 || x==1,"Must be 0 or 1");
                 statsEnabled = stats==1;
+
                 if(request.queryParams("limit")!=null)
                     useLimit = true;
                 else if(request.queryParams("percentage")!=null)
@@ -101,7 +103,7 @@ public class VideosController {
 
         new GetRequest("/videos/viral"){
 
-            @Parameter(description = "Label window indicates the starting for measuring the attributes",defaultValue = "3")
+            @Parameter(description = "Label window indicates the starting day for measuring the attributes",defaultValue = "3")
             public int lbl_wnd;
 
             @Parameter(description = "Category of the videos",defaultValue = "0")
@@ -158,6 +160,9 @@ public class VideosController {
 
         new GetRequest("/videos/recent"){
 
+            @Parameter(description = "Label window indicates the starting day for measuring the attributes",defaultValue = "3")
+            public int lbl_wnd;
+
             @Parameter(description = "Category of the videos.",defaultValue = "0")
             public int category;
 
@@ -172,9 +177,13 @@ public class VideosController {
 
             private boolean useLimit;
 
+            @Parameter(description = "Returns statistics about the videos",defaultValue = "1")
+            public int stats;
+            private boolean statsEnabled;
+
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
-                final JsonArray videos;
+                final JsonObject object;
                 final Random random;
 
                 if(seed==-1)
@@ -183,14 +192,13 @@ public class VideosController {
                     random = new Random(seed);
 
                 if(useLimit) {
-                    videos = videosService.getRecentVideos(limit,2, random, category);
+                    object = videosService.getRecentVideos(statsEnabled,lbl_wnd,limit,2, random, category);
                 }else{
                     int limit = (int) ((videosService.getTotalVideosFromCategory(category)  * percentage));
-                    videos = videosService.getRecentVideos(limit,2, random, category);
+                    object = videosService.getRecentVideos(statsEnabled,lbl_wnd,limit,2, random, category);
                 }
-                result.addNumber("total_videos",videos.size());
-                result.addElement("videos",videos);
 
+                result.setData(object);
                 return result.build();
             }
 
@@ -199,10 +207,13 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0 && x<=6,"Category must be a number between 0 and 5");
                 int minDays =  videosService.getVideoRecords().getMinDays(category);
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>0 && x<=minDays,"Labeling wnd must be in the range of collected data");
                 seed = ParseParameters.parseIntegerQueryParam(request,result,"seed",1,x->x>=-1 ,"Seed must be positive");
                 limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"Limit must be positive");
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0 && x<1,"Percentage must be in the range of 0 and 1");
 
+                stats = ParseParameters.parseIntegerQueryParam(request,result,"stats",1,x->x== 0 || x==1,"Must be 0 or 1");
+                statsEnabled = stats==1;
 
                 if(request.queryParams("limit")!=null)
                     useLimit = true;
@@ -217,6 +228,9 @@ public class VideosController {
 
         new GetRequest("/videos/random"){
 
+            @Parameter(description = "Label window indicates the starting day for measuring the attributes",defaultValue = "3")
+            public int lbl_wnd;
+
             @Parameter(description = "Category of the videos.",defaultValue = "0")
             public int category;
 
@@ -231,9 +245,13 @@ public class VideosController {
 
             private boolean useLimit;
 
+            @Parameter(description = "Returns statistics about the videos",defaultValue = "1")
+            public int stats;
+            private boolean statsEnabled;
+
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
-                final JsonArray videos;
+                final JsonObject object;
                 final Random random;
 
                 if(seed==-1)
@@ -242,14 +260,13 @@ public class VideosController {
                     random = new Random(seed);
 
                 if(useLimit) {
-                    videos = videosService.getRandomVideos(limit, random, category);
+                    object = videosService.getRandomVideos(statsEnabled,lbl_wnd,limit,2, random, category);
                 }else{
                     int limit = (int) ((videosService.getTotalVideosFromCategory(category)  * percentage));
-                    videos = videosService.getRandomVideos(limit, random, category);
+                    object = videosService.getRandomVideos(statsEnabled,lbl_wnd,limit,2, random, category);
                 }
-                result.addNumber("total_videos",videos.size());
-                result.addElement("videos",videos);
 
+                result.setData(object);
                 return result.build();
             }
 
@@ -258,10 +275,13 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0 && x<=6,"Category must be a number between 0 and 5");
                 int minDays =  videosService.getVideoRecords().getMinDays(category);
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>0 && x<=minDays,"Labeling wnd must be in the range of collected data");
                 seed = ParseParameters.parseIntegerQueryParam(request,result,"seed",1,x->x>=-1 ,"Seed must be positive");
                 limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"Limit must be positive");
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0 && x<1,"Percentage must be in the range of 0 and 1");
 
+                stats = ParseParameters.parseIntegerQueryParam(request,result,"stats",1,x->x== 0 || x==1,"Must be 0 or 1");
+                statsEnabled = stats==1;
 
                 if(request.queryParams("limit")!=null)
                     useLimit = true;
@@ -273,7 +293,6 @@ public class VideosController {
 
             }
         };
-
         new GetRequest("/videos/:id"){
 
             @Parameter(description = "Video Id",required = true)

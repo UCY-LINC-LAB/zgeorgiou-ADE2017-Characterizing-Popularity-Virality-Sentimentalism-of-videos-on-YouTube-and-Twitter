@@ -7,7 +7,7 @@ import { Component, OnInit, Input,OnChanges} from '@angular/core';
 })
 export class GroupsGraphComponent implements OnInit,OnChanges {
 
-  private ready;
+  public ready;
 
   @Input()
   public loading : boolean;
@@ -15,13 +15,17 @@ export class GroupsGraphComponent implements OnInit,OnChanges {
   @Input()
   public error : boolean;
 
+  @Input()
+  public chart : boolean;
+
   constructor() { }
 
   ngOnInit() {
     this.ready = false;
   }
   ngOnChanges(){
-    if(this.loading ==true)
-      this.ready= true;
+    if(this.loading ==true){
+      this.loading = false;
+      }
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import {DailyStats} from './groups-graph/daily-stats';
 @Component({
   selector: 'app-groups-analysis',
   templateUrl: './groups-analysis.component.html',
@@ -7,8 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GroupsAnalysisComponent implements OnInit {
 
-  public graphLoading;
-  public error;
+  private graphLoading;
+  private error;
+  private errorMsg;
+  private chart;
+
 
   constructor() { }
 
@@ -17,10 +20,20 @@ export class GroupsAnalysisComponent implements OnInit {
   }
 
   getData(data :any){
-    console.log('From Parent:',data);
     this.graphLoading = true;
     this.error = false;
     let total_videos = data.total_videos;
-    let stats = data.stats;
+    let daily = data.stats.daily;
+    let dailyStatsObj  = new DailyStats(total_videos,daily);
+
+    this.chart = dailyStatsObj.getGraph();
+
+
+  }
+
+  getError(error: any){
+    this.error = true;
+    this.errorMsg = error;
+
   }
 }
