@@ -11,7 +11,8 @@ export class VideoCategories {
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
-                    enabled: true
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.y}',
                 },
                 showInLegend: true
         }

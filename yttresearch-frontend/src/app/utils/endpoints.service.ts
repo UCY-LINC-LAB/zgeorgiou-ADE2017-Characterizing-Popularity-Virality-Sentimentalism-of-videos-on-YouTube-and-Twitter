@@ -5,17 +5,31 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 
-import {Endpoints} from '../../utils/endpoints';
 
 @Injectable()
-export class VideoCategoriesService {
+export class EndpointsService {
+
+  private HOST = "http://localhost:8000";
+
 
   constructor(private http:Http) { }
 
 
+  /**
+   * Load Videos endpoint
+   */
   public loadCategories() : Observable<any>{
-    let url = `${Endpoints.HOST}/videos`;
+    let url = `${this.HOST}/videos`;
+    return this.http.get(url)
+        .map(this.extractData)
+        .catch(this.handleError);
+  }
 
+  /**
+   * Load Videos endpoint
+   */
+  public loadPopularGroup() : Observable<any>{
+    let url = `${this.HOST}/videos/popular`;
     return this.http.get(url)
         .map(this.extractData)
         .catch(this.handleError);

@@ -13,6 +13,12 @@ import { NavigationComponent } from './navigation/navigation.component';
 import { VideoAnalysisComponent } from './video-analysis/video-analysis.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { VideoCategoriesComponent } from './dashboard/video-categories/video-categories.component';
+import { GroupsAnalysisComponent } from './groups-analysis/groups-analysis.component';
+import { GroupsAnalysisFormComponent } from './groups-analysis/groups-analysis-form/groups-analysis-form.component';
+
+//Services
+import {EndpointsService} from './utils/endpoints.service';
+import { GroupsGraphComponent } from './groups-analysis/groups-graph/groups-graph.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +26,10 @@ import { VideoCategoriesComponent } from './dashboard/video-categories/video-cat
     NavigationComponent,
     VideoAnalysisComponent,
     DashboardComponent,
-    VideoCategoriesComponent
+    VideoCategoriesComponent,
+    GroupsAnalysisComponent,
+    GroupsAnalysisFormComponent,
+    GroupsGraphComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +39,7 @@ import { VideoCategoriesComponent } from './dashboard/video-categories/video-cat
     Ng2HighchartsModule,
 
   ],
-  providers: [],
+  providers: [EndpointsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

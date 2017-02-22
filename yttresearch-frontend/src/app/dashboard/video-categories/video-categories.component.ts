@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 
-import { VideoCategoriesService } from './video-categories.service';
+import { EndpointsService } from '../../utils/endpoints.service';
 import {VideoCategories} from './video-categories';
 
 @Component({
   selector: 'app-video-categories',
   templateUrl: './video-categories.component.html',
   styleUrls: ['./video-categories.component.css'],
-  providers: [VideoCategoriesService,]
+  providers: [EndpointsService,]
 })
 export class VideoCategoriesComponent implements OnInit {
 
@@ -16,7 +16,7 @@ private error : boolean;
 
   chartOptions = {}
 
-  public constructor(private videoCategoriesService : VideoCategoriesService) {
+  public constructor(private EndpointsService : EndpointsService) {
    }
 
   ngOnInit() {
@@ -28,15 +28,12 @@ private error : boolean;
     this.loading = true;
     this.error = false;
 
-    this.videoCategoriesService.loadCategories()
+    this.EndpointsService.loadCategories()
         .subscribe( data => this.dataFetched(data), error => this.errorFetched(error));
   }
 
   private dataFetched(data : any){
-    console.log(data);
-
     this.chartOptions =  new VideoCategories(data).getGraph();
-    console.log(this.chartOptions);
 
     this.loading = false; //Data is loaded
   }

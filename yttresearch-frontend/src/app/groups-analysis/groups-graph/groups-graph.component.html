@@ -1,0 +1,16 @@
+<div *ngIf="!ready" class="col-xs-6 col-md-6"> 
+    <h3> <small> Type submit </small></h3>
+</div>
+
+<div *ngIf="error" class="col-xs-8 col-xs-offset-4"> 
+    <img class="img-responsive" width="50%" height="50%" src="assets/no-result.png"/>
+    <h3> <small> Server looks down... </small></h3>
+</div>
+<div *ngIf="!error && loading" class="col-xs-6 col-md-6"> 
+    <img class="img-responsive" width="50%" height="50%" src="assets/loading.svg"/>
+    <h3> <small> Loading categories... </small></h3>
+</div>
+
+<div *ngIf="!error && !loading" class="col-xs-6 col-md-6"> 
+    <div [ng2-highcharts]="chartOptions"> </div>
+</div>
