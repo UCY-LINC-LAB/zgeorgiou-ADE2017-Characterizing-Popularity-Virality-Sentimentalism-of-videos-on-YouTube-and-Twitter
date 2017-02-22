@@ -230,10 +230,21 @@ public class VideosService {
                 Collectors.groupingBy( VideoRecord::getArtificial_category,Collectors.toList()));
         groups.entrySet().forEach(entry->{
             JsonObject object = new JsonObject();
+            List<VideoRecord> records = entry.getValue();
             String name = DataInputHandler.getArtificialCategoryName(entry.getKey());
             int total = entry.getValue().size();
             object.addProperty("name",name);
             object.addProperty("total_videos",total);
+            double avg_views = Average.views(records);
+            object.addProperty("avg_views",avg_views);
+            object.addProperty("avg_views_std",StandardDeviation.views(records,avg_views));
+            object.addProperty("views_median",Median.views(records));
+
+            double avg_tweets = Average.tweets(records);
+            object.addProperty("avg_tweets",avg_tweets);
+            object.addProperty("avg_tweets_std",StandardDeviation.tweets(records,avg_tweets));
+            object.addProperty("tweets_median",Median.tweets(records));
+
             array.add(object);
         });
 

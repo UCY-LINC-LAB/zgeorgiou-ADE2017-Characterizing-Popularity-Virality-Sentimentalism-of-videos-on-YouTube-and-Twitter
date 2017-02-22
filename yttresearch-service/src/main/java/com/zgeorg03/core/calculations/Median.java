@@ -39,6 +39,33 @@ public class Median {
     /**
      *
      * @param videoRecords
+     * @return Median
+     */
+    public static long  views(List<VideoRecord> videoRecords){
+        if(videoRecords.size()==0)
+            return 0;
+
+        List<Integer> list = videoRecords.stream().mapToInt(VideoRecord::getTotalViews).sorted().boxed().collect(Collectors.toList());
+        return list.get(list.size()/2);
+
+    }
+
+    /**
+     *
+     * @param videoRecords
+     * @return Median of total tweets
+     */
+    public static long  tweets(List<VideoRecord> videoRecords){
+        if(videoRecords.size()==0)
+            return 0;
+
+        List<Integer> list = videoRecords.stream().mapToInt(VideoRecord::getTotalTweets).sorted().boxed().collect(Collectors.toList());
+        return list.get(list.size()/2);
+
+    }
+    /**
+     *
+     * @param videoRecords
      * @param lbl_wnd
      * @return Map for each day
      */

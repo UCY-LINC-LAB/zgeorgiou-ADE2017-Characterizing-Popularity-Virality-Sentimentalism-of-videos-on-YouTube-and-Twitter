@@ -48,6 +48,29 @@ public class StandardDeviation {
     /**
      *
      * @param videoRecords
+     * @return
+     */
+    public static double views(List<VideoRecord> videoRecords,double avg){
+        if(videoRecords.size()==0)
+            return 0;
+        double sum = videoRecords.stream().mapToDouble(r->(r.getTotalViews()-avg)*(r.getTotalViews())).sum();
+        return Math.sqrt(sum/videoRecords.size());
+    }
+
+    /**
+     *
+     * @param videoRecords
+     * @return
+     */
+    public static double tweets(List<VideoRecord> videoRecords,double avg){
+        if(videoRecords.size()==0)
+            return 0;
+        double sum = videoRecords.stream().mapToDouble(r->(r.getTotalTweets()-avg)*(r.getTotalTweets())).sum();
+        return Math.sqrt(sum/videoRecords.size());
+    }
+    /**
+     *
+     * @param videoRecords
      * @param lbl_wnd
      * @return
      */

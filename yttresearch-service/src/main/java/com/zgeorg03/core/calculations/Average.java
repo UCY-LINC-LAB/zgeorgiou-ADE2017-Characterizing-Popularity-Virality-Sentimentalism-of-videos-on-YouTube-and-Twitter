@@ -45,6 +45,28 @@ public class Average {
 
     /**
      *
+     * @param videoRecords
+     * @return Average number of total views
+     */
+    public static double views(List<VideoRecord> videoRecords){
+        if(videoRecords.size()==0)
+            return  0;
+
+        return videoRecords.stream().mapToLong(VideoRecord::getTotalViews).average().getAsDouble();
+    }
+    /**
+     *
+     * @param videoRecords
+     * @return Average number of total tweets
+     */
+    public static double tweets(List<VideoRecord> videoRecords){
+        if(videoRecords.size()==0)
+            return  0;
+
+        return videoRecords.stream().mapToLong(VideoRecord::getTotalTweets).average().getAsDouble();
+    }
+    /**
+     *
      * Average tweets per day
      * @param videoRecords
      * @param lbl_wnd
