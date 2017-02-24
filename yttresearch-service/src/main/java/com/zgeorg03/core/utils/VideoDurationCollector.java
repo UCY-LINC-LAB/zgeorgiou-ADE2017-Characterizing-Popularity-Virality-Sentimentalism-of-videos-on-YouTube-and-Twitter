@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -79,14 +80,18 @@ public class VideoDurationCollector {
             logger.error("Cannot read  duration file");
         }
 
-        List<VideoRecord> withNoDuration = videoRecords.values().stream().filter(video -> !video.hasDuration()).limit(batchSize).collect(Collectors.toList());
-        if(withNoDuration.size()==0) {
+        Random rnd = new Random();
+        List<VideoRecord> withNoDuration = videoRecords.values().stream().filter(x->!x.hasDuration()).collect(Collectors.toList());
+
+        List<VideoRecord> finalList = rnd.ints(0,withNoDuration.size())
+                .mapToObj(x-> withNoDuration.get(x)).limit(batchSize).collect(Collectors.toList());
+        if(finalList.size()==0) {
             logger.info("All videos have duration");
             return;
         }
-        logger.info("Picked "+withNoDuration.size()+" videos with no duration");
+        logger.info("Picked "+finalList.size()+" videos with no duration");
 
-        withNoDuration.stream().map(VideoRecord::getVideo_id).forEach(id -> {
+        finalList.stream().map(VideoRecord::getVideo_id).forEach(id -> {
             long duration = getVideoDuration(id);
             videosDuration.put(id,duration);
             videoRecords.get(id).setDuration(duration);
@@ -109,6 +114,7 @@ public class VideoDurationCollector {
         videosDuration.entrySet().forEach((entry) ->
                 pw.print(entry.getKey()+"\t"+entry.getValue()+"\n")
         );
+        logger.info("Duration: Done with "+ videosDuration.size() + " videos");
     }
     /**
      * Convert duration into millis

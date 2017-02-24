@@ -37,7 +37,7 @@ public class App {
         final ExecutorService executorService = Executors.newFixedThreadPool(4);
         VideosLoader videosLoader =null;
         try {
-            videosLoader = new VideosLoader(path,100, 60);
+            videosLoader = new VideosLoader(path,500, 60);
             executorService.execute(videosLoader);
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage());
