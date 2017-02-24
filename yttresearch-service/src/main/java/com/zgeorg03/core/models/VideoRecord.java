@@ -45,6 +45,7 @@ public class VideoRecord implements JsonModel {
     private final String experimentDate;
 
     //TODO Duration & Comments
+    private long duration=-1; // Duration in millis
 
 
     public VideoRecord(int experiment_id, String video_id, long experiment_timestamp, String date_uploaded, int category, int artificial_category, int uploaders_uploads, int uploaders_subscribers, int totalViews, int totalLikes, int totalDislikes, int totalComments, int totalTweets, int totalOriginalTweets, int totalQuotes, int totalRetweets, int totalUserFollowers, int totalUserFavorites, int totalTweetsInEnglish, int totalUsersInEnglish, int totalUserStatuses, int totalUserFriends, int totalUsersVerified, int toalHashtags, List<Day> dayList) {
@@ -202,6 +203,7 @@ public class VideoRecord implements JsonModel {
         object.addProperty("totalUserFriends",totalUserFriends);
         object.addProperty("totalUsersVerified",totalUsersVerified);
         object.addProperty("totalHashtags",toalHashtags);
+        object.addProperty("duration",duration);
         object.add("dayList",dayArray);
         return object;
     }
@@ -294,6 +296,9 @@ public class VideoRecord implements JsonModel {
         if(map.getOrDefault("totalHashtags",0)==1)
             object.addProperty("totalHashtags",toalHashtags);
 
+        if(map.getOrDefault("duration",0)==1)
+            object.addProperty("duration",duration);
+
         if(map.getOrDefault("dayList",0)==1) {
             JsonArray dayArray = new JsonArray();
             dayList.forEach(x -> dayArray.add(x.toJson()));
@@ -339,5 +344,17 @@ public class VideoRecord implements JsonModel {
 
     public int getArtificial_category() {
         return artificial_category;
+    }
+
+    public boolean hasDuration() {
+        return duration!=-1;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 }

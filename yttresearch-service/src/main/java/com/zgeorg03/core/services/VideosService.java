@@ -87,6 +87,7 @@ public class VideosService {
             object.add("stats", stats);
         }
 
+        object.add("videos",videos);
         return  object;
     }
 
@@ -119,6 +120,7 @@ public class VideosService {
             JsonObject stats = getStats(records, lbl_wnd);
             object.add("stats", stats);
         }
+        object.add("videos",videos);
         return  object;
     }
     /**
@@ -148,6 +150,7 @@ public class VideosService {
             JsonObject stats = getStats(records, lbl_wnd);
             object.add("stats", stats);
         }
+        object.add("videos",videos);
         return  object;
     }
     /**

@@ -3,6 +3,7 @@ package com.zgeorg03.core.models;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -110,5 +111,16 @@ public class VideoRecords extends ConcurrentHashMap<String,VideoRecord>{
     }
 
 
+    public void writeDuration(PrintWriter pw) {
+        List<VideoRecord> withDuration = values().stream().filter(video -> video.hasDuration()).collect(Collectors.toList());
+        int count = withDuration.size();
+        if (count != 0) {
 
+            logger.info("Writing "+ count + " videos");
+        }
+        pw.print(count+"\n");
+        withDuration.forEach(videoRecord -> {
+            pw.print(videoRecord.getVideo_id()+"\t"+videoRecord.getDuration()+"\n");
+        });
+    }
 }

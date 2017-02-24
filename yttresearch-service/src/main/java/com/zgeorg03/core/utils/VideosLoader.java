@@ -5,11 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +25,9 @@ public class VideosLoader  implements Runnable {
 
     private final Map<Integer,Boolean> experiments = new TreeMap<>();
 
-    public VideosLoader(String path, int sleepTime) throws Exception {
+    private final VideoDurationCollector videoDurationCollector;
+
+    public VideosLoader(String path,int durationBatchSize, int sleepTime) throws Exception {
         this.root = Paths.get(path).toFile();
         this.sleepTime = sleepTime;
         if(!this.root.exists() || !this.root.canRead())
@@ -36,6 +35,12 @@ public class VideosLoader  implements Runnable {
         if(!this.root.isDirectory())
             throw new Exception(this.root.getAbsolutePath()+" is not a directory");
         this.videoRecords = new VideoRecords();
+
+        videoDurationCollector = new VideoDurationCollector(videoRecords,path, durationBatchSize);
+
+
+
+
     }
 
     @Override
@@ -44,6 +49,7 @@ public class VideosLoader  implements Runnable {
         while (true){
 
             update();
+            videoDurationCollector.getDurations();
 
 
             try {
