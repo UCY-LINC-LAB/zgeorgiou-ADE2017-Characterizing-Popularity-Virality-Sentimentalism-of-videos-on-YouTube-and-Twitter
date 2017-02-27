@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 public class YouTubeRequests {
     private static final String BASE_VIDEOS = "https://www.googleapis.com/youtube/v3/videos";
     private static final String BASE_COMMENTS = "https://www.googleapis.com/youtube/v3/commentThreads";
+    private static final String BASE_CHANNELS = "https://www.googleapis.com/youtube/v3/channels";
 
     private final String key;
     private final String video_id;
@@ -36,13 +37,14 @@ public class YouTubeRequests {
     }
 
     /**
-     * Get latest 100 comments if exist
+     * Get latest max comments if exist
+     * @param max
      * @return
      */
-    public JsonObject getLatestComments(){
+    public JsonObject getLatestComments(int max){
         cost+=2;
         String part = "snippet";
-        String url = BASE_COMMENTS + "?videoId=" + video_id + "&key=" + key + "&part=" + part+"&maxResults="+100+"&order=time&textFormat=plainText";
+        String url = BASE_COMMENTS + "?videoId=" + video_id + "&key=" + key + "&part=" + part+"&maxResults="+max+"&order=time&textFormat=plainText";
         JsonObject result = getRequest(url);
 
         if(!isRequestOk(result)) {
@@ -75,6 +77,7 @@ public class YouTubeRequests {
 
 
         JsonObject object = new JsonObject();
+        object.addProperty("size",myComments.size());
         object.add("comments",myComments);
         return object;
 
@@ -89,13 +92,24 @@ public class YouTubeRequests {
         JsonObject content = getContentDetails();
         JsonObject topics = getTopics();
         JsonObject result = new JsonObject();
+        if(snippet.get("error")!=null){
+           result.addProperty("error",snippet.get("error").getAsString());
+        }
+        if(content.get("error")!=null){
+            result.addProperty("error",snippet.get("error").getAsString());
+        }
+
         result.add("title",snippet.get("title"));
         result.add("channel_id",snippet.get("channel_id"));
         result.add("description",snippet.get("description"));
         result.add("category_id",snippet.get("category_id"));
         result.add("published_at",snippet.get("published_at"));
         result.add("duration",content.get("duration"));
-        result.add("topics",topics.get("topics"));
+
+        if(topics.get("error")!=null)
+            result.add("topics",topics.get("topics"));
+        else
+            result.add("topics",new JsonArray());
 
         return result;
     }
@@ -111,6 +125,12 @@ public class YouTubeRequests {
         JsonObject channelStats = getChannelStatistics(channelId);
 
         JsonObject result = new JsonObject();
+        if(statistics.get("error")!=null){
+            result.addProperty("error",statistics.get("error").getAsString());
+        }
+        if(channelStats.get("error")!=null){
+            result.addProperty("error",channelStats.get("error").getAsString());
+        }
 
         result.addProperty("timestamp",timestamp);
         result.add("view_count",statistics.get("view_count"));
@@ -134,7 +154,7 @@ public class YouTubeRequests {
     private JsonObject getChannelStatistics(String channelId) {
         cost+=2;
         String part = "statistics";
-        String url = BASE_VIDEOS + "?id=" + video_id + "&key=" + key + "&part=" + part;
+        String url = BASE_CHANNELS + "?id=" + channelId + "&key=" + key + "&part=" + part;
         JsonObject result = getRequest(url);
 
         if(!isRequestOk(result)) {
@@ -148,8 +168,15 @@ public class YouTubeRequests {
 
 
         JsonObject object =new JsonObject();
+
         object.addProperty("view_count",statistics.get("viewCount").getAsLong());
-        object.addProperty("comment_count",statistics.get("commentCount").getAsLong());
+
+        JsonElement commentCount = statistics.get("comment_count");
+        if(commentCount!=null)
+            object.addProperty("comment_count",commentCount.getAsLong());
+        else
+            object.addProperty("comment_count",-1);
+
         JsonElement subscriberCount = statistics.get("subscriberCount");
         if(subscriberCount!=null)
             object.addProperty("subscriber_count",subscriberCount.getAsLong());
@@ -181,14 +208,24 @@ public class YouTubeRequests {
             return result;
         }
 
-        JsonArray topics = result.getAsJsonArray("items").get(0)
-                .getAsJsonObject().get("topicDetails").getAsJsonObject()
-                .get("topicCategories").getAsJsonArray();
+        JsonArray topics =result.getAsJsonArray("items");
+        if(topics.size()==0){
+            JsonObject obj = new JsonObject();
+            obj.add("topics",new JsonArray());
+            return obj;
+        }
+        JsonElement topicDetails = topics.get(0) .getAsJsonObject().get("topicDetails");
+        if(topicDetails==null){
+            JsonObject obj = new JsonObject();
+            obj.add("topics",new JsonArray());
+            return obj;
+        }
+        JsonArray tp = topicDetails.getAsJsonObject().get("topicCategories").getAsJsonArray();
 
 
         JsonObject object =new JsonObject();
         JsonArray myArray = new JsonArray();
-        for(JsonElement element : topics){
+        for(JsonElement element : tp){
             String u[] = element.getAsString().split("/");
             if(u.length!=0)
                 myArray.add(u[u.length-1]);
@@ -217,13 +254,42 @@ public class YouTubeRequests {
         JsonObject statistics = result.getAsJsonArray("items").get(0)
                 .getAsJsonObject().get("statistics").getAsJsonObject();
 
+        if(statistics==null) {
+            result.addProperty("error", "No statistics details");
+            return result;
+        }
 
         JsonObject object =new JsonObject();
-        object.addProperty("view_count",statistics.get("viewCount").getAsLong());
-        object.addProperty("like_count",statistics.get("likeCount").getAsLong());
-        object.addProperty("dislike_count",statistics.get("dislikeCount").getAsLong());
-        object.addProperty("favorite_count",statistics.get("favoriteCount").getAsLong());
-        object.addProperty("comment_count",statistics.get("commentCount").getAsLong());
+
+        JsonElement  viewCount = statistics.get("viewCount");
+        if(viewCount!=null)
+            object.addProperty("view_count",viewCount.getAsLong());
+        else
+            object.addProperty("view_count",0L);
+
+        JsonElement  likeCount = statistics.get("likeCount");
+        if(likeCount!=null)
+            object.addProperty("like_count",likeCount.getAsLong());
+        else
+            object.addProperty("like_count",0L);
+
+        JsonElement  dislikeCount = statistics.get("dislikeCount");
+        if(dislikeCount!=null)
+            object.addProperty("dislike_count",dislikeCount.getAsLong());
+        else
+            object.addProperty("dislike_count",0L);
+
+        JsonElement  favoriteCount = statistics.get("favoriteCount");
+        if(favoriteCount!=null)
+            object.addProperty("favorite_count",favoriteCount.getAsLong());
+        else
+            object.addProperty("favorite_count",0L);
+
+        JsonElement  commentCount = statistics.get("commentCount");
+        if(commentCount!=null)
+            object.addProperty("comment_count",commentCount.getAsLong());
+        else
+            object.addProperty("comment_count",0L);
 
         return object;
     }
