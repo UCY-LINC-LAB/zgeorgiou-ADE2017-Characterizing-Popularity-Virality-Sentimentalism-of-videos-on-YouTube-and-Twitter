@@ -31,7 +31,7 @@ public class DynamicInfoMonitor implements Runnable {
             if(videos.size()==0){
                 try {
                     TimeUnit.MINUTES.sleep(1*count);
-                    if(count<60)
+                    if(count<10)
                         count++;
                 } catch (InterruptedException e) { e.printStackTrace(); }
             }else{
