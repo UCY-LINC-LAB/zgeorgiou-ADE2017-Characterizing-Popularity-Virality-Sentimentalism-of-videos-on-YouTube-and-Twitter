@@ -3,6 +3,7 @@
 Analysis on how YouTube videos disseminate through social media
 
 This project is divided into 3 main/core services:
+
 1. **Collector**
 2. **Analyzer**
 3. **Presenter**
@@ -22,14 +23,13 @@ TPS: Twitter Public Stream
   * configurations
 * Commands are handled via Rest API
 
-### TODO
-1. Authorized all requests using a token
-
-### What is collected?
-Video:
-1. video_id
-2. title
-3.
+### TODO's
+1. [ ] Authorize all requests using a token
+2. [x] Select the youtube key with the least cost.
+3. [ ] Decide what to do with the comments
+4. [ ] Make an endpoint for deleting videos, comments and tweets for incomplete videos
+5. [ ] If more than 36 hours pass since the last update mark the video as incomplete
+6. [ ] Provide more statistics for monitoring
 
 ## 2. Video & Tweets Analysis
 

@@ -28,7 +28,7 @@ public class App {
         port(8001);
 
 
-        DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
+        DBConnection dbConnection = new DBConnection("test",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         //Core Jobs
