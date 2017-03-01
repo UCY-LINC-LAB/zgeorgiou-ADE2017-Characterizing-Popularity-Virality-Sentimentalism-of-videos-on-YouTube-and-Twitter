@@ -44,7 +44,7 @@ public class YouTubeRequests {
     public JsonObject getLatestComments(int max){
         cost+=2;
         String part = "snippet";
-        String url = BASE_COMMENTS + "?videoId=" + video_id + "&key=" + key + "&part=" + part+"&maxResults="+max+"&order=time&textFormat=plainText";
+        String url = BASE_COMMENTS + "?videoId=" + video_id + "&key=" + key + "&part=" + part+"&maxResults="+max+"&order=relevance&textFormat=plainText";
         JsonObject result = getRequest(url);
 
         if(!isRequestOk(result)) {

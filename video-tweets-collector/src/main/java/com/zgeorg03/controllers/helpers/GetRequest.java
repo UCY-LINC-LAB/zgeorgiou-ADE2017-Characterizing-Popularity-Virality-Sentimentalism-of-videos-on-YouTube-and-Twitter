@@ -26,7 +26,7 @@ public abstract class GetRequest {
     protected Object request(Request request,Response response){
         logger.info("Request from:" + request.ip());
         JsonResult result = new JsonResult();
-        if(!tokenCheck(request))
+        if(!ParseParameters.tokenCheck(request))
             return result.addError("Token needed!").build();
 
 
@@ -45,16 +45,6 @@ public abstract class GetRequest {
     }
 
 
-    /***
-     * Authorized Access
-     * //TODO For now it is not needed
-     * @param request
-     * @return
-     */
-    public boolean tokenCheck(Request request){
-        String token = request.headers("token");
-        return true;
-    }
     public abstract Object  execute(Request request, Response response, JsonResult result);
 
     public abstract void handleParams(Request request, Response response, JsonResult result);

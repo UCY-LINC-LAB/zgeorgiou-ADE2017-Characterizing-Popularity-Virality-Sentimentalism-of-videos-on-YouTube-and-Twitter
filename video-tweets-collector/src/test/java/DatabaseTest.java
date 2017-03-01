@@ -108,7 +108,7 @@ public class DatabaseTest {
 
     @Test()
     public void getVideosNeedUpdate(){
-        System.out.println(services.getVideosThatNeedDynamicUpdate(5, TimeUnit.MINUTES));
+        System.out.println(services.getDbVideosService().getVideosThatNeedDynamicUpdate(5, TimeUnit.MINUTES));
     }
 
     @Test

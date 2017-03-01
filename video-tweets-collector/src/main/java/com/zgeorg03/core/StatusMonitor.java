@@ -99,7 +99,6 @@ public class StatusMonitor implements Runnable {
                 tweet.addProperty("favorite_count",status.getFavoriteCount());
                 tweet.addProperty("lang",status.getLang());
                 tweet.addProperty("retweet_count",status.getRetweetCount());
-                tweet.addProperty("source",status.getSource());
                 tweet.addProperty("is_favorited",status.isFavorited());
                 tweet.addProperty("is_possibly_sensitive",status.isPossiblySensitive());
                 tweet.addProperty("is_retweet",status.isRetweet());
@@ -120,9 +119,9 @@ public class StatusMonitor implements Runnable {
                 long id = status.getId();
 
                 // When a video is in the database
-                if(dbServices.checkVideoExistenceOnly(videoId)){
+                if(dbServices.getDbVideosService().checkVideoExistenceOnly(videoId)){
                     //When it's also monitored we need to add its tweet
-                    if(dbServices.checkVideoExistenceAndBeingMonitored(videoId)){
+                    if(dbServices.getDbVideosService().checkVideoExistenceAndBeingMonitored(videoId)){
 
                         boolean added =  dbServices.addTweet(id,tweet);
                         if(added) {
@@ -135,7 +134,7 @@ public class StatusMonitor implements Runnable {
                     //If we have space for more videos to monitor
                 }else if(!reachedMonitorCapacity){
 
-                    if(dbServices.getTotalMonitoredVideosAndNotFinished()>=dbServices.getMaxVideosBeingMonitored()) {
+                    if(dbServices.getDbVideosService().getTotalMonitoredVideosAndNotFinished()>=dbServices.getMaxVideosBeingMonitored()) {
                         reachedMonitorCapacity=true;
                         logger.info("Reached Monitoring videos capacity");
                         continue;
@@ -154,7 +153,7 @@ public class StatusMonitor implements Runnable {
                         logger.info("Cannot add Video: " + videoId + " because of " + videoData.get("error").getAsString());
                         continue;
                     }
-                    boolean videoAdded = dbServices.addNewVideo(videoId,videoData);
+                    boolean videoAdded = dbServices.getDbVideosService().addNewVideo(videoId,videoData);
 
                     if(videoAdded){
                         boolean added =  dbServices.addTweet(id,tweet);

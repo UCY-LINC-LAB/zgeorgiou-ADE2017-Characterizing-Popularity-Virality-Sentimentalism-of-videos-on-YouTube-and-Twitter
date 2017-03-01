@@ -183,4 +183,16 @@ public class ParseParameters {
         }catch (NumberFormatException e){ result.addError(id + " parameter should be a float"); }
         return x;
     }
+
+    /***
+     * Authorized Access
+     * @param request
+     * @return
+     */
+    public static boolean tokenCheck(Request request){
+        String token = request.headers("token");
+        if(token.equals("yttresearch2016"))
+            return true;
+        return false;
+    }
 }

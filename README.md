@@ -24,7 +24,7 @@ TPS: Twitter Public Stream
 * Commands are handled via Rest API
 
 ### TODO's
-1. [ ] Authorize all requests using a token
+1. [x] Authorize all requests using a token
 2. [x] Select the youtube key with the least cost.
 3. [ ] Decide what to do with the comments
 4. [ ] Make an endpoint for deleting videos, comments and tweets for incomplete videos

@@ -23,18 +23,20 @@ public class IndexService extends Service {
         String databaseName = dbServices.getDatabaseName();
         int youtubeKeys = dbServices.getTotalYouTubeAPIKeys();
         int twitterKeys = dbServices.getTotalTwitterApps();
-        int finishedVideos = dbServices.getTotalFinishedVideos();
+        int finishedVideos = dbServices.getDbVideosService().getTotalFinishedVideos();
+        int incompleteVideos = dbServices.getDbVideosService().getTotalIncompleteVideos();
         int maxVideosBeingMonitored = dbServices.getMaxVideosBeingMonitored();
         int maxCommentsPerVideo = dbServices.getMaxCommentsPerVideo();
-        int monitoredVideos = dbServices.getTotalMonitoredVideosAndNotFinished();
+        int monitoredVideos = dbServices.getDbVideosService().getTotalMonitoredVideosAndNotFinished();
         int totalTweets = dbServices.getTotalTweets();
 
-        int videos_need_update = dbServices.getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS).size();
+        int videos_need_update = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS).size();
 
         JsonObject info = new JsonObject();
         info.addProperty("youtube_keys",youtubeKeys);
         info.addProperty("twitter_keys",twitterKeys);
         info.addProperty("videos_finished",finishedVideos);
+        info.addProperty("videos_incomplete",incompleteVideos);
         info.addProperty("videos_monitored",monitoredVideos);
         info.addProperty("videos_need_update",videos_need_update);
         info.addProperty("total_tweets",totalTweets);
@@ -91,6 +93,12 @@ public class IndexService extends Service {
             result.addProperty("error","Failed to set max videos being monitored");
         return result;
     }
+
+    /**
+     * TODO Need implementation I think
+     * @param comments
+     * @return
+     */
     public JsonObject setMaxComments(int comments){
         JsonObject result = new JsonObject();
         if( dbServices.setMaxCommentsPerVideo(comments)) {

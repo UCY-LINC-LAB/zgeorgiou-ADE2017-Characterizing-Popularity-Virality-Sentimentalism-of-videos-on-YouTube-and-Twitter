@@ -26,7 +26,7 @@ public class CommentsMonitor implements Runnable {
 
         int count=1;
         while(true){
-            Map<String,Integer> videos = dbServices.getVideosThatNeedComments(maxComments);
+            Map<String,Integer> videos = dbServices.getDbVideosService().getVideosThatNeedComments(maxComments);
 
             if(videos.size()==0){
                 try {

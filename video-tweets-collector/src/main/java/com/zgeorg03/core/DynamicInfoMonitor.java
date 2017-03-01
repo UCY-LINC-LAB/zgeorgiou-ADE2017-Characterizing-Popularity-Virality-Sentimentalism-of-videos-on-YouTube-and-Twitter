@@ -26,7 +26,7 @@ public class DynamicInfoMonitor implements Runnable {
 
         int count=1;
         while(true){
-            List<String> videos = dbServices.getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS);
+            List<String> videos = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS);
 
             if(videos.size()==0){
                 try {
@@ -48,20 +48,20 @@ public class DynamicInfoMonitor implements Runnable {
 
             videos.forEach(video ->{
                 YouTubeRequests requests = new YouTubeRequests(video,key);
-                String channelId = dbServices.getChannelId(video);
+                String channelId = dbServices.getDbVideosService().getChannelId(video);
                 JsonObject dynamicData =  requests.getDynamicData(channelId);
                 if(dynamicData.get("error")!=null) {
                     logger.error("Dynamic data couldn't be fetched for " + video + " because " + dynamicData.get("error").getAsString());
-                   if(dbServices.setVideoAsIncomplete(video)) {
+                   if(dbServices.getDbVideosService().setVideoAsIncomplete(video)) {
                        logger.error(video + " is set as incomplete");
                        statusMonitor.setReachedMonitorCapacity(false);
                    }
-                }else if(dbServices.addDynamicData(video,dynamicData))
+                }else if(dbServices.getDbVideosService().addDynamicData(video,dynamicData))
                     logger.info("Dynamic data added for "+video);
 
                 //Checking if a video reached 15th day
-                if(dbServices.checkVideoIsFinished(video)){
-                    if(dbServices.setVideoAsFinished(video))
+                if(dbServices.getDbVideosService().checkVideoIsFinished(video)){
+                    if(dbServices.getDbVideosService().setVideoAsFinished(video))
                         logger.info("Video:"+video +" has finished!");
                 }
             });
