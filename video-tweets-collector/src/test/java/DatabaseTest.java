@@ -108,12 +108,18 @@ public class DatabaseTest {
 
     @Test()
     public void getVideosNeedUpdate(){
+        /**
         System.out.println(services.getDbVideosService().getVideosThatNeedDynamicUpdate(5, TimeUnit.MINUTES));
-    }
+         **/
+
+
+         }
 
     @Test
     public void testVideosBeingMonitored(){
+        /**
         System.out.println(services.getMaxVideosBeingMonitored());
+         **/
     }
 
     @Test

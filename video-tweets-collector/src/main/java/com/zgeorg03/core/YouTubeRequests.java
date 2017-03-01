@@ -171,7 +171,7 @@ public class YouTubeRequests {
 
         object.addProperty("view_count",statistics.get("viewCount").getAsLong());
 
-        JsonElement commentCount = statistics.get("comment_count");
+        JsonElement commentCount = statistics.get("commentCount");
         if(commentCount!=null)
             object.addProperty("comment_count",commentCount.getAsLong());
         else

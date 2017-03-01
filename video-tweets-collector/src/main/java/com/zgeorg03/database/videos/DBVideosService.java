@@ -67,13 +67,16 @@ public class DBVideosService implements DBVideosI {
 
     @Override
     public int getTotalIncompleteVideos() {
-        return (int) videos.count( eq("meta.incomplete",true) );
+        return (int) videos.count( and(
+                eq("meta.incomplete",true) , eq("meta.finished",false))
+        );
     }
 
     @Override
     public List<String> getVideosThatAreIncomplete() {
         List<String> list = new LinkedList<>();
-        MongoCursor<Document> cursor = videos.find(eq("meta.incomplete",true))
+        MongoCursor<Document> cursor = videos.find(and(eq("meta.incomplete",true),
+                eq("meta.finished",false)))
                 .projection(fields(include("_id"))).iterator();
 
         while(cursor.hasNext()){
@@ -102,7 +105,7 @@ public class DBVideosService implements DBVideosI {
             if(last_update!=-1 && (time-last_update>=durationInMillis*2)){
                 //Mark as incomplete
                 try{
-                    Document update = new Document("meta.incomplete",true);
+                    Document update = new Document("$set" ,new Document("meta.incomplete",true));
                     this.videos.updateOne(eq("_id", video_id),update);
                     logger.info("Setting video:" + video_id+" as incomplete because data has not been collected the appropriate time!");
                 } catch(MongoWriteException we){
@@ -221,73 +224,18 @@ public class DBVideosService implements DBVideosI {
             Document day;
 
             // If its the first day
-            if(days.size()==0) {
-                day = new Document()
-                        .append("day", current_date)
-                        .append("timestamp", dynamicData.get("timestamp").getAsLong())
-                        .append("view_count", dynamicData.get("view_count").getAsLong())
-                        .append("like_count", dynamicData.get("like_count").getAsLong())
-                        .append("dislike_count", dynamicData.get("dislike_count").getAsLong())
-                        .append("favorite_count", dynamicData.get("favorite_count").getAsLong())
-                        .append("comment_count", dynamicData.get("comment_count").getAsLong())
-                        .append("channel_view_count", dynamicData.get("channel_view_count").getAsLong())
-                        .append("channel_comment_count", dynamicData.get("channel_comment_count").getAsLong())
-                        .append("channel_subscriber_count", dynamicData.get("channel_subscriber_count").getAsLong())
-                        .append("channel_video_count", dynamicData.get("channel_video_count").getAsLong());
-            }else{
-                day = new Document();
-                Document last_day = days.get(days.size()-1);
-
-                long ld_view_count = last_day.getLong("view_count");
-                if(ld_view_count==-1)
-                    day.append("view_count", dynamicData.get("view_count").getAsLong());
-                else
-                    day.append("view_count", dynamicData.get("view_count").getAsLong()-ld_view_count);
-
-                long ld_like_count = last_day.getLong("like_count");
-                if(ld_like_count==-1)
-                    day.append("like_count", dynamicData.get("like_count").getAsLong());
-                else
-                    day.append("like_count", dynamicData.get("like_count").getAsLong()-ld_like_count);
-
-                long ld_dislike_count = last_day.getLong("dislike_count");
-                if(ld_dislike_count==-1)
-                    day.append("dislike_count", dynamicData.get("dislike_count").getAsLong());
-                else
-                    day.append("dislike_count", dynamicData.get("dislike_count").getAsLong()-ld_dislike_count);
-
-                long ld_favorite_count = last_day.getLong("favorite_count");
-                if(ld_favorite_count==-1)
-                    day.append("favorite_count", dynamicData.get("favorite_count").getAsLong());
-                else
-                    day.append("favorite_count", dynamicData.get("favorite_count").getAsLong()-ld_favorite_count);
-
-                long ld_comment_count = last_day.getLong("comment_count");
-                if(ld_comment_count==-1)
-                    day.append("comment_count", dynamicData.get("comment_count").getAsLong());
-                else
-                    day.append("comment_count", dynamicData.get("comment_count").getAsLong()-ld_comment_count);
-
-                long ld_channel_view_count = last_day.getLong("channel_view_count");
-                if(ld_channel_view_count==-1)
-                    day.append("channel_view_count", dynamicData.get("channel_view_count").getAsLong());
-                else
-                    day.append("channel_view_count", dynamicData.get("channel_view_count").getAsLong()-ld_channel_view_count);
-
-                long ld_channel_comment_count = last_day.getLong("channel_comment_count");
-                if(ld_channel_comment_count==-1)
-                    day.append("channel_comment_count", dynamicData.get("channel_comment_count").getAsLong());
-                else
-                    day.append("channel_comment_count", dynamicData.get("channel_comment_count").getAsLong()-ld_channel_comment_count);
-
-                long ld_channel_subscriber_count = last_day.getLong("channel_subscriber_count");
-                if(ld_channel_subscriber_count==-1)
-                    day.append("channel_subscriber_count", dynamicData.get("channel_subscriber_count").getAsLong());
-                else
-                    day.append("channel_subscriber_count", dynamicData.get("channel_subscriber_count").getAsLong()-ld_channel_subscriber_count);
-
-
-            }
+            day = new Document()
+                    .append("day", current_date)
+                    .append("timestamp", dynamicData.get("timestamp").getAsLong())
+                    .append("view_count", dynamicData.get("view_count").getAsLong())
+                    .append("like_count", dynamicData.get("like_count").getAsLong())
+                    .append("dislike_count", dynamicData.get("dislike_count").getAsLong())
+                    .append("favorite_count", dynamicData.get("favorite_count").getAsLong())
+                    .append("comment_count", dynamicData.get("comment_count").getAsLong())
+                    .append("channel_view_count", dynamicData.get("channel_view_count").getAsLong())
+                    .append("channel_comment_count", dynamicData.get("channel_comment_count").getAsLong())
+                    .append("channel_subscriber_count", dynamicData.get("channel_subscriber_count").getAsLong())
+                    .append("channel_video_count", dynamicData.get("channel_video_count").getAsLong());
             days.add(day);
             meta.put("last_update",System.currentTimeMillis());
             meta.put("comments_finished",false); //Request new comments

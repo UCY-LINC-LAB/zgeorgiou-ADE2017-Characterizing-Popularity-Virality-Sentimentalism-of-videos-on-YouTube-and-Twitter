@@ -32,7 +32,7 @@ public class App {
         DBServices dbServices = new DBServices(dbConnection);
 
         //Core Jobs
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         //Status-Tweets Monitor
         StatusMonitor statusMonitor = new StatusMonitor(dbServices);
@@ -45,6 +45,10 @@ public class App {
         //Comments Monitor
         CommentsMonitor commentsMonitor = new CommentsMonitor(dbServices, 5);
         executorService.execute(commentsMonitor);
+
+        //Incomplete Videos Monitor
+        IncompleteVideosMonitor incompleteVideosMonitor = new IncompleteVideosMonitor(dbServices);
+        executorService.execute(incompleteVideosMonitor);
 
 
         //Services

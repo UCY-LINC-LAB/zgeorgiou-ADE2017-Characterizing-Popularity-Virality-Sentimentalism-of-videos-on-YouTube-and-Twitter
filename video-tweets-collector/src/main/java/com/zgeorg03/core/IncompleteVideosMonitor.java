@@ -28,7 +28,7 @@ public class IncompleteVideosMonitor implements Runnable {
 
             if(videos.size()==0){
                 try {
-                    TimeUnit.HOURS.sleep(3); // 3 hours
+                    TimeUnit.HOURS.sleep(1); // 1 hours
                 } catch (InterruptedException e) { e.printStackTrace(); }
             }
 
