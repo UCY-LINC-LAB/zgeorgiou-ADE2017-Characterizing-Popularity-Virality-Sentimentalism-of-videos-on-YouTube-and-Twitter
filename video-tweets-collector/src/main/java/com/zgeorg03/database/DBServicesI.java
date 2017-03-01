@@ -22,6 +22,13 @@ public interface DBServicesI {
     int addComments(String video_id,JsonObject comments);
 
     /**
+     * Delete comments from a video
+     * @param video_id
+     * @return
+     */
+    int deleteComments(String  video_id);
+
+    /**
      * Add Tweet
      * @param video_id The id of the video
      * @param tweet The tweet object
@@ -29,6 +36,12 @@ public interface DBServicesI {
      */
     boolean addTweet(long video_id,JsonObject tweet);
 
+    /**
+     * Delete tweets mentioning a video
+     * @param video_id
+     * @return
+     */
+    int deleteTweets(String  video_id);
 
     /**
      * Add a new YouTubeAPIKey.
@@ -115,6 +128,7 @@ public interface DBServicesI {
      * @return
      */
     boolean setMaxCommentsPerVideo(int max);
+
 
 
 

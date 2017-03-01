@@ -32,7 +32,7 @@ public class CommentsMonitor implements Runnable {
                 try {
                     logger.info("Comments Monitor: Sleeping for "+ count+" minutes");
                     TimeUnit.MINUTES.sleep(1*count);
-                    if(count<360)
+                    if(count<60)
                         count*=2;
                 } catch (InterruptedException e) { e.printStackTrace(); }
             }else{

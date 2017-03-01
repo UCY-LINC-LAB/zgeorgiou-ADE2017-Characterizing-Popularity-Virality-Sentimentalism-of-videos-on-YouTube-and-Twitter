@@ -38,6 +38,13 @@ public interface DBVideosI {
 
     /**
      *
+     * Get a list of videos that are marked as incomplete
+     * @return List of id's
+     */
+    List<String> getVideosThatAreIncomplete();
+
+    /**
+     *
      * Get a list of videos that need a dynamic update.
      * The duration is the period that has to pass in order to set a video for dynamic update
      * @return List of id's

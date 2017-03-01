@@ -35,7 +35,7 @@ public class VideoStreamListener implements StatusListener {
     public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
 
         limit=numberOfLimitedStatuses;
-        if(limit-limitbefore>100){
+        if(Math.abs(limit-limitbefore)>200){
             logger.info("LIMIT:"+numberOfLimitedStatuses);
         }
         limitbefore=numberOfLimitedStatuses;
@@ -56,7 +56,6 @@ public class VideoStreamListener implements StatusListener {
     @Override
     public void onException(Exception ex) {
         logger.error(ex.getLocalizedMessage());
-        ex.printStackTrace();
 
     }
 }

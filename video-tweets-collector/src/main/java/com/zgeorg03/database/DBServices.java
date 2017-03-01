@@ -103,6 +103,20 @@ public  class DBServices implements DBServicesI{
     }
 
     @Override
+    public int deleteComments(String video_id) {
+        try{
+           return (int) comments.deleteMany(eq("video_id",video_id)).getDeletedCount();
+        } catch(MongoWriteException we){
+            logger.error(we.getError().getMessage());
+            return 0;
+        } catch(MongoException ex) {
+            logger.error(ex.getLocalizedMessage());
+            return 0;
+        }
+
+    }
+
+    @Override
     public boolean addTweet(long tweetId, JsonObject tweet) {
 
         Document document = new Document();
@@ -144,6 +158,19 @@ public  class DBServices implements DBServicesI{
 
         return true;
 
+    }
+
+    @Override
+    public int deleteTweets(String video_id) {
+        try{
+            return (int) tweets.deleteMany(eq("video_id",video_id)).getDeletedCount();
+        } catch(MongoWriteException we){
+            logger.error(we.getError().getMessage());
+            return 0;
+        } catch(MongoException ex) {
+            logger.error(ex.getLocalizedMessage());
+            return 0;
+        }
     }
 
     @Override

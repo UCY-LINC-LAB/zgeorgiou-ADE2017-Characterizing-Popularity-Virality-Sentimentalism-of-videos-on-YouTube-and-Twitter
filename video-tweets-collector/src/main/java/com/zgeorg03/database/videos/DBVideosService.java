@@ -71,6 +71,21 @@ public class DBVideosService implements DBVideosI {
     }
 
     @Override
+    public List<String> getVideosThatAreIncomplete() {
+        List<String> list = new LinkedList<>();
+        MongoCursor<Document> cursor = videos.find(eq("meta.incomplete",true))
+                .projection(fields(include("_id"))).iterator();
+
+        while(cursor.hasNext()){
+            Document document  = cursor.next();
+            String id= document.getString("_id");
+            list.add(id);
+        }
+        cursor.close();
+        return list;
+    }
+
+    @Override
     public List<String> getVideosThatNeedDynamicUpdate(long duration, TimeUnit unit) {
         long durationInMillis = unit.toMillis(duration);
         long time = System.currentTimeMillis();
@@ -84,11 +99,12 @@ public class DBVideosService implements DBVideosI {
             String video_id = (String) doc.get("_id");
 
             long last_update = ((Document)doc.get("meta")).getLong("last_update");
-            if(time-last_update>=durationInMillis*2){
+            if(last_update!=-1 && (time-last_update>=durationInMillis*2)){
                 //Mark as incomplete
                 try{
                     Document update = new Document("meta.incomplete",true);
                     this.videos.updateOne(eq("_id", video_id),update);
+                    logger.info("Setting video:" + video_id+" as incomplete because data has not been collected the appropriate time!");
                 } catch(MongoWriteException we){
                     logger.error(we.getError().getMessage());
                 } catch(MongoException ex) {

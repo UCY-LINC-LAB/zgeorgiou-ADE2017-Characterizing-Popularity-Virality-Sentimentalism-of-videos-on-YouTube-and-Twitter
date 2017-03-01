@@ -79,7 +79,7 @@ public class IndexController {
             }
         };
 
-        new PutRequest("/youtubeApp") {
+        new PutRequest("/youtubeKey") {
 
 
             @Parameter(description = "API key",required = true)
