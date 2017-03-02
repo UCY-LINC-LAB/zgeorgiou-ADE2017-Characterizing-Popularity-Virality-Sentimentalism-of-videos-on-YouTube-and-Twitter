@@ -27,7 +27,7 @@ import static com.mongodb.client.model.Projections.include;
  */
 public  class DBServices implements DBServicesI{
     private final Logger logger  = LoggerFactory.getLogger(DBServices.class);
-    private final int default_max_videos_being_monitored= 5;
+    private final int default_max_videos_being_monitored= 100;
     private final int default_max_comments_per_video= 100;
 
     private final String databaseName;

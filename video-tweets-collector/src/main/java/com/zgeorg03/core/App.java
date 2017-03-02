@@ -27,8 +27,12 @@ public class App {
 
         port(8001);
 
+        String db="yttresearch";
+        if(args.length==1)
+            db = args[0];
 
-        DBConnection dbConnection = new DBConnection("test",new ServerAddress("localhost"));
+
+        DBConnection dbConnection = new DBConnection(db,new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         //Core Jobs
@@ -43,7 +47,7 @@ public class App {
         executorService.execute(dynamicInfoMonitor);
 
         //Comments Monitor
-        CommentsMonitor commentsMonitor = new CommentsMonitor(dbServices, 5);
+        CommentsMonitor commentsMonitor = new CommentsMonitor(dbServices, 100);
         executorService.execute(commentsMonitor);
 
         //Incomplete Videos Monitor

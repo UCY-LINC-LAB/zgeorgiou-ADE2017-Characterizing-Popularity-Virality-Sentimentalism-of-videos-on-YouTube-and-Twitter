@@ -183,6 +183,7 @@ public class DBVideosService implements DBVideosI {
                     .append("monitored",true)
                     .append("finished",false)
                     .append("incomplete",false)
+                    .append("processed",false)
                     .append("comments_collected",0L)
                     .append("comments_finished",false)
                     .append("last_update",-1L)

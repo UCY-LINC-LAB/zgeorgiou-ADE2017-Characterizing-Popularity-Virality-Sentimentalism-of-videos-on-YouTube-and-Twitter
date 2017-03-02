@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.zgeorg03</groupId>
-    <artifactId>analysis-service</artifactId>
+    <artifactId>yttresearch-analyzer</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -16,16 +16,18 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${sl4j.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
         <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-core</artifactId>
-            <version>${spark.version}</version>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.4.2</version>
         </dependency>
 
         <dependency>
@@ -34,7 +36,19 @@
             <version>${gson.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <!-- any other plugins -->
@@ -69,5 +83,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
