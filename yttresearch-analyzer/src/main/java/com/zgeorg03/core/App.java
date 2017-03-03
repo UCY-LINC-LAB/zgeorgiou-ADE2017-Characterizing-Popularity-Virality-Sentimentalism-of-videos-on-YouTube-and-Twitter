@@ -2,10 +2,12 @@ package com.zgeorg03.core;
 
 import com.mongodb.ServerAddress;
 import com.zgeorg03.controllers.IndexController;
+import com.zgeorg03.controllers.VideosController;
 import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.services.IndexService;
+import com.zgeorg03.services.VideosService;
 
 import static spark.Spark.after;
 import static spark.Spark.before;
@@ -21,15 +23,17 @@ public class App {
 
         port(8000);
 
-        DBConnection dbConnection = new DBConnection("test",new ServerAddress("localhost"));
+        DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         //Services
         final IndexService indexService = new IndexService(dbServices);
+        final VideosService videosService = new VideosService(dbServices);
 
 
         //Controllers
         new IndexController(indexService);
+        new VideosController(videosService);
 
 
 

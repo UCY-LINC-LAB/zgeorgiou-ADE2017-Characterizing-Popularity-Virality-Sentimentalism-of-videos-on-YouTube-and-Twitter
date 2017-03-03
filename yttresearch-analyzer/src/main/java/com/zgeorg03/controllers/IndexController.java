@@ -20,6 +20,7 @@ public class IndexController {
 
                 result.addString("database",indexService.getDatabaseName());
                 result.addNumber("videos_finished_but_not_proccesed",indexService.getFinishedButNotProcessedVideosCount());
+                result.addNumber("videos_finished_and_proccesed",indexService.getFinishedButNotProcessedVideosCount());
 
 
                 return result.build();

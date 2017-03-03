@@ -1,11 +1,8 @@
 import com.mongodb.ServerAddress;
-import com.zgeorg03.videoprocess.ProcessVideo;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
-import org.bson.Document;
+import com.zgeorg03.videoprocess.ProcessVideo;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * Created by zgeorg03 on 3/2/17.
@@ -15,7 +12,7 @@ public class DBServicesTest {
     private final DBServices services;
 
     public DBServicesTest() {
-        DBConnection connection = new DBConnection("test",new ServerAddress("localhost"));
+        DBConnection connection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         services = new DBServices(connection);
     }
 
@@ -26,8 +23,9 @@ public class DBServicesTest {
         System.out.println(services.getFinishedButNotProcessedVideos(10));
     }
     @Test
-    public void proccessVideo(){
-        String videoID = "2Nnz0aaVyY4";
-        ProcessVideo processVideo= new ProcessVideo(services.getProcessVideosDBService(), videoID);
+    public void proccessVideo() throws Exception {
+        String videoID = "9GJJMZjISmY";
+        ProcessVideo processVideo= new ProcessVideo(services, videoID);
+        System.out.println(services.getProcessVideosDBService().addOrReplaceProcessedVideo(processVideo.getDbVideo()));
     }
 }

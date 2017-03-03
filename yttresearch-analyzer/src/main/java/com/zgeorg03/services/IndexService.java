@@ -25,6 +25,15 @@ public class IndexService extends Service {
     }
 
     /**
+     * Get the number of videos that are finished and processed
+     * @return
+     */
+    public int getFinishedAndProcessedVideosCount(){
+        return dbServices.getFinishedAndProcessedVideosCount();
+
+    }
+
+    /**
      * Retrieve the database name
      * @return
      */

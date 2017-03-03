@@ -37,11 +37,19 @@ public class DBServices {
         processedVideos = connection.getDatabase().getCollection("processedVideos");
         databaseName = connection.getDatabase().getName();
 
-        processVideosDBService = new ProcessVideosDBService(videos,tweets,comments);
+        processVideosDBService = new ProcessVideosDBService(videos,tweets,comments,processedVideos);
     }
 
 
-
+    /**
+     * Get video
+     * @param videoId
+     * @return
+     */
+    public Document getVideo(String videoId) {
+        Document document = (Document) videos.find(eq("_id", videoId)).first();
+        return document;
+    }
     /**
      * Get the number of videos that are finished but not processed
      * @return
@@ -50,6 +58,16 @@ public class DBServices {
        return (int) videos.count(and(
                eq("meta.finished",true),eq("meta.processed",false))
        );
+    }
+
+    /**
+     * Get the number of videos that are finished and processed
+     * @return
+     */
+    public int getFinishedAndProcessedVideosCount(){
+        return (int) videos.count(and(
+                eq("meta.finished",true),eq("meta.processed",true))
+        );
     }
 
     /**
