@@ -96,7 +96,7 @@ public class YouTubeRequests {
            result.addProperty("error",snippet.get("error").getAsString());
         }
         if(content.get("error")!=null){
-            result.addProperty("error",snippet.get("error").getAsString());
+            result.addProperty("error",content.get("error").getAsString());
         }
 
         result.add("title",snippet.get("title"));
@@ -344,10 +344,14 @@ public class YouTubeRequests {
 
         JsonObject contentDetails = result.getAsJsonArray("items").get(0)
                 .getAsJsonObject().get("contentDetails").getAsJsonObject();
-        String duration = contentDetails.get("duration").getAsString();
+        String durationString = contentDetails.get("duration").getAsString();
 
         JsonObject object =new JsonObject();
-        object.addProperty("duration",getDuration(duration));
+        long duration =  getDuration(durationString);
+        if(duration!=-1)
+            object.addProperty("duration",duration);
+        else
+            result.addProperty("error","No duration");
 
         return object;
     }
@@ -402,18 +406,23 @@ public class YouTubeRequests {
      * @return
      */
     private long getDuration(String durationString) {
-        String time = durationString.substring(2);
-        long duration = 0L;
-        Object[][] indexs = new Object[][]{{"H", 3600}, {"M", 60}, {"S", 1}};
-        for(int i = 0; i < indexs.length; i++) {
-            int index = time.indexOf((String) indexs[i][0]);
-            if(index != -1) {
-                String value = time.substring(0, index);
-                duration += Integer.parseInt(value) * (int) indexs[i][1] * 1000;
-                time = time.substring(value.length() + 1);
+        try{
+            String time = durationString.substring(2);
+            long duration = 0L;
+            Object[][] indexs = new Object[][]{{"H", 3600}, {"M", 60}, {"S", 1}};
+            for(int i = 0; i < indexs.length; i++) {
+                int index = time.indexOf((String) indexs[i][0]);
+                if(index != -1) {
+                    String value = time.substring(0, index);
+                    duration += Integer.parseInt(value) * (int) indexs[i][1] * 1000;
+                    time = time.substring(value.length() + 1);
+                }
             }
+            return duration;
+
+        }catch (Exception ex){
+            return -1;
         }
-        return duration;
     }
 
     /**

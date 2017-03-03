@@ -207,7 +207,10 @@ public class DBVideosService implements DBVideosI {
         } catch(MongoException ex) {
             logger.error(ex.getLocalizedMessage());
             return false;
-        }
+        } catch(Exception ex) {
+        logger.error(ex.getLocalizedMessage());
+        return false;
+    }
     }
     @Override
     public boolean addDynamicData(String video_id, JsonObject dynamicData) {
