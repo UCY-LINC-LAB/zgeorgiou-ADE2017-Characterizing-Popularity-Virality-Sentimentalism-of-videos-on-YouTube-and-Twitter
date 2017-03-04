@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -131,7 +130,42 @@ public class ProcessVideo {
         dbVideo.setTotal_channel_videos(total_channel_videos);
 
 
+        addTweets(dbVideo.getCollected_at());
+    }
 
+    /**
+     * Add tweets
+     */
+    private void addTweets(long startOffset){
+        long millisInDay = 1000*60*60*24;
+        for(Document document : tweets){
+            long created_at = document.getLong("created_at");
+            long diff = created_at - startOffset;
+            if(diff<0)
+                diff=0;
+            int dayIndex = (int) (diff/millisInDay);
+
+            String  lang = document.getString("lang");
+            boolean is_favorited   = document.getBoolean("is_favorited");
+            boolean is_possibly_sensitive   = document.getBoolean("is_possibly_sensitive");
+            boolean is_retweet   = document.getBoolean("is_retweet");
+            long  user_created_at = document.getLong("user_created_at");
+            long  user_followers_count = document.getLong("user_followers_count");
+            long  user_friends_count = document.getLong("user_friends_count");
+            long  user_favorites_count = document.getLong("user_favorites_count");
+            long  user_listed_count = document.getLong("user_listed_count");
+            long  user_statuses_count = document.getLong("user_statuses_count");
+            boolean  user_verified = document.getBoolean("user_verified");
+            String  user_lang = document.getString("user_lang");
+            List<Document>  hashtags = (List<Document>) document.get("hashtags");
+
+
+            Day day = dbVideo.getDays().get(dayIndex);
+
+            day.setTweetStuff(dbVideo.getPublished_at(),lang,is_favorited,is_possibly_sensitive,is_retweet,user_created_at,user_followers_count,user_friends_count,user_favorites_count,user_listed_count,user_statuses_count,user_verified,user_lang,hashtags);
+
+
+        }
     }
 
     /**

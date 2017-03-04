@@ -39,7 +39,7 @@ public class VideosController {
         new GetRequest("/videos/:id"){
 
             @Parameter(required = true,description = "The id of the video")
-            private String videoId;
+            private String video_id;
 
             @Parameter(description = "Specify the max number of comments to return")
             private int comments;
@@ -48,19 +48,19 @@ public class VideosController {
             public Object execute(Request request, Response response, JsonResult result) {
 
                 if(comments!=-1){
-                    JsonArray commentsArray = videosService.getComments(videoId,comments);
-                    result.addString("video", videoId);
+                    JsonArray commentsArray = videosService.getComments(video_id,comments);
+                    result.addString("video", video_id);
                     result.addElement("comments", commentsArray);
                     return result.build();
                 }
-                    JsonObject object = videosService.getVideo(videoId);
+                    JsonObject object = videosService.getVideo(video_id);
                     result.addElement("video", object);
                 return result.build();
             }
 
             @Override
             public void handleParams(Request request, Response response, JsonResult result) {
-                videoId = ParseParameters.parseStringParam(request,result,":id","",x->true,"");
+                video_id = ParseParameters.parseStringParam(request,result,":id","", x->true,"");
                 comments = ParseParameters.parseIntegerQueryParam(request,result,"comments",-1,x-> x>0 && x<=100,"Comments could be from 0 to 100");
 
 

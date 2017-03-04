@@ -251,4 +251,19 @@ public class DBVideo implements JsonModel,BsonModel{
     public void setTotal_channel_videos(long total_channel_videos) {
         this.total_channel_videos = total_channel_videos;
     }
+
+    public void setTotalFromDB(Document document) {
+        setTotal_views(document.getLong("total_views"));
+        setTotal_likes(document.getLong("total_likes"));
+        setTotal_dislikes(document.getLong("total_dislikes"));
+        setTotal_comments(document.getLong("total_comments"));
+        setTotal_tweets(document.getLong("total_tweets"));
+        setTotal_original_tweets(document.getLong("total_original_tweets"));
+        setTotal_retweets(document.getLong("total_retweets"));
+        setTotal_channel_views(document.getLong("total_channel_views"));
+        setTotal_channel_comments(document.getLong("total_channel_comments"));
+        setTotal_channel_subscribers(document.getLong("total_channel_subscribers"));
+        setTotal_channel_videos(document.getLong("total_channel_videos"));
+
+    }
 }

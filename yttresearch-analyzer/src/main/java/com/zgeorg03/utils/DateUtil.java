@@ -11,6 +11,7 @@ public class DateUtil {
 
     private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
 
+    public static long dayInMillis = 86400000;
     public static String toDate(long timestamp){
 
         return fmt.format(new Date(timestamp));

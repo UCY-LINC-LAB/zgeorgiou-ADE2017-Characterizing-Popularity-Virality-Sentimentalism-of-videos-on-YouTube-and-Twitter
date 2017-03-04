@@ -73,6 +73,7 @@ public class ProcessVideosDBService {
 
     /**
      * Retrieve video
+     * //TODO Retreiving video
      * @param videoId
      * @return
      */
@@ -82,7 +83,6 @@ public class ProcessVideosDBService {
         if(document ==null)
             return null;
 
-        System.out.println(document);
         String title = document.getString("title");
         String description = document.getString("description");
         int category = document.getInteger("category");
@@ -106,20 +106,12 @@ public class ProcessVideosDBService {
             long channel_subscriber_added = doc.getLong("channel_subscriber_added");
             long channel_videos_added = doc.getLong("channel_videos_added");
             Day day = new Day(date,views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscriber_added,channel_videos_added);
+            day.setTweetStuffFromDB(doc);
             dbVideo.getDays().add(day);
         }
 
-        dbVideo.setTotal_views(document.getLong("total_views"));
-        dbVideo.setTotal_likes(document.getLong("total_likes"));
-        dbVideo.setTotal_dislikes(document.getLong("total_dislikes"));
-        dbVideo.setTotal_comments(document.getLong("total_comments"));
-        dbVideo.setTotal_tweets(document.getLong("total_tweets"));
-        dbVideo.setTotal_original_tweets(document.getLong("total_original_tweets"));
-        dbVideo.setTotal_retweets(document.getLong("total_retweets"));
-        dbVideo.setTotal_channel_views(document.getLong("total_channel_views"));
-        dbVideo.setTotal_channel_comments(document.getLong("total_channel_comments"));
-        dbVideo.setTotal_channel_subscribers(document.getLong("total_channel_subscribers"));
-        dbVideo.setTotal_channel_videos(document.getLong("total_channel_videos"));
+        dbVideo.setTotalFromDB(document);
+
         return dbVideo;
     }
 

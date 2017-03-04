@@ -40,20 +40,21 @@ public class CommentsMonitor implements Runnable {
             }
 
 
-            //This is a new video
-            String key = dbServices.getYouTubeAPIKey();
-            if(key.isEmpty()){
-                logger.error("YouTube key not available");
-                continue;
-            }
 
-            videos.entrySet().forEach(entry ->{
-                String video = entry.getKey();
-                int max = entry.getValue();
-                YouTubeRequests requests = new YouTubeRequests(video,key);
-                JsonObject commentsData =  requests.getLatestComments(max);
-                int added =dbServices.addComments(video,commentsData);
-                logger.info((video+": added " + added +" of "+max+" comments"));
+            videos.entrySet().forEach(entry -> {
+                //This is a new video
+                String key = dbServices.getYouTubeAPIKey();
+                if (!key.isEmpty()) {
+                    String video = entry.getKey();
+                    int max = entry.getValue();
+                    YouTubeRequests requests = new YouTubeRequests(video, key);
+                    JsonObject commentsData = requests.getLatestComments(max);
+                    int added = dbServices.addComments(video, commentsData);
+                    logger.info((video + ": added " + added + " of " + max + " comments"));
+                }
+                else{
+                    logger.error("YouTube key not available");
+                }
             });
         }
     }

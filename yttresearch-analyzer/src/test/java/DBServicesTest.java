@@ -24,7 +24,7 @@ public class DBServicesTest {
     }
     @Test
     public void proccessVideo() throws Exception {
-        String videoID = "9GJJMZjISmY";
+        String videoID = "7aASbWJS-uM";
         ProcessVideo processVideo= new ProcessVideo(services, videoID);
         System.out.println(services.getProcessVideosDBService().addOrReplaceProcessedVideo(processVideo.getDbVideo()));
     }
