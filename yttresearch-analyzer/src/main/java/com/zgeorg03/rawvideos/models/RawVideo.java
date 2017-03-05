@@ -1,4 +1,4 @@
-package com.zgeorg03.rawvideoprocess;
+package com.zgeorg03.rawvideos.models;
 
 import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.DateUtil;

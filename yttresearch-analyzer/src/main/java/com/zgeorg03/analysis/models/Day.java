@@ -1,4 +1,4 @@
-package com.zgeorg03.video;
+package com.zgeorg03.analysis.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +13,7 @@ import java.util.Map;
  * Created by zgeorg03 on 3/3/17.
  */
 public class Day implements JsonModel{
+    private final int day;
     private final String date;
     private final long views_added;
     private final long likes_added;
@@ -43,6 +44,7 @@ public class Day implements JsonModel{
     public static class Builder{
 
         public static Day create(Document document){
+            int day = document.getInteger("day");
             String date = document.getString("date");
             long views_added = document.getLong("views_added");
             long likes_added = document.getLong("likes_added");
@@ -82,15 +84,16 @@ public class Day implements JsonModel{
             Map<String,Integer> hashtags = new HashMap<>();
             hashtagsList.forEach(doc-> doc.keySet().forEach(key -> hashtags.put(key,doc.getInteger(key))));
 
-            return new Day(date,views_added,likes_added,dislikes_added,favorites_added,comments_added,
+            return new Day(day, date,views_added,likes_added,dislikes_added,favorites_added,comments_added,
                     channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added,tweets_added,
                     original_tweets_added,retweets_added,tweets_favorited_added,tweets_possibly_sensitive_added, user_days_created_before_video, user_followers_count, user_friends_count, language, hashtags);
         }
     }
-    private Day(String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added,
+    private Day(int day, String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added,
                 long channel_views_added, long channel_comments_added, long channel_subscribers_added, long channel_videos_added, long tweets_added, long original_tweets_added,
                 long retweets_added, long tweets_favorited_added, long tweets_possibly_sensitive_added
             , Stat<Integer> user_days_created_before_video, Stat<Long> user_followers_count, Stat<Long> user_friends_count, Map<String, Integer> language, Map<String, Integer> hashtags){
+        this.day = day;
         this.date = date;
         this.views_added = views_added;
         this.likes_added = likes_added;
@@ -205,5 +208,7 @@ public class Day implements JsonModel{
         return array;
     }
 
-
+    public int getDay() {
+        return day;
+    }
 }

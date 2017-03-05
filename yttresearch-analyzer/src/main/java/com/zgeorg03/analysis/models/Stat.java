@@ -1,4 +1,4 @@
-package com.zgeorg03.video;
+package com.zgeorg03.analysis.models;
 
 import com.google.gson.JsonObject;
 import com.zgeorg03.utils.JsonModel;

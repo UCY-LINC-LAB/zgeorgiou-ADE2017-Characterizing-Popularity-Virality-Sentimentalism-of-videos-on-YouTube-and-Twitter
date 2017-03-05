@@ -3,10 +3,10 @@ package com.zgeorg03.services;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.database.DBServices;
-import com.zgeorg03.database.services.ProcessRawVideoDBService;
+import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.services.helpers.Service;
 import com.zgeorg03.utils.DateUtil;
-import com.zgeorg03.video.Video;
+import com.zgeorg03.analysis.models.Video;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
  */
 public class VideosService extends Service {
 
-    private final ProcessRawVideoDBService processRawVideoDBService;
+    private final ProcessVideoDBService processVideoDBService;
     public VideosService(DBServices dbServices) {
         super(dbServices);
-        processRawVideoDBService = dbServices.getProcessRawVideoDBService();
+        processVideoDBService = dbServices.getProcessVideoDBService();
     }
 
 
@@ -27,14 +27,14 @@ public class VideosService extends Service {
      * Total number of videos ready for analysis
      * @return
      */
-    public int getTotalVideos(){
-        return dbServices.getProcessRawVideoDBService().getTotalVideos();
+    public int getTotalVideos(int artificialCategory){
+        return dbServices.getProcessVideoDBService().getTotalVideos(artificialCategory);
     }
 
 
     public JsonObject getVideo(String videoId) {
         JsonObject object = new JsonObject();
-        Video video = processRawVideoDBService.getVideo(videoId);
+        Video video = processVideoDBService.getVideo(videoId);
         if(video ==null){
             object.addProperty("error","Video " + videoId + " not found!");
             return object;
@@ -43,12 +43,24 @@ public class VideosService extends Service {
     }
 
 
-    public JsonArray getPopularVideos(int lbl_wnd,int limit){
-        return dbServices.getProcessRawVideoDBService().getVideosWithHighestViews(lbl_wnd,limit);
+    public JsonArray getPopularVideos(int artificial_category, int lbl_wnd,int limit){
+        return dbServices.getProcessVideoDBService().getVideosWithTheMostViews(artificial_category,lbl_wnd,limit);
+    }
+
+    public JsonArray getViralVideos(int artificial_category, int lbl_wnd,int limit){
+        return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,lbl_wnd,limit);
+    }
+
+    public JsonArray getRecentVideos(int artificial_category,int days, int limit){
+        return dbServices.getProcessVideoDBService().getRecentVideos(days,artificial_category,limit);
+    }
+
+    public JsonArray getRandomVideos(int artificial_category, int limit){
+        return dbServices.getProcessVideoDBService().getRandomVideos(artificial_category,limit);
     }
 
     public JsonArray getComments(String videoId, int comments) {
-        List<JsonObject> documentList = processRawVideoDBService.getComments(videoId).stream()
+        List<JsonObject> documentList = processVideoDBService.getComments(videoId).stream()
                 .map(document -> {
                     JsonObject comment = new JsonObject();
                     comment.addProperty("id",document.getString("_id"));
@@ -62,5 +74,9 @@ public class VideosService extends Service {
         JsonArray array = new JsonArray();
         documentList.stream().forEach(x -> array.add(x));
         return array;
+    }
+
+    public ProcessVideoDBService getProcessVideoDBService() {
+        return processVideoDBService;
     }
 }

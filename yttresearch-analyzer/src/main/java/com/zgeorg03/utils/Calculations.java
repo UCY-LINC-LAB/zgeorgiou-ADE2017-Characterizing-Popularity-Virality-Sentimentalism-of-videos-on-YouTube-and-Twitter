@@ -1,5 +1,7 @@
 package com.zgeorg03.utils;
 
+import com.zgeorg03.analysis.models.Stat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +75,18 @@ public class Calculations {
         if(list.size()==0)
             return 0;
         return Math.sqrt(list.stream().mapToDouble(v -> (v-avg)*(v-avg)).sum()/list.size());
+    }
+    public static Stat<Long> getStatsLong(List<Long> list){
+        double average = Calculations.averageLong(list);
+        long median = Calculations.medianLong(list);
+        double std = Calculations.stdLong(list,average);
+        return new Stat<>(average,median,std);
+    }
+    public static Stat<Integer> getStatsInt(List<Integer> list){
+        double average = Calculations.averageInt(list);
+        int median = Calculations.medianInt(list);
+        double std = Calculations.stdInt(list,average);
+        return new Stat<>(average,median,std);
     }
 }
 

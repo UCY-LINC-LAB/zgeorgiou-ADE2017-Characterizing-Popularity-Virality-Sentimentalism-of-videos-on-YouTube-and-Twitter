@@ -3,7 +3,7 @@ package com.zgeorg03.database;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.zgeorg03.database.services.ProcessRawVideoDBService;
+import com.zgeorg03.database.services.ProcessVideoDBService;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class DBServices {
     private final MongoCollection comments;
     private final MongoCollection processedVideos;
 
-    private final ProcessRawVideoDBService processRawVideoDBService;
+    private final ProcessVideoDBService processVideoDBService;
 
     public DBServices(DBConnection connection){
         videos = connection.getDatabase().getCollection("videos");
@@ -37,7 +37,7 @@ public class DBServices {
         processedVideos = connection.getDatabase().getCollection("processedVideos");
         databaseName = connection.getDatabase().getName();
 
-        processRawVideoDBService = new ProcessRawVideoDBService(videos,tweets,comments,processedVideos);
+        processVideoDBService = new ProcessVideoDBService(videos,tweets,comments,processedVideos);
     }
 
 
@@ -100,7 +100,7 @@ public class DBServices {
     }
 
 
-    public ProcessRawVideoDBService getProcessRawVideoDBService() {
-        return processRawVideoDBService;
+    public ProcessVideoDBService getProcessVideoDBService() {
+        return processVideoDBService;
     }
 }

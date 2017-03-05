@@ -1,4 +1,4 @@
-package com.zgeorg03.video;
+package com.zgeorg03.analysis.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -135,5 +135,85 @@ public class Video implements JsonModel{
     @Override
     public JsonObject toJson(Map<String, Integer> view) {
         return toJson();
+    }
+
+    public String getVideo_id() {
+        return video_id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+
+    public int getArtificial_category() {
+        return artificial_category;
+    }
+
+    public long getPublished_at() {
+        return published_at;
+    }
+
+    public long getCollected_at() {
+        return collected_at;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public List<Day> getDays() {
+        return days;
+    }
+
+    public long getTotal_views() {
+        return total_views;
+    }
+
+    public long getTotal_likes() {
+        return total_likes;
+    }
+
+    public long getTotal_dislikes() {
+        return total_dislikes;
+    }
+
+    public long getTotal_comments() {
+        return total_comments;
+    }
+
+    public long getTotal_tweets() {
+        return total_tweets;
+    }
+
+    public long getTotal_original_tweets() {
+        return total_original_tweets;
+    }
+
+    public long getTotal_retweets() {
+        return total_retweets;
+    }
+
+    public long getTotal_channel_views() {
+        return total_channel_views;
+    }
+
+    public long getTotal_channel_comments() {
+        return total_channel_comments;
+    }
+
+    public long getTotal_channel_subscribers() {
+        return total_channel_subscribers;
+    }
+
+    public long getTotal_channel_videos() {
+        return total_channel_videos;
     }
 }

@@ -1,7 +1,10 @@
-package com.zgeorg03.rawvideoprocess;
+package com.zgeorg03.rawvideos;
 
 import com.zgeorg03.database.DBServices;
-import com.zgeorg03.database.services.ProcessRawVideoDBService;
+import com.zgeorg03.database.services.ProcessVideoDBService;
+import com.zgeorg03.rawvideos.models.RawDay;
+import com.zgeorg03.rawvideos.models.RawVideo;
+import com.zgeorg03.utils.Categories;
 import com.zgeorg03.utils.DateUtil;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -17,7 +20,7 @@ import java.util.List;
 public class ProcessVideo {
     private static final Logger logger = LoggerFactory.getLogger(DBServices.class);
     private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-    private final ProcessRawVideoDBService processRawVideoDBService;
+    private final ProcessVideoDBService processVideoDBService;
     private final String videoID;
 
     private final Document video;
@@ -28,13 +31,13 @@ public class ProcessVideo {
 
     public ProcessVideo(DBServices dbServices, String videoID) throws Exception {
 
-        this.processRawVideoDBService = dbServices.getProcessRawVideoDBService();
+        this.processVideoDBService = dbServices.getProcessVideoDBService();
         this.videoID = videoID;
         video =dbServices.getVideo(videoID);
         if(video ==null)
             throw new Exception("RawVideo doesn't exist");
-        tweets = processRawVideoDBService.getTweets(videoID);
-        comments = processRawVideoDBService.getComments(videoID);
+        tweets = processVideoDBService.getTweets(videoID);
+        comments = processVideoDBService.getComments(videoID);
 
         addStaticInfo();
         addDynamicInfo();
@@ -44,7 +47,7 @@ public class ProcessVideo {
         String title = video.getString("title");
         String description = video.getString("description");
         int category = video.getInteger("category_id");
-        int artificial_category = getArtificialCategory(category);
+        int artificial_category = Categories.getArtificialCategory(category);
         long published_at = video.getLong("published_at");
         long collected_at = ((Document) video.get("meta")).getLong("timestamp");
         long duration = video.getLong("duration");
@@ -176,14 +179,6 @@ public class ProcessVideo {
         rawVideo.setTotal_retweets(total_retweets);
     }
 
-    /**
-     * TODO Needs implementation
-     * @param category
-     * @return
-     */
-    private int getArtificialCategory(int category) {
-        return category;
-    }
 
     public RawVideo getVideo() {
         return rawVideo;

@@ -1,6 +1,7 @@
-package com.zgeorg03.rawvideoprocess;
+package com.zgeorg03.rawvideos;
 
 import com.zgeorg03.database.DBServices;
+import com.zgeorg03.rawvideos.models.RawVideo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class FinishedVideosMonitor implements Runnable {
             List<String> notProcessed = dbServices.getFinishedButNotProcessedVideos(maxVideos);
 
             if (notProcessed.isEmpty()) {
+                logger.info("All videos are processed. Going to sleep...");
                 try { TimeUnit.HOURS.sleep(6); } catch (InterruptedException e) { }
             }
 
@@ -36,13 +38,16 @@ public class FinishedVideosMonitor implements Runnable {
                 try {
                     ProcessVideo processVideo = new ProcessVideo(dbServices, videoId);
                     RawVideo rawVideo = processVideo.getVideo();
-                    dbServices.getProcessRawVideoDBService().addOrReplaceProcessedVideo(rawVideo);
+                    dbServices.getProcessVideoDBService().addOrReplaceProcessedVideo(rawVideo);
+
+                    //Normally we set it as processed
+                    dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());
                 }
             });
 
-            try { TimeUnit.MINUTES.sleep(1); } catch (InterruptedException e) { }
+            try { TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) { }
         }
     }
 }
