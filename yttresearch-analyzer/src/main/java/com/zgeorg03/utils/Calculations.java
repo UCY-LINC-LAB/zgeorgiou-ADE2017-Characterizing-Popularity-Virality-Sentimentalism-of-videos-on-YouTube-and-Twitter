@@ -32,6 +32,17 @@ public class Calculations {
             return 0;
         return list.stream().mapToLong(x->x).average().getAsDouble();
     }
+
+    /**
+     * Return average of a double list
+     * @param list
+     * @return
+     */
+    public static double averageDouble(List<Double> list){
+        if(list.size()==0)
+            return 0;
+        return list.stream().mapToDouble(x->x).average().getAsDouble();
+    }
     /**
      * Return median of an Integer list
      * @param list
@@ -57,6 +68,18 @@ public class Calculations {
     }
 
     /**
+     * Return median of a Double list
+     * @param list
+     * @return
+     */
+    public static Double medianDouble(List<Double> list){
+        if(list.size()==0)
+            return 0.0;
+        List<Double> sorted = list.stream().sorted().collect(Collectors.toList());
+        return sorted.get(sorted.size()/2);
+    }
+
+    /**
      * Return std of an Integer list
      * @param list
      * @return
@@ -76,10 +99,27 @@ public class Calculations {
             return 0;
         return Math.sqrt(list.stream().mapToDouble(v -> (v-avg)*(v-avg)).sum()/list.size());
     }
+    /**
+     * Return std of a Double list
+     * @param list
+     * @return
+     */
+    public static double stdDouble(List<Double> list,double avg){
+        if(list.size()==0)
+            return 0;
+        return Math.sqrt(list.stream().mapToDouble(v -> (v-avg)*(v-avg)).sum()/list.size());
+    }
+
     public static Stat<Long> getStatsLong(List<Long> list){
         double average = Calculations.averageLong(list);
         long median = Calculations.medianLong(list);
         double std = Calculations.stdLong(list,average);
+        return new Stat<>(average,median,std);
+    }
+    public static Stat<Double> getStatsDouble(List<Double> list){
+        double average = Calculations.averageDouble(list);
+        double median = Calculations.medianDouble(list);
+        double std = Calculations.stdDouble(list,average);
         return new Stat<>(average,median,std);
     }
     public static Stat<Integer> getStatsInt(List<Integer> list){

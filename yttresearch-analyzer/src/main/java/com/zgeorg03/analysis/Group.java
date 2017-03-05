@@ -40,6 +40,14 @@ public class Group extends LinkedList<Video> implements JsonModel{
     private List<Long> totalTweetsList(){
         return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getTweets_added()).sum()).collect(Collectors.toList());
     }
+
+    private List<Long> totalLikesList(){
+        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getLikes_added()).sum()).collect(Collectors.toList());
+    }
+
+    private List<Long> totalDislikesList(){
+        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getDislikes_added()).sum()).collect(Collectors.toList());
+    }
     private List<Integer> durationList(){
         return this.stream().map(x->((int)x.getDuration()/1000)).collect(Collectors.toList());
     }
@@ -52,6 +60,8 @@ public class Group extends LinkedList<Video> implements JsonModel{
         object.add("duration", Calculations.getStatsInt(durationList()).toJson());
         object.add("total_views", Calculations.getStatsLong(totalViewsList()).toJson());
         object.add("total_tweets", Calculations.getStatsLong(totalTweetsList()).toJson());
+        object.add("total_likes", Calculations.getStatsLong(totalLikesList()).toJson());
+        object.add("total_dislikes", Calculations.getStatsLong(totalDislikesList()).toJson());
         if(showDailyStats)
             object.add("days", daysStats.toJson());
 

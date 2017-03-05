@@ -136,6 +136,13 @@ public class Day implements JsonModel{
         return tweets_added;
     }
 
+    public long getOriginal_tweets_added() {
+        return original_tweets_added;
+    }
+
+    public long getRetweets_added() {
+        return retweets_added;
+    }
 
     public long getFavorites_added() {
         return favorites_added;
@@ -159,6 +166,18 @@ public class Day implements JsonModel{
 
     public String getDate() {
         return date;
+    }
+
+    public Stat<Long> getUser_followers_count() {
+        return user_followers_count;
+    }
+
+    public Stat<Long> getUser_friends_count() {
+        return user_friends_count;
+    }
+
+    public Stat<Integer> getUser_days_created_before_video() {
+        return user_days_created_before_video;
     }
 
     @Override

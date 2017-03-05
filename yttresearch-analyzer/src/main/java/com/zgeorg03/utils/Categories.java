@@ -46,6 +46,7 @@ public class Categories {
         categories.put(42 , "Shorts");
         categories.put(43 , "Shows");
         categories.put(44 , "Trailers");
+        artificial_categories.put(0,"All");
         artificial_categories.put(1,"Music");
         artificial_categories.put(2,"Games");
         artificial_categories.put(3,"People & Blogs");

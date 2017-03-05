@@ -38,4 +38,8 @@ public class Stat<T> implements JsonModel{
     public JsonObject toJson(Map<String, Integer> view) {
         return toJson();
     }
+
+    public Double getAverage() {
+        return average;
+    }
 }
