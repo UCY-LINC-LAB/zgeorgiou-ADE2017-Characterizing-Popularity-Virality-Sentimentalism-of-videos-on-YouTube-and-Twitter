@@ -1,7 +1,7 @@
-package com.zgeorg03.videoprocess;
+package com.zgeorg03.rawvideoprocess;
 
 import com.zgeorg03.database.DBServices;
-import com.zgeorg03.database.services.ProcessVideosDBService;
+import com.zgeorg03.database.services.ProcessRawVideoDBService;
 import com.zgeorg03.utils.DateUtil;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -17,26 +17,25 @@ import java.util.List;
 public class ProcessVideo {
     private static final Logger logger = LoggerFactory.getLogger(DBServices.class);
     private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-    private final ProcessVideosDBService processVideosDBService;
+    private final ProcessRawVideoDBService processRawVideoDBService;
     private final String videoID;
 
     private final Document video;
     private final List<Document> tweets;
     private final List<Document> comments;
 
-    private  DBVideo dbVideo;
+    private RawVideo rawVideo;
 
     public ProcessVideo(DBServices dbServices, String videoID) throws Exception {
 
-        this.processVideosDBService = dbServices.getProcessVideosDBService();
+        this.processRawVideoDBService = dbServices.getProcessRawVideoDBService();
         this.videoID = videoID;
         video =dbServices.getVideo(videoID);
-        if(video==null)
-            throw new Exception("Video doesn't exist");
-        tweets = processVideosDBService.getTweets(videoID);
-        comments = processVideosDBService.getComments(videoID);
+        if(video ==null)
+            throw new Exception("RawVideo doesn't exist");
+        tweets = processRawVideoDBService.getTweets(videoID);
+        comments = processRawVideoDBService.getComments(videoID);
 
-        System.out.println(video);
         addStaticInfo();
         addDynamicInfo();
     }
@@ -47,10 +46,10 @@ public class ProcessVideo {
         int category = video.getInteger("category_id");
         int artificial_category = getArtificialCategory(category);
         long published_at = video.getLong("published_at");
-        long collected_at = ((Document)video.get("meta")).getLong("timestamp");
+        long collected_at = ((Document) video.get("meta")).getLong("timestamp");
         long duration = video.getLong("duration");
 
-        dbVideo = new DBVideo(videoID,title,description,category,artificial_category,published_at,collected_at,duration);
+        rawVideo = new RawVideo(videoID,title,description,category,artificial_category,published_at,collected_at,duration);
     }
 
 
@@ -60,7 +59,7 @@ public class ProcessVideo {
     private void addDynamicInfo(){
         List<Document> days = (List<Document>) this.video.get("days");
         if(days.size()!=15)
-            logger.error("Video: "+ videoID+" doesn't have 15 days. This shouldn't have happen.");
+            logger.error("RawVideo: "+ videoID+" doesn't have 15 days. This shouldn't have happen.");
         long total_views = 0;
         long total_likes = 0;
         long total_dislikes = 0;
@@ -94,8 +93,8 @@ public class ProcessVideo {
         total_channel_subscribers +=channel_subscribers_added;
         total_channel_videos +=channel_videos_added;
 
-        Day first = new Day(DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
-        dbVideo.getDays().add(first);
+        RawDay first = new RawDay(0, DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
+        rawVideo.getRawDays().add(first);
         for(int i=1;i<days.size();i++){
             day = days.get(i);
             timestamp = day.getLong("timestamp");
@@ -108,8 +107,8 @@ public class ProcessVideo {
             channel_comments_added = day.getLong("channel_comment_count")-total_channel_comments;
             channel_subscribers_added = day.getLong("channel_subscriber_count")-total_channel_subscribers;
             channel_videos_added = day.getLong("channel_video_count")-total_channel_videos;
-            Day current = new Day(DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
-            dbVideo.getDays().add(current);
+            RawDay current = new RawDay(i,DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
+            rawVideo.getRawDays().add(current);
             total_views +=views_added;
             total_likes +=likes_added;
             total_dislikes +=dislikes_added;
@@ -120,17 +119,16 @@ public class ProcessVideo {
             total_channel_subscribers +=channel_subscribers_added;
             total_channel_videos +=channel_videos_added;
         }
-        dbVideo.setTotal_views(total_views);
-        dbVideo.setTotal_likes(likes_added);
-        dbVideo.setTotal_dislikes(dislikes_added);
-        dbVideo.setTotal_comments(total_comments);
-        dbVideo.setTotal_channel_views(total_channel_views);
-        dbVideo.setTotal_channel_comments(total_channel_comments);
-        dbVideo.setTotal_channel_subscribers(total_channel_subscribers);
-        dbVideo.setTotal_channel_videos(total_channel_videos);
-
-
-        addTweets(dbVideo.getCollected_at());
+        rawVideo.setTotal_views(total_views);
+        rawVideo.setTotal_likes(total_likes);
+        rawVideo.setTotal_dislikes(dislikes_added);
+        rawVideo.setTotal_favorited(favorites_added);
+        rawVideo.setTotal_comments(comments_added);
+        rawVideo.setTotal_channel_views(channel_views_added);
+        rawVideo.setTotal_channel_comments(channel_comments_added);
+        rawVideo.setTotal_channel_subscribers(total_channel_subscribers);
+        rawVideo.setTotal_channel_videos(channel_videos_added);
+        addTweets(rawVideo.getCollected_at());
     }
 
     /**
@@ -138,6 +136,10 @@ public class ProcessVideo {
      */
     private void addTweets(long startOffset){
         long millisInDay = 1000*60*60*24;
+        long total_tweets=0;
+        long total_original_tweets=0;
+        long total_retweets=0;
+
         for(Document document : tweets){
             long created_at = document.getLong("created_at");
             long diff = created_at - startOffset;
@@ -157,15 +159,21 @@ public class ProcessVideo {
             long  user_statuses_count = document.getLong("user_statuses_count");
             boolean  user_verified = document.getBoolean("user_verified");
             String  user_lang = document.getString("user_lang");
-            List<Document>  hashtags = (List<Document>) document.get("hashtags");
+            List<String>  hashtags = (List<String>) document.get("hashtags");
 
 
-            Day day = dbVideo.getDays().get(dayIndex);
+            RawDay rawDay = rawVideo.getRawDays().get(dayIndex);
 
-            day.setTweetStuff(dbVideo.getPublished_at(),lang,is_favorited,is_possibly_sensitive,is_retweet,user_created_at,user_followers_count,user_friends_count,user_favorites_count,user_listed_count,user_statuses_count,user_verified,user_lang,hashtags);
-
-
+            rawDay.setTweetStuff(rawVideo.getPublished_at(),lang,is_favorited,is_possibly_sensitive,is_retweet,user_created_at,user_followers_count,user_friends_count,user_favorites_count,user_listed_count,user_statuses_count,user_verified,user_lang,hashtags);
+            total_tweets++;
+            if(is_retweet)
+                total_retweets++;
+            else
+                total_original_tweets++;
         }
+        rawVideo.setTotal_tweets(total_tweets);
+        rawVideo.setTotal_original_tweets(total_original_tweets);
+        rawVideo.setTotal_retweets(total_retweets);
     }
 
     /**
@@ -177,7 +185,7 @@ public class ProcessVideo {
         return category;
     }
 
-    public DBVideo getDbVideo() {
-        return dbVideo;
+    public RawVideo getVideo() {
+        return rawVideo;
     }
 }

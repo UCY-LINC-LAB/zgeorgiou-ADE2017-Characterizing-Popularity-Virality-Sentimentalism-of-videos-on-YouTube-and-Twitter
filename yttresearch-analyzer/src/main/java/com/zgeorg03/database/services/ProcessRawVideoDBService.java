@@ -1,16 +1,20 @@
 package com.zgeorg03.database.services;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.zgeorg03.database.DBServices;
-import com.zgeorg03.videoprocess.DBVideo;
-import com.zgeorg03.videoprocess.Day;
+import com.zgeorg03.rawvideoprocess.RawVideo;
+import com.zgeorg03.rawvideoprocess.RawDay;
+import com.zgeorg03.video.Video;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +23,7 @@ import static com.mongodb.client.model.Filters.eq;
 /**
  * Created by zgeorg03 on 3/2/17.
  */
-public class ProcessVideosDBService {
+public class ProcessRawVideoDBService {
     private static final Logger logger = LoggerFactory.getLogger(DBServices.class);
 
     private final MongoCollection videos;
@@ -27,24 +31,72 @@ public class ProcessVideosDBService {
     private final MongoCollection comments;
     private final MongoCollection processedDBVideos;
 
-    public ProcessVideosDBService(MongoCollection videos, MongoCollection tweets, MongoCollection comments, MongoCollection processedVideos) {
+    public ProcessRawVideoDBService(MongoCollection videos, MongoCollection tweets, MongoCollection comments, MongoCollection processedVideos) {
         this.videos = videos;
         this.tweets = tweets;
         this.comments = comments;
         this.processedDBVideos = processedVideos;
     }
 
+    /**
+     db.getCollection('processedVideos').aggregate([
+     { "$unwind" : "$days"},
+     { "$match" : {"days.day" : {$gte : 0}}},
+     { "$group" :
+     { _id : "$_id", sum : { $sum : "$days.views_added"}
+     }},
+     { "$sort" : { "sum"  : -1}},
+     { "$limit" : 5 },
+     { "$project" : {total_views:"$sum"}}
+     ]);
+
+
+     * @param limit
+     * @return
+     */
+    public JsonArray getVideosWithHighestViews(int lbl_wnd, int limit){
+        List<Document> query = Arrays.asList(
+                new Document("$unwind","$days"),
+                new Document("$match",
+                        new Document("days.day",
+                                new Document("$gte",lbl_wnd))),
+                new Document("$group",
+                        new Document("_id", "$_id")
+                        .append("sum",
+                                new Document("$sum","$days.views_added"))),
+                new Document("$sort",
+                        new Document("sum",-1)),
+                new Document("$limit",limit),
+                new Document("$project",
+                        new Document("total_views","$sum"))
+
+        );
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while(cursor.hasNext()){
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_views = document.getLong("total_views");
+            object.addProperty("video_id",video_id);
+            object.addProperty("total_views",total_views);
+            object.addProperty("url","/videos/"+video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
 
     /**
      * Add a processedVideo
-     * @param video
+     * @param rawVideo
      * @return
      */
-    public boolean addOrReplaceProcessedVideo(DBVideo video){
-       Document document = video.toBson();
+    public boolean addOrReplaceProcessedVideo(RawVideo rawVideo){
+       Document document = rawVideo.toBson();
         try{
-            if(processedDBVideos.count(eq("_id",video.getVideo_id()))==1)
-                processedDBVideos.replaceOne(eq("_id",video.getVideo_id()),document);
+            if(processedDBVideos.count(eq("_id", rawVideo.getVideo_id()))==1)
+                processedDBVideos.replaceOne(eq("_id", rawVideo.getVideo_id()),document);
             else
                 processedDBVideos.insertOne(document);
             return true;
@@ -77,42 +129,15 @@ public class ProcessVideosDBService {
      * @param videoId
      * @return
      */
-    public DBVideo getVideo(String videoId){
+    public Video getVideo(String videoId){
 
         Document document =  (Document) processedDBVideos.find(eq("_id",videoId)).first();
         if(document ==null)
             return null;
 
-        String title = document.getString("title");
-        String description = document.getString("description");
-        int category = document.getInteger("category");
-        int artificial_category = document.getInteger("artificial_category");
-        long published_at = document.getLong("published_at_timestamp");
-        long collected_at = document.getLong("collected_at_timestamp");
-        long duration = document.getLong("duration");
+        return new Video.Builder().create(document);
 
-        List<Document> documents = (List<Document>) document.get("days");
 
-        DBVideo dbVideo = new DBVideo(videoId,title,description,category,artificial_category,published_at,collected_at,duration);
-        for(Document doc : documents){
-            String date = doc.getString("date");
-            long views_added = doc.getLong("views_added");
-            long likes_added = doc.getLong("likes_added");
-            long dislikes_added = doc.getLong("dislikes_added");
-            long favorites_added = doc.getLong("favorites_added");
-            long comments_added = doc.getLong("comments_added");
-            long channel_views_added = doc.getLong("channel_views_added");
-            long channel_comments_added = doc.getLong("channel_comments_added");
-            long channel_subscriber_added = doc.getLong("channel_subscriber_added");
-            long channel_videos_added = doc.getLong("channel_videos_added");
-            Day day = new Day(date,views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscriber_added,channel_videos_added);
-            day.setTweetStuffFromDB(doc);
-            dbVideo.getDays().add(day);
-        }
-
-        dbVideo.setTotalFromDB(document);
-
-        return dbVideo;
     }
 
 

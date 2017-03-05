@@ -1,7 +1,7 @@
 import com.mongodb.ServerAddress;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
-import com.zgeorg03.videoprocess.ProcessVideo;
+import com.zgeorg03.rawvideoprocess.ProcessVideo;
 import org.junit.Test;
 
 /**
@@ -26,6 +26,6 @@ public class DBServicesTest {
     public void proccessVideo() throws Exception {
         String videoID = "7aASbWJS-uM";
         ProcessVideo processVideo= new ProcessVideo(services, videoID);
-        System.out.println(services.getProcessVideosDBService().addOrReplaceProcessedVideo(processVideo.getDbVideo()));
+        services.getProcessRawVideoDBService().addOrReplaceProcessedVideo(processVideo.getVideo());
     }
 }

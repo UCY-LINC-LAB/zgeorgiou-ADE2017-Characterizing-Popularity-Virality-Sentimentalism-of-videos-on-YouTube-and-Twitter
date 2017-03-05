@@ -6,8 +6,12 @@ import com.zgeorg03.controllers.VideosController;
 import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
+import com.zgeorg03.rawvideoprocess.FinishedVideosMonitor;
 import com.zgeorg03.services.IndexService;
 import com.zgeorg03.services.VideosService;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static spark.Spark.after;
 import static spark.Spark.before;
@@ -25,6 +29,10 @@ public class App {
 
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,10);
+        executorService.execute(finishedVideosMonitor);
 
         //Services
         final IndexService indexService = new IndexService(dbServices);

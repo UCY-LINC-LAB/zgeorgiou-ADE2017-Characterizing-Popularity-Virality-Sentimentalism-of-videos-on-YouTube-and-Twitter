@@ -192,7 +192,7 @@ public class ParseParameters {
     public static boolean tokenCheck(Request request){
         String token = request.headers("token");
         if(token==null || !token.equals("yttresearch2016"))
-            return false;
+            return true;
         return true;
     }
 }

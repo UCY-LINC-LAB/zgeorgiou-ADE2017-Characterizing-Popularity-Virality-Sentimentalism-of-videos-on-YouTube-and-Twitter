@@ -39,30 +39,31 @@ public class DynamicInfoMonitor implements Runnable {
             }
 
 
-            //This is a new video
-            String key = dbServices.getYouTubeAPIKey();
-            if(key.isEmpty()){
-                logger.error("YouTube key not available");
-                continue;
-            }
 
-            videos.forEach(video ->{
-                YouTubeRequests requests = new YouTubeRequests(video,key);
-                String channelId = dbServices.getDbVideosService().getChannelId(video);
-                JsonObject dynamicData =  requests.getDynamicData(channelId);
-                if(dynamicData.get("error")!=null) {
-                    logger.error("Dynamic data couldn't be fetched for " + video + " because " + dynamicData.get("error").getAsString());
-                   if(dbServices.getDbVideosService().setVideoAsIncomplete(video)) {
-                       logger.error(video + " is set as incomplete");
-                       statusMonitor.setReachedMonitorCapacity(false);
-                   }
-                }else if(dbServices.getDbVideosService().addDynamicData(video,dynamicData))
-                    logger.info("Dynamic data added for "+video);
+            videos.forEach(video -> {
+                //This is a new video
+                String key = dbServices.getYouTubeAPIKey();
+                if (!key.isEmpty()) {
 
-                //Checking if a video reached 15th day
-                if(dbServices.getDbVideosService().checkVideoIsFinished(video)){
-                    if(dbServices.getDbVideosService().setVideoAsFinished(video))
-                        logger.info("Video:"+video +" has finished!");
+                    YouTubeRequests requests = new YouTubeRequests(video, key);
+                    String channelId = dbServices.getDbVideosService().getChannelId(video);
+                    JsonObject dynamicData = requests.getDynamicData(channelId);
+                    if (dynamicData.get("error") != null) {
+                        logger.error("Dynamic data couldn't be fetched for " + video + " because " + dynamicData.get("error").getAsString());
+                        if (dbServices.getDbVideosService().setVideoAsIncomplete(video)) {
+                            logger.error(video + " is set as incomplete");
+                            statusMonitor.setReachedMonitorCapacity(false);
+                        }
+                    } else if (dbServices.getDbVideosService().addDynamicData(video, dynamicData))
+                        logger.info("Dynamic data added for " + video);
+
+                    //Checking if a video reached 15th day
+                    if (dbServices.getDbVideosService().checkVideoIsFinished(video)) {
+                        if (dbServices.getDbVideosService().setVideoAsFinished(video))
+                            logger.info("Video:" + video + " has finished!");
+                    }
+                }else {
+                    logger.error("YouTube key not available");
                 }
             });
         }

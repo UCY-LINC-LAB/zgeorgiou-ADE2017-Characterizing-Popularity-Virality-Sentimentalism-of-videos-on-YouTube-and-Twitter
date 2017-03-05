@@ -27,6 +27,8 @@ public class VideosController {
 
                 result.addNumber("total_videos",videosService.getTotalVideos());
 
+                result.addElement("popular",videosService.getPopularVideos(0,5));
+
                 return result.build();
             }
 

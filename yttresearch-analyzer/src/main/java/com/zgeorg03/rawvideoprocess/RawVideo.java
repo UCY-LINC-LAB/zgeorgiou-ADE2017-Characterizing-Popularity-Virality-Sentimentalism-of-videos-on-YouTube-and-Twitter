@@ -1,21 +1,17 @@
-package com.zgeorg03.videoprocess;
+package com.zgeorg03.rawvideoprocess;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.DateUtil;
-import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/2/17.
  */
-public class DBVideo implements JsonModel,BsonModel{
+public class RawVideo implements BsonModel{
 
     //Static
     private final String video_id;
@@ -27,12 +23,13 @@ public class DBVideo implements JsonModel,BsonModel{
     private final long collected_at;
     private final long duration;
 
-    private final List<Day> days;
+    private final List<RawDay> rawDays;
 
     //Count these
     private long total_views;
     private long total_likes;
     private long total_dislikes;
+    private long total_favorited;
     private long total_comments;
     private long total_tweets;
     private long total_original_tweets;
@@ -43,7 +40,7 @@ public class DBVideo implements JsonModel,BsonModel{
     private long total_channel_videos;
 
 
-    public DBVideo(String video_id, String title, String description, int category, int artificial_category, long published_at, long collected_at, long duration) {
+    public RawVideo(String video_id, String title, String description, int category, int artificial_category, long published_at, long collected_at, long duration) {
         this.video_id = video_id;
         this.title = title;
         this.description = description;
@@ -52,7 +49,7 @@ public class DBVideo implements JsonModel,BsonModel{
         this.published_at = published_at;
         this.collected_at = collected_at;
         this.duration = duration;
-        this.days = new ArrayList<>();
+        this.rawDays = new ArrayList<>();
     }
 
     public void setTotal_views(long total_views) {
@@ -85,7 +82,7 @@ public class DBVideo implements JsonModel,BsonModel{
 
     @Override
     public String toString() {
-        return "DBVideo{" +
+        return "RawVideo{" +
                 "video_id='" + video_id + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
@@ -94,7 +91,7 @@ public class DBVideo implements JsonModel,BsonModel{
                 ", published_at=" + published_at +
                 ", collected_at=" + collected_at +
                 ", duration=" + duration +
-                ", days=" + days +
+                ", rawDays=" + rawDays +
                 ", total_views=" + total_views +
                 ", total_likes=" + total_likes +
                 ", total_dislikes=" + total_dislikes +
@@ -137,8 +134,8 @@ public class DBVideo implements JsonModel,BsonModel{
         return duration;
     }
 
-    public List<Day> getDays() {
-        return days;
+    public List<RawDay> getRawDays() {
+        return rawDays;
     }
 
     public long getTotal_views() {
@@ -170,43 +167,6 @@ public class DBVideo implements JsonModel,BsonModel{
     }
 
     @Override
-    public JsonObject toJson() {
-        JsonObject result = new JsonObject();
-        result.addProperty("video_id",video_id);
-        result.addProperty("title",title);
-        result.addProperty("description", description);
-        result.addProperty("category",category);
-        result.addProperty("artificial_category",artificial_category);
-        result.addProperty("published_at",DateUtil.toDate(published_at));
-        result.addProperty("published_at_timestamp",published_at);
-        result.addProperty("collected_at", DateUtil.toDate(collected_at));
-        result.addProperty("collected_at_timestamp",collected_at);
-        result.addProperty("duration",duration);
-
-        result.addProperty("total_views",total_views);
-        result.addProperty("total_likes",total_likes);
-        result.addProperty("total_dislikes",total_dislikes);
-        result.addProperty("total_comments",total_comments);
-        result.addProperty("total_tweets",total_tweets);
-        result.addProperty("total_original_tweets",total_original_tweets);
-        result.addProperty("total_retweets",total_retweets);
-        result.addProperty("total_channel_views",total_channel_views);
-        result.addProperty("total_channel_comments",total_channel_comments);
-        result.addProperty("total_channel_subscribers",total_channel_subscribers);
-        result.addProperty("total_channel_videos",total_channel_videos);
-
-        JsonArray array = new JsonArray();
-        days.stream().forEach(day -> array.add(day.toJson()));
-        result.add("days",array);
-        return result;
-    }
-
-    @Override
-    public JsonObject toJson(Map<String, Integer> view) {
-        return toJson();
-    }
-
-    @Override
     public Document toBson() {
         Document result = new Document();
         result.append("_id",video_id);
@@ -222,6 +182,7 @@ public class DBVideo implements JsonModel,BsonModel{
         result.append("total_views",total_views);
         result.append("total_likes",total_likes);
         result.append("total_dislikes",total_dislikes);
+        result.append("total_favorited",total_favorited);
         result.append("total_comments",total_comments);
         result.append("total_tweets",total_tweets);
         result.append("total_original_tweets",total_original_tweets);
@@ -231,7 +192,7 @@ public class DBVideo implements JsonModel,BsonModel{
         result.append("total_channel_subscribers",total_channel_subscribers);
         result.append("total_channel_videos",total_channel_videos);
 
-        List<Document> array = days.stream().map(day -> day.toBson()).collect(Collectors.toList());
+        List<Document> array = rawDays.stream().map(rawDay -> rawDay.toBson()).collect(Collectors.toList());
         result.append("days",array);
         return result;
     }
@@ -252,18 +213,11 @@ public class DBVideo implements JsonModel,BsonModel{
         this.total_channel_videos = total_channel_videos;
     }
 
-    public void setTotalFromDB(Document document) {
-        setTotal_views(document.getLong("total_views"));
-        setTotal_likes(document.getLong("total_likes"));
-        setTotal_dislikes(document.getLong("total_dislikes"));
-        setTotal_comments(document.getLong("total_comments"));
-        setTotal_tweets(document.getLong("total_tweets"));
-        setTotal_original_tweets(document.getLong("total_original_tweets"));
-        setTotal_retweets(document.getLong("total_retweets"));
-        setTotal_channel_views(document.getLong("total_channel_views"));
-        setTotal_channel_comments(document.getLong("total_channel_comments"));
-        setTotal_channel_subscribers(document.getLong("total_channel_subscribers"));
-        setTotal_channel_videos(document.getLong("total_channel_videos"));
+    public long getTotal_favorited() {
+        return total_favorited;
+    }
 
+    public void setTotal_favorited(long total_favorited) {
+        this.total_favorited = total_favorited;
     }
 }
