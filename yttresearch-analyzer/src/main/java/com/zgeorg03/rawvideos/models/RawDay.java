@@ -1,9 +1,12 @@
 package com.zgeorg03.rawvideos.models;
 
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.DateUtil;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,6 +15,8 @@ import java.util.stream.Collectors;
  * Created by zgeorg03 on 3/3/17.
  */
 public class RawDay implements BsonModel{
+    private final Logger logger = LoggerFactory.getLogger(RawDay.class);
+
     private final int day;
     private final String date;
     private final long views_added;
@@ -34,11 +39,14 @@ public class RawDay implements BsonModel{
     private ArrayList<Long> list_user_followers_count= new ArrayList<>();
     private ArrayList<Long> list_user_friends_count= new ArrayList<>();
 
+    private List<String> list_english_text= new ArrayList<>();
+
 
     private Map<String,Integer> language = new HashMap<>();
     private Map<String,Integer> hashtags = new HashMap<>();
+    private final SentimentAnalysis sentimentAnalysis;
 
-    public RawDay(int day, String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added, long channel_views_added, long channel_comments_added, long channel_subscribers_added, long channel_videos_added){
+    public RawDay(int day, String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added, long channel_views_added, long channel_comments_added, long channel_subscribers_added, long channel_videos_added, SentimentAnalysis sentimentAnalysis){
         this.day = day;
         this.date = date;
         this.views_added = views_added;
@@ -50,6 +58,7 @@ public class RawDay implements BsonModel{
         this.channel_comments_added = channel_comments_added;
         this.channel_subscribers_added = channel_subscribers_added;
         this.channel_videos_added = channel_videos_added;
+        this.sentimentAnalysis = sentimentAnalysis;
     }
 
     @Override
@@ -159,6 +168,17 @@ public class RawDay implements BsonModel{
         result.append("median_user_friends_count", Calculations.medianLong(list_user_friends_count));
         result.append("std_user_friends_count", Calculations.stdLong(list_user_friends_count,avg_user_friends_count));
 
+        try {
+            if(list_english_text.isEmpty())
+                result.append("tweets_sentiment","Not enough tweets");
+            else
+                result.append("tweets_sentiment",sentimentAnalysis.run(list_english_text).toBson());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            result.append("tweets_sentiment","Couldn't be calculated");
+        }
+
+
         List<Document> language = this.language.entrySet().stream().sorted((e1,e2)-> e2.getValue().compareTo(e1.getValue())).map(entry -> new Document(entry.getKey(),entry.getValue())).limit(10).collect(Collectors.toList());
         result.append("language",language);
 
@@ -167,7 +187,7 @@ public class RawDay implements BsonModel{
         return result;
     }
 
-    public void setTweetStuff(long video_created_at,String lang, boolean is_favorited, boolean is_possibly_sensitive, boolean is_retweet, long user_created_at, long user_followers_count, long user_friends_count, long user_favorites_count, long user_listed_count, long user_statuses_count, boolean user_verified, String user_lang, List<String> hashtags) {
+    public void setTweetStuff(long video_created_at, String lang, String text, boolean is_favorited, boolean is_possibly_sensitive, boolean is_retweet, long user_created_at, long user_followers_count, long user_friends_count, long user_favorites_count, long user_listed_count, long user_statuses_count, boolean user_verified, String user_lang, List<String> hashtags) {
 
         tweets_added++;
         if(is_retweet)
@@ -178,6 +198,11 @@ public class RawDay implements BsonModel{
             tweets_favorites_added++;
         if(is_possibly_sensitive)
             tweets_possibly_sensitive_added++;
+
+
+        //If its english
+        if(lang.equalsIgnoreCase("en"))
+            list_english_text.add(text);
 
 
         //Compute the number of days that the user was created before video

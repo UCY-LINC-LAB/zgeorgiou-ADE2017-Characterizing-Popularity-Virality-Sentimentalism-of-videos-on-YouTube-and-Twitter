@@ -1,6 +1,7 @@
 package com.zgeorg03.core;
 
 import com.mongodb.ServerAddress;
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.controllers.IndexController;
 import com.zgeorg03.controllers.VideosController;
 import com.zgeorg03.controllers.helpers.JsonResult;
@@ -22,16 +23,17 @@ import static spark.Spark.*;
  */
 public class App {
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws Exception {
 
 
         port(8000);
+        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("sentiment/sentiment.py");
 
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,50);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,200, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
 
         //Services

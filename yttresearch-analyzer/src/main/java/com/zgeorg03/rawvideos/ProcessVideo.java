@@ -1,5 +1,6 @@
 package com.zgeorg03.rawvideos;
 
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.rawvideos.models.RawDay;
@@ -29,10 +30,12 @@ public class ProcessVideo {
 
     private RawVideo rawVideo;
 
-    public ProcessVideo(DBServices dbServices, String videoID) throws Exception {
+    private final SentimentAnalysis sentimentAnalysis;
+    public ProcessVideo(DBServices dbServices, String videoID, SentimentAnalysis sentimentAnalysis) throws Exception {
 
         this.processVideoDBService = dbServices.getProcessVideoDBService();
         this.videoID = videoID;
+        this.sentimentAnalysis = sentimentAnalysis;
         video =dbServices.getVideo(videoID);
         if(video ==null)
             throw new Exception("RawVideo doesn't exist");
@@ -96,7 +99,7 @@ public class ProcessVideo {
         total_channel_subscribers +=channel_subscribers_added;
         total_channel_videos +=channel_videos_added;
 
-        RawDay first = new RawDay(0, DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
+        RawDay first = new RawDay(0, DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added, sentimentAnalysis);
         rawVideo.getRawDays().add(first);
         for(int i=1;i<days.size();i++){
             day = days.get(i);
@@ -110,7 +113,7 @@ public class ProcessVideo {
             channel_comments_added = day.getLong("channel_comment_count")-total_channel_comments;
             channel_subscribers_added = day.getLong("channel_subscriber_count")-total_channel_subscribers;
             channel_videos_added = day.getLong("channel_video_count")-total_channel_videos;
-            RawDay current = new RawDay(i,DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added);
+            RawDay current = new RawDay(i,DateUtil.toDate(timestamp), views_added,likes_added,dislikes_added,favorites_added,comments_added,channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added, sentimentAnalysis);
             rawVideo.getRawDays().add(current);
             total_views +=views_added;
             total_likes +=likes_added;
@@ -150,6 +153,7 @@ public class ProcessVideo {
                 diff=0;
             int dayIndex = (int) (diff/millisInDay);
 
+            String  text = document.getString("text");
             String  lang = document.getString("lang");
             boolean is_favorited   = document.getBoolean("is_favorited");
             boolean is_possibly_sensitive   = document.getBoolean("is_possibly_sensitive");
@@ -167,7 +171,7 @@ public class ProcessVideo {
 
             RawDay rawDay = rawVideo.getRawDays().get(dayIndex);
 
-            rawDay.setTweetStuff(rawVideo.getPublished_at(),lang,is_favorited,is_possibly_sensitive,is_retweet,user_created_at,user_followers_count,user_friends_count,user_favorites_count,user_listed_count,user_statuses_count,user_verified,user_lang,hashtags);
+            rawDay.setTweetStuff(rawVideo.getPublished_at(),lang,text,is_favorited,is_possibly_sensitive,is_retweet,user_created_at,user_followers_count,user_friends_count,user_favorites_count,user_listed_count,user_statuses_count,user_verified,user_lang,hashtags);
             total_tweets++;
             if(is_retweet)
                 total_retweets++;

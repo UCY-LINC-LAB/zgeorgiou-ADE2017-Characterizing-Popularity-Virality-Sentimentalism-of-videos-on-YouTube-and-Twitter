@@ -1,4 +1,5 @@
 import com.mongodb.ServerAddress;
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.ProcessVideo;
@@ -25,7 +26,8 @@ public class DBServicesTest {
     @Test
     public void proccessVideo() throws Exception {
         String videoID = "7aASbWJS-uM";
-        ProcessVideo processVideo= new ProcessVideo(services, videoID);
+        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("sentiment/sentiment.py");
+        ProcessVideo processVideo= new ProcessVideo(services, videoID, sentimentAnalysis);
         services.getProcessVideoDBService().addOrReplaceProcessedVideo(processVideo.getVideo());
     }
 }

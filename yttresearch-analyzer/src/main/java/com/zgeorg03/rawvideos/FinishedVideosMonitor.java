@@ -1,5 +1,6 @@
 package com.zgeorg03.rawvideos;
 
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.models.RawVideo;
 import org.slf4j.Logger;
@@ -17,9 +18,11 @@ public class FinishedVideosMonitor implements Runnable {
     private final DBServices dbServices;
     private int maxVideos;
 
-    public FinishedVideosMonitor(DBServices dbServices,int maxVideos) {
+    private final SentimentAnalysis sentimentAnalysis;
+    public FinishedVideosMonitor(DBServices dbServices, int maxVideos, SentimentAnalysis sentimentAnalysis) {
         this.dbServices = dbServices;
         this.maxVideos = maxVideos;
+        this.sentimentAnalysis = sentimentAnalysis;
     }
 
 
@@ -36,7 +39,7 @@ public class FinishedVideosMonitor implements Runnable {
 
             notProcessed.forEach(videoId -> {
                 try {
-                    ProcessVideo processVideo = new ProcessVideo(dbServices, videoId);
+                    ProcessVideo processVideo = new ProcessVideo(dbServices, videoId, sentimentAnalysis);
                     RawVideo rawVideo = processVideo.getVideo();
                     dbServices.getProcessVideoDBService().addOrReplaceProcessedVideo(rawVideo);
 
