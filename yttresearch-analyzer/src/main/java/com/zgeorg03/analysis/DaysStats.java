@@ -1,5 +1,6 @@
 package com.zgeorg03.analysis;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Day;
 import com.zgeorg03.utils.JsonModel;
@@ -24,9 +25,11 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
     public JsonObject toJson() {
         JsonObject object = new JsonObject();
 
+        JsonArray  array = new JsonArray();
         this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
-                .forEachOrdered(entry->object.add(entry.getKey()+"",entry.getValue().toJson()));
+                .forEachOrdered(entry->array.add(entry.getValue().toJson()));
 
+        object.add("array",array);
         return object;
     }
 
@@ -42,7 +45,7 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
                 continue;
             DayStat dayStat = get(key);
             if(dayStat==null) {
-                dayStat = new DayStat();
+                dayStat = new DayStat(key);
                 put(key,dayStat);
             }
             dayStat.addDay(d);

@@ -2,13 +2,13 @@ import {Group} from './group';
 export class Groups {
 
     constructor(
-        private popular : Group,
-        private viral : Group ,
-        private recent : Group ,
-        private random : Group ,
-        private popular_viral  : Group ,
-        private popular_not_viral : Group ,
-        private viral_not_popular: Group
+        public popular : Group,
+        public viral : Group ,
+        public recent : Group ,
+        public random : Group ,
+        public popular_viral  : Group ,
+        public popular_not_viral : Group ,
+        public viral_not_popular: Group
     ){}
 
 

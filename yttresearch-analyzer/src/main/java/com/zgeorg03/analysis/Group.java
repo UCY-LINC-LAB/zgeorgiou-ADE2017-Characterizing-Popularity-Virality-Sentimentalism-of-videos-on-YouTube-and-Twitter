@@ -63,7 +63,7 @@ public class Group extends LinkedList<Video> implements JsonModel{
         object.add("total_likes", Calculations.getStatsLong(totalLikesList()).toJson());
         object.add("total_dislikes", Calculations.getStatsLong(totalDislikesList()).toJson());
         if(showDailyStats)
-            object.add("days", daysStats.toJson());
+            object.add("days", daysStats.toJson().get("array"));
 
 
         return object;

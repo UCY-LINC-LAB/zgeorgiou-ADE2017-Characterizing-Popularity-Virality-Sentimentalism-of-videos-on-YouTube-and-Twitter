@@ -2,10 +2,11 @@ import {Groups} from './groups';
 export class GroupsResult {
 
     constructor(
-        private category_name : string,
-        private percentage : number,
-        private lbl_wnd : number,
-        private groups: Groups
+        public category_name : string,
+        public category : number,
+        public percentage : number,
+        public lbl_wnd : number,
+        public groups: Groups
     ){}
 
 

@@ -33,7 +33,7 @@ public class App {
         DBServices dbServices = new DBServices(dbConnection);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,200, sentimentAnalysis);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,100, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
 
         //Services

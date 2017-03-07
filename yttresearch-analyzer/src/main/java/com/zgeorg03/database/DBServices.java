@@ -76,6 +76,8 @@ public class DBServices {
      * @return
      */
     public List<String> getFinishedButNotProcessedVideos(int max){
+        if(max==0)
+            return  new LinkedList<>();
         try( MongoCursor cursor = videos.find(
                 and(
                         eq("meta.finished",true),

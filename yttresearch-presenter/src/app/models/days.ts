@@ -1,8 +1,8 @@
-import {Day} from './day';
+import {GroupDay} from './group-day';
 export class Days {
 
     constructor(
-        private days:Array<Day>,
+        private days:Array<GroupDay>,
     ){}
 
 

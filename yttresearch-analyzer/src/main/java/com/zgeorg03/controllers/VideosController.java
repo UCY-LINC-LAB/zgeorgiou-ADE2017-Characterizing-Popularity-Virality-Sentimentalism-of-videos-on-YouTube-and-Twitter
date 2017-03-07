@@ -55,7 +55,7 @@ public class VideosController {
             @Parameter(description = "Labeling window, indicates the day to begin calculating the attributes",defaultValue = "1")
             private int lbl_wnd;
 
-            @Parameter(description = "If set to 1, it returns the daily statistics",defaultValue = "0")
+            @Parameter(description = "If set to 1, it returns the daily statistics",defaultValue = "1")
             private boolean daily;
 
             @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
@@ -119,7 +119,7 @@ public class VideosController {
 
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",1,x->x>=0&&x<=15,"lbl_wnd should be from 0 to 15");
 
-                daily = ParseParameters.parseBooleanQueryParam(request,result,"daily",false,x->x==0 || x==1 ,"daily must be either 0 or 1");
+                daily = ParseParameters.parseBooleanQueryParam(request,result,"daily",true,x->x==0 || x==1 ,"daily must be either 0 or 1");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
 

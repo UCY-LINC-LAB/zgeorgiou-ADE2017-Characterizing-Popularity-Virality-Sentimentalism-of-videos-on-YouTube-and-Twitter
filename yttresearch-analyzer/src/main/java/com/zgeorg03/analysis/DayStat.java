@@ -2,6 +2,7 @@ package com.zgeorg03.analysis;
 
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Day;
+import com.zgeorg03.analysis.models.SentimentJson;
 import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.JsonModel;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 public class DayStat implements JsonModel{
 
+    private final int day;
     List<Long> view_added = new LinkedList<>();
 
     List<Long> tweets_added = new LinkedList<>();
@@ -28,9 +30,19 @@ public class DayStat implements JsonModel{
     List<Double> average_user_friends = new LinkedList<>();
     List<Double> average_user_days_created_before_video = new LinkedList<>();
 
+    List<Double> tweets_sentiment_neu = new LinkedList<>();
+    List<Double> tweets_sentiment_neg = new LinkedList<>();
+    List<Double> tweets_sentiment_pos = new LinkedList<>();
+    List<Double> tweets_sentiment_compound = new LinkedList<>();
+
+    public DayStat(int day) {
+        this.day = day;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject object = new JsonObject();
+        object.addProperty("day",day);
         object.add("views_added",Calculations.getStatsLong(view_added).toJson());
         object.add("tweets_added",Calculations.getStatsLong(tweets_added).toJson());
         object.add("retweets_added",Calculations.getStatsLong(retweets_added).toJson());
@@ -41,6 +53,10 @@ public class DayStat implements JsonModel{
         object.add("average_user_followers",Calculations.getStatsDouble(user_followers).toJson());
         object.add("average_user_friends",Calculations.getStatsDouble(average_user_friends).toJson());
         object.add("average_user_days_created_before_video",Calculations.getStatsDouble(average_user_days_created_before_video).toJson());
+        object.add("tweets_sentiment_neu",Calculations.getStatsDouble(tweets_sentiment_neu).toJson());
+        object.add("tweets_sentiment_neg",Calculations.getStatsDouble(tweets_sentiment_neg).toJson());
+        object.add("tweets_sentiment_pos",Calculations.getStatsDouble(tweets_sentiment_pos).toJson());
+        object.add("tweets_sentiment_compound",Calculations.getStatsDouble(tweets_sentiment_compound).toJson());
 
         return object;
     }
@@ -64,6 +80,13 @@ public class DayStat implements JsonModel{
         user_followers.add(d.getUser_followers_count().getAverage());
         average_user_friends.add(d.getUser_friends_count().getAverage());
         average_user_days_created_before_video.add(d.getUser_days_created_before_video().getAverage());
+        if( d.getTweets_sentiment().isValid()) {
+            SentimentJson sentiment = d.getTweets_sentiment();
+            tweets_sentiment_neu.add(sentiment.getNeu().getAverage());
+            tweets_sentiment_neg.add(sentiment.getNeg().getAverage());
+            tweets_sentiment_pos.add(sentiment.getPos().getAverage());
+            tweets_sentiment_compound.add(sentiment.getCompound().getAverage());
+        }
 
     }
 }

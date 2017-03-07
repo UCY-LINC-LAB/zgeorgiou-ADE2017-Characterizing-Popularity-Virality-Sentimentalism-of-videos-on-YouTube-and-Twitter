@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
+import {EndpointsServiceService} from '../utils/endpoints-service.service';
+import {GroupsResult} from '../models/groups-result';
+
 @Component({
   selector: 'app-groups-analysis',
   templateUrl: './groups-analysis.component.html',
@@ -7,10 +10,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GroupsAnalysisComponent implements OnInit {
 
+  private error : string;
   private categories = [];
   private category = 0;
+  private lbl_wnd = 1;
+  private percentage = 2.5;
 
-  constructor() { }
+  private  groupsResult: GroupsResult;
+
+  private dailyOptions = [
+    "Views",
+    "Tweets",
+    "Likes",
+    "Dislikes",
+  ]
+
+  option =  'Views';
+
+  constructor(private service : EndpointsServiceService) { }
 
   ngOnInit() {
 
@@ -27,6 +44,21 @@ export class GroupsAnalysisComponent implements OnInit {
   }
 
   private submit(){
-
+    let lblWnd = Number(this.lbl_wnd)
+    if (lblWnd<0 || lblWnd>14) {
+      this.error = "Label window must be between 0 and 14";
+      this.lbl_wnd=1;
+      return ;
+    }
+    let perc = Number(this.percentage) / 100;
+    if (!perc || perc >=1 || perc <=0) {
+      this.error = "Percentage must be a float between 0 and 100";
+      this.percentage=2.5;
+      return ;
+    }
+    this.service.loadGroups(this.category,lblWnd,perc)
+      .subscribe(data => {
+        this.groupsResult = data;
+      },error => this.error = error);
   }
 }

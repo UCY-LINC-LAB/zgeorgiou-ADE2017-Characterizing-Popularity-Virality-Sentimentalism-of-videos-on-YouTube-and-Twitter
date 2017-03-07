@@ -5,6 +5,7 @@ import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -19,6 +20,19 @@ public class Stat<T> implements JsonModel,BsonModel{
         this.average = average;
         this.median = median;
         this.std = std;
+    }
+    public Stat(T type,Document document){
+
+        this.average = document.getDouble("average");
+            if(type instanceof  Long){
+                this.median = (T) document.getLong("median");
+            }else if(type instanceof  Integer){
+                this.median = (T) document.getInteger("median");
+            }else if(type instanceof  Double|| type instanceof  Float)
+                this.median = (T) document.getDouble("median");
+            else
+                this.median = type;
+        this.std = document.getDouble("std");
     }
 
     @Override
@@ -53,4 +67,5 @@ public class Stat<T> implements JsonModel,BsonModel{
         object.append("std",std);
         return object;
     }
+
 }

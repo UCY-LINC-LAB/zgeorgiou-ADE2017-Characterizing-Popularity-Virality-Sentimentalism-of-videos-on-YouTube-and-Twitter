@@ -1,26 +1,37 @@
 <div class="container">
-<div class="row">
-<div class="col-xs-8 col-md-4">
-<form>
-    <div class="form-group">
-        <label> Category </label>
-        <select class="form-control" [(ngModel)]="category" name="category" required>
-            <option *ngFor="let category of categories" [value]="category.id" >{{category.name}}</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label> Labeling Window </label>
-        <input class="form-control" type="number" name="lblWnd" placeholder="Labeling window" [(ngModel)]="lblWnd" required/>
-    </div>
-    <div class="form-group">
-        <label> Percentage </label>
-        <div class="input-group">
-            <input class="form-control" name="percentage" type="text" [(ngModel)]="percentage"/>
-            <span class="input-group-addon">%</span>
+        <div class="row">
+        <div class="col-xs-8 col-md-4">
+        <form>
+            <div class="form-group">
+                <label> Category </label>
+                <select class="form-control" [(ngModel)]="category" name="category" required>
+                    <option *ngFor="let category of categories" [value]="category.id" >{{category.name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label> Labeling Window </label>
+                <input class="form-control" type="number" name="lbl_wnd" placeholder="Labeling window" [(ngModel)]="lbl_wnd" required/>
+            </div>
+            <div class="form-group">
+                <label> Percentage </label>
+                <div class="input-group">
+                    <input class="form-control" name="percentage" type="text" [(ngModel)]="percentage"/>
+                    <span class="input-group-addon">%</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default" (click)="submit()">Submit</button>
+            <div *ngIf="error"> {{error}} </div>
+        </form>
+        </div>
+        </div>
+</div>
+
+<div class="container">
+    <div class="row">
+
+        <div class="radio" *ngFor="let item of dailyOptions">
+            <label> <input type="radio" name="option" (click)="option = item" [checked]="item === option"> {{item}} </label>
         </div>
     </div>
-    <button type="submit" class="btn btn-default" (click)="submit()">Submit</button>
-</form>
 </div>
-</div>
-</div>
+<app-groups-stats *ngIf="groupsResult" [option]="option" [data]="groupsResult"> </app-groups-stats>

@@ -1,4 +1,4 @@
-import {Days} from './days';
+import {GroupDay} from './group-day';
 import {Stat} from './stat';
 export class Group {
 
@@ -8,9 +8,10 @@ export class Group {
         private total_views : Stat ,
         private total_tweets : Stat ,
         private total_likes : Stat ,
-        private total_dislikes : Stat ,
-        private days: Days
+        public total_dislikes : Stat ,
+        public days: Array<GroupDay>
     ){}
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.zgeorg03.rawvideos.models;
 
 import com.zgeorg03.analysis.SentimentAnalysis;
+import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.DateUtil;
