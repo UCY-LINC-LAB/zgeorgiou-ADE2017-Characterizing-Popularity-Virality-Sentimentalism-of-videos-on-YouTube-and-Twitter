@@ -1,9 +1,28 @@
 <div class="container">
   <div class="row">
   {{data.category_name}}
-  {{likes_average}}
   </div>
   <div class="row">
-      <div [ng2-highcharts]="options" class="graph"> </div>
+      <div [ng2-highcharts]="groupsChart" class="graph"> </div>
+  </div>
+
+  <div class="row">
+      <div class="col-xs-3 col-md-3">
+        <div class="row">
+            <div class="col-xs-7 col-md-7">
+              <div class="radio" *ngFor="let item of groups">
+                  <label> <input type="radio" name="groups" (click)="group = item;" [checked]="item === group"> {{item}} </label>
+              </div>
+            </div>
+            <div class="col-xs-5 col-md-5">
+              <div class="radio" *ngFor="let item of options">
+                  <label> <input type="radio" name="options" (click)="option = item;" [checked]="item === option"> {{item}} </label>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="col-xs-9 col-md-9">
+        <div [ng2-highcharts]="groupChart" class="graph"> </div>
+      </div>
   </div>
 </div>
