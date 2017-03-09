@@ -2,6 +2,7 @@ package com.zgeorg03.analysis.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
@@ -25,6 +26,7 @@ public class Video implements JsonModel{
     private final long collected_at;
     private final long duration;
 
+    private final SentimentJson comments_sentiment;
     private final List<Day> days;
 
     //Count these
@@ -63,6 +65,15 @@ public class Video implements JsonModel{
             long total_channel_comments = document.getLong("total_channel_comments");
             long total_channel_subscribers = document.getLong("total_channel_subscribers");
             long total_channel_videos = document.getLong("total_channel_videos");
+
+            SentimentJson comments_sentiment;
+            try {
+                document.getString("comments_sentiment");
+                comments_sentiment = new SentimentJson(true);
+            }catch (ClassCastException ex){
+                comments_sentiment  = SentimentAnalysis.parseSentiment((Document)document.get("comments_sentiment"));
+
+            }
             List<Document> documents = (List<Document>) document.get("days");
             List<Day> days = new LinkedList<>();
 
@@ -70,13 +81,13 @@ public class Video implements JsonModel{
                 days.add(Day.Builder.create(doc));
             }
             return  new Video(video_id, title, description, category, artificial_category, published_at, collected_at, duration,
-                    total_views, total_likes, total_dislikes, total_comments, total_tweets, total_original_tweets,
+                    comments_sentiment, total_views, total_likes, total_dislikes, total_comments, total_tweets, total_original_tweets,
                     total_retweets, total_channel_views, total_channel_comments, total_channel_subscribers, total_channel_videos,days);
         }
     }
     public Video(String video_id, String title, String description, int category, int artificial_category, long published_at, long collected_at, long duration,
-                 long total_views, long total_likes, long total_dislikes, long total_comments, long total_tweets, long total_original_tweets,
-                 long total_retweets, long total_channel_views, long total_channel_comments, long total_channel_subscribers, long total_channel_videos,List<Day> days){
+                 SentimentJson comments_sentiment, long total_views, long total_likes, long total_dislikes, long total_comments, long total_tweets, long total_original_tweets,
+                 long total_retweets, long total_channel_views, long total_channel_comments, long total_channel_subscribers, long total_channel_videos, List<Day> days){
 
         this.video_id = video_id;
         this.title = title;
@@ -86,6 +97,7 @@ public class Video implements JsonModel{
         this.published_at = published_at;
         this.collected_at = collected_at;
         this.duration = duration;
+        this.comments_sentiment = comments_sentiment;
         this.total_views = total_views;
         this.total_likes = total_likes;
         this.total_dislikes = total_dislikes;
@@ -125,6 +137,7 @@ public class Video implements JsonModel{
         result.addProperty("total_channel_comments",total_channel_comments);
         result.addProperty("total_channel_subscribers",total_channel_subscribers);
         result.addProperty("total_channel_videos",total_channel_videos);
+        result.add("comments_sentiment",comments_sentiment.toJson());
 
         JsonArray jsonDays = new JsonArray();
         days.stream().map(day-> day.toJson()).forEach(x->jsonDays.add(x));

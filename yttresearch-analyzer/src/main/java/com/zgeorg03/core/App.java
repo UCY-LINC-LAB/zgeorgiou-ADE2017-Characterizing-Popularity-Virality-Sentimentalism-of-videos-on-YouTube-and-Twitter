@@ -27,7 +27,7 @@ public class App {
 
 
         port(8000);
-        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("sentiment/sentiment.py");
+        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("scripts/sentiment/sentiment.py");
 
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);

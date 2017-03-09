@@ -2,6 +2,7 @@ package com.zgeorg03.analysis.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
 
@@ -29,10 +30,13 @@ public class Day implements JsonModel{
     private final long retweets_added;
     private final long tweets_favorited_added;
     private final long tweets_possibly_sensitive_added;
+    private final long tweets_hashtags_added;
+    private final long tweets_in_english_added;
 
     private final Stat<Integer> user_days_created_before_video;
     private final Stat<Long> user_followers_count;
     private final Stat<Long> user_friends_count;
+    private final Stat<Long> user_statuses_count;
 
     private final SentimentJson tweets_sentiment;
     private final Map<String,Integer> language;
@@ -61,6 +65,8 @@ public class Day implements JsonModel{
             long retweets_added =  document.getLong("retweets_added");
             long tweets_favorited_added =  document.getLong("tweets_favorited_added");
             long tweets_possibly_sensitive_added =  document.getLong("tweets_possibly_sensitive_added");
+            long tweets_hashtags_added =  document.getLong("tweets_hashtags_added");
+            long tweets_in_english_added =  document.getLong("tweets_in_english_added");
 
             double average_user_days_created_before_video =  document.getDouble("average_user_days_created_before_video");
             int median_user_days_created_before_video =  document.getInteger("median_user_days_created_before_video");
@@ -77,12 +83,14 @@ public class Day implements JsonModel{
             double std_user_friends_count =  document.getDouble("std_user_friends_count");
             Stat<Long> user_friends_count = new Stat<>(average_user_friends_count,median_user_friends_count,std_user_friends_count);
 
+            Stat<Long> user_statuses_count = new Stat(0L,(Document)document.get("user_statuses_count"));
+
             SentimentJson tweets_sentiment;
             try {
-                document.getString("tweets_sentiment");
+                document.getString("comments_sentiment");
                 tweets_sentiment = new SentimentJson(true);
             }catch (ClassCastException ex){
-                tweets_sentiment  = parseSentiment((Document)document.get("tweets_sentiment"));
+                tweets_sentiment  = SentimentAnalysis.parseSentiment((Document)document.get("comments_sentiment"));
 
             }
 
@@ -96,21 +104,14 @@ public class Day implements JsonModel{
 
             return new Day(day, date,views_added,likes_added,dislikes_added,favorites_added,comments_added,
                     channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added,tweets_added,
-                    original_tweets_added,retweets_added,tweets_favorited_added,tweets_possibly_sensitive_added, user_days_created_before_video, user_followers_count, user_friends_count, tweets_sentiment, language, hashtags);
+                    original_tweets_added,retweets_added,tweets_favorited_added,tweets_possibly_sensitive_added, tweets_hashtags_added, tweets_in_english_added, user_days_created_before_video, user_followers_count, user_friends_count, user_statuses_count, tweets_sentiment, language, hashtags);
         }
 
-        private static SentimentJson parseSentiment(Document document) {
-            Stat<Double> neg = new Stat<Double>((double) 0,(Document)document.get("neg"));
-            Stat<Double> pos = new Stat<Double>((double) 0,(Document)document.get("pos"));
-            Stat<Double> neu = new Stat<Double>((double) 0,(Document)document.get("neu"));
-            Stat<Double> compound = new Stat<Double>((double) 0,(Document)document.get("compound"));
-            return new SentimentJson(neg,pos,neu,compound);
-        }
     }
     private Day(int day, String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added,
                 long channel_views_added, long channel_comments_added, long channel_subscribers_added, long channel_videos_added, long tweets_added, long original_tweets_added,
                 long retweets_added, long tweets_favorited_added, long tweets_possibly_sensitive_added
-            , Stat<Integer> user_days_created_before_video, Stat<Long> user_followers_count, Stat<Long> user_friends_count, SentimentJson tweets_sentiment, Map<String, Integer> language, Map<String, Integer> hashtags){
+            , long tweets_hashtags_added, long tweets_in_english_added, Stat<Integer> user_days_created_before_video, Stat<Long> user_followers_count, Stat<Long> user_friends_count, Stat<Long> user_statuses_count, SentimentJson tweets_sentiment, Map<String, Integer> language, Map<String, Integer> hashtags){
         this.day = day;
         this.date = date;
         this.views_added = views_added;
@@ -127,9 +128,12 @@ public class Day implements JsonModel{
         this.retweets_added = retweets_added;
         this.tweets_favorited_added = tweets_favorited_added;
         this.tweets_possibly_sensitive_added = tweets_possibly_sensitive_added;
+        this.tweets_hashtags_added = tweets_hashtags_added;
+        this.tweets_in_english_added = tweets_in_english_added;
         this.user_days_created_before_video = user_days_created_before_video;
         this.user_followers_count = user_followers_count;
         this.user_friends_count = user_friends_count;
+        this.user_statuses_count = user_statuses_count;
         this.tweets_sentiment = tweets_sentiment;
         this.language = language;
         this.hashtags = hashtags;
@@ -202,6 +206,7 @@ public class Day implements JsonModel{
     @Override
     public JsonObject toJson() {
         JsonObject result = new JsonObject();
+        result.addProperty("day",day);
         result.addProperty("date",date);
         result.addProperty("views_added",views_added);
         result.addProperty("likes_added", likes_added);
@@ -217,10 +222,14 @@ public class Day implements JsonModel{
         result.addProperty("retweets_added",retweets_added);
         result.addProperty("tweets_favorited_added", tweets_favorited_added);
         result.addProperty("tweets_possibly_sensitive_added",tweets_possibly_sensitive_added);
+        result.addProperty("tweets_hashtags_added",tweets_hashtags_added);
+        result.addProperty("tweets_in_english_added",tweets_in_english_added);
 
         result.add("user_days_created_before_video",user_days_created_before_video.toJson());
         result.add("user_followers_count",user_followers_count.toJson());
         result.add("user_friends_count",user_friends_count.toJson());
+        result.add("user_statuses_count",user_friends_count.toJson());
+
         result.add("tweets_sentiment",tweets_sentiment.toJson());
 
         JsonObject language = new JsonObject();

@@ -39,6 +39,7 @@ public class RawDay implements BsonModel{
     private ArrayList<Integer> list_user_days_created_before_video  = new ArrayList<>();
     private ArrayList<Long> list_user_followers_count= new ArrayList<>();
     private ArrayList<Long> list_user_friends_count= new ArrayList<>();
+    private ArrayList<Long> list_user_statuses_count= new ArrayList<>();
 
     private List<String> list_english_text= new ArrayList<>();
 
@@ -153,6 +154,8 @@ public class RawDay implements BsonModel{
         result.append("retweets_added",retweets_added);
         result.append("tweets_favorited_added",tweets_favorites_added);
         result.append("tweets_possibly_sensitive_added",tweets_possibly_sensitive_added);
+        result.append("tweets_hashtags_added",hashtags.values().stream().mapToLong(i->i).sum());
+        result.append("tweets_in_english_added",(long)list_english_text.size());
 
         double avg_user_days_created_before_video = Calculations.averageInt(list_user_days_created_before_video);
         result.append("average_user_days_created_before_video",avg_user_days_created_before_video);
@@ -169,6 +172,7 @@ public class RawDay implements BsonModel{
         result.append("median_user_friends_count", Calculations.medianLong(list_user_friends_count));
         result.append("std_user_friends_count", Calculations.stdLong(list_user_friends_count,avg_user_friends_count));
 
+        result.append("user_statuses_count",Calculations.getStatsLong(list_user_statuses_count).toBson());
         try {
             if(list_english_text.isEmpty())
                 result.append("tweets_sentiment","Not enough tweets");
@@ -211,6 +215,7 @@ public class RawDay implements BsonModel{
         list_user_days_created_before_video.add(user_created_days_before_video);
         list_user_followers_count.add(user_followers_count);
         list_user_friends_count.add(user_friends_count);
+        list_user_statuses_count.add(user_statuses_count);
 
         language.compute(lang,(k,v)->(v==null)?1:v+1);
         for(String hashtag:hashtags) {

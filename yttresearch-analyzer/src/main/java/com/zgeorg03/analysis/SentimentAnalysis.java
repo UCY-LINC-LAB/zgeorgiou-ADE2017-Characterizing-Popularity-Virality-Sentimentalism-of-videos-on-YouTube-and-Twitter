@@ -1,7 +1,9 @@
 package com.zgeorg03.analysis;
 
 import com.zgeorg03.analysis.models.SentimentBson;
+import com.zgeorg03.analysis.models.SentimentJson;
 import com.zgeorg03.analysis.models.Stat;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,13 @@ public class SentimentAnalysis {
         return new SentimentBson(neg,pos,neu,compound);
     }
 
+    public static SentimentJson parseSentiment(Document document) {
+        Stat<Double> neg = new Stat<Double>((double) 0,(Document)document.get("neg"));
+        Stat<Double> pos = new Stat<Double>((double) 0,(Document)document.get("pos"));
+        Stat<Double> neu = new Stat<Double>((double) 0,(Document)document.get("neu"));
+        Stat<Double> compound = new Stat<Double>((double) 0,(Document)document.get("compound"));
+        return new SentimentJson(neg,pos,neu,compound);
+    }
     public class SentimentProcess implements Callable<List<String>>{
         private final List<String> list;
         BufferedReader in;

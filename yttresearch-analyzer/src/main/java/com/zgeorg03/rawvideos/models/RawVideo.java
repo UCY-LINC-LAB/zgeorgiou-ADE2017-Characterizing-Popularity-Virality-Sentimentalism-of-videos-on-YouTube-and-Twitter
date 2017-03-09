@@ -1,8 +1,11 @@
 package com.zgeorg03.rawvideos.models;
 
+import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.utils.BsonModel;
 import com.zgeorg03.utils.DateUtil;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,7 @@ import java.util.stream.Collectors;
  * Created by zgeorg03 on 3/2/17.
  */
 public class RawVideo implements BsonModel{
+    private final Logger logger= LoggerFactory.getLogger(RawVideo.class);
 
     //Static
     private final String video_id;
@@ -39,8 +43,12 @@ public class RawVideo implements BsonModel{
     private long total_channel_subscribers;
     private long total_channel_videos;
 
+    //Helpers
+    private final SentimentAnalysis sentimentAnalysis;
+    private final List<String> comments_text;
 
-    public RawVideo(String video_id, String title, String description, int category, int artificial_category, long published_at, long collected_at, long duration) {
+    public RawVideo(String video_id, String title, String description, int category, int artificial_category, long published_at, long collected_at, long duration, SentimentAnalysis sentimentAnalysis, List<String> comments_text) {
+
         this.video_id = video_id;
         this.title = title;
         this.description = description;
@@ -49,7 +57,9 @@ public class RawVideo implements BsonModel{
         this.published_at = published_at;
         this.collected_at = collected_at;
         this.duration = duration;
+        this.sentimentAnalysis = sentimentAnalysis;
         this.rawDays = new ArrayList<>();
+        this.comments_text =comments_text;
     }
 
     public void setTotal_views(long total_views) {
@@ -192,6 +202,15 @@ public class RawVideo implements BsonModel{
         result.append("total_channel_subscribers",total_channel_subscribers);
         result.append("total_channel_videos",total_channel_videos);
 
+        try {
+            if(comments_text.isEmpty())
+                result.append("comments_sentiment","Not enough comments");
+            else
+                result.append("comments_sentiment",sentimentAnalysis.run(comments_text).toBson());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            result.append("comments_sentiment","Couldn't be calculated");
+        }
         List<Document> array = rawDays.stream().map(rawDay -> rawDay.toBson()).collect(Collectors.toList());
         result.append("days",array);
         return result;

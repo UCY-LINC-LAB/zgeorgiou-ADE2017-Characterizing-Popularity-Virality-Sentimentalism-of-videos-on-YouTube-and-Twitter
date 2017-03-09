@@ -44,12 +44,14 @@ public class FinishedVideosMonitor implements Runnable {
                     dbServices.getProcessVideoDBService().addOrReplaceProcessedVideo(rawVideo);
 
                     //Normally we set it as processed
+                    // TODO CHANGE THISSS IN PRODUCTION
                     dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());
                 }
             });
 
+            // TODO CHANGE THIS IN PRODUCTION
             try { TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) { }
         }
     }

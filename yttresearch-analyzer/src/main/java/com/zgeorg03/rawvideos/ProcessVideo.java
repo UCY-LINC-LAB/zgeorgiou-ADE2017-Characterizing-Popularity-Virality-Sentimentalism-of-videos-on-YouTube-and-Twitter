@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -55,7 +56,13 @@ public class ProcessVideo {
         long collected_at = ((Document) video.get("meta")).getLong("timestamp");
         long duration = video.getLong("duration");
 
-        rawVideo = new RawVideo(videoID,title,description,category,artificial_category,published_at,collected_at,duration);
+        List<String> comments_text = new LinkedList<>();
+        for(Document comment : comments){
+            String text = comment.getString("text");
+            comments_text.add(text);
+
+        }
+        rawVideo = new RawVideo(videoID,title,description,category,artificial_category,published_at,collected_at,duration,sentimentAnalysis,comments_text);
     }
 
 
