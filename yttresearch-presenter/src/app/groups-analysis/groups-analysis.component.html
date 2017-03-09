@@ -28,10 +28,17 @@
 
 <div class="container">
     <div class="row">
-
-        <div class="radio" *ngFor="let item of dailyOptions">
-            <label> <input type="radio" name="option" (click)="option = item" [checked]="item === option"> {{item}} </label>
+        <div class="col-md-3">
+            <div class="radio" *ngFor="let item of groupsOptions">
+                <label> <input type="radio" name="groupsOption" (click)="groupsOption = item;" [checked]="item === groupsOption"> {{item}} </label>
+            </div>
+            </div>
+        <div class="col-md-6">
+            <label> 
+                <input type="checkbox" name="errorBars" (change)="errorBars=!errorBars" [checked]="errorBars"> Show Error Bars
+            </label>
         </div>
     </div>
 </div>
-<app-groups-stats *ngIf="groupsResult" [option]="option" [data]="groupsResult"> </app-groups-stats>
+{{errorBars}}
+<app-groups-stats *ngIf="groupsResult" [showErrorBars]="errorBars" [groupsOption]="groupsOption" [data]="groupsResult"> </app-groups-stats>

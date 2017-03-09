@@ -100,10 +100,10 @@ public class Day implements JsonModel{
         }
 
         private static SentimentJson parseSentiment(Document document) {
-            Stat<Double> neg = new Stat<Double>((double) 0,(Document)document.get("neg"));
-            Stat<Double> pos = new Stat<Double>((double) 0,(Document)document.get("pos"));
-            Stat<Double> neu = new Stat<Double>((double) 0,(Document)document.get("neu"));
-            Stat<Double> compound = new Stat<Double>((double) 0,(Document)document.get("compound"));
+            Stat<Double> neg = new Stat<>((double) 0,(Document)document.get("neg"));
+            Stat<Double> pos = new Stat<>((double) 0,(Document)document.get("pos"));
+            Stat<Double> neu = new Stat<>((double) 0,(Document)document.get("neu"));
+            Stat<Double> compound = new Stat<>((double) 0,(Document)document.get("compound"));
             return new SentimentJson(neg,pos,neu,compound);
         }
     }

@@ -75,7 +75,7 @@ public class DayStat implements JsonModel{
         likes_added.add(d.getLikes_added());
         dislikes_added.add(d.getDislikes_added());
 
-        if(d.getDislikes_added()!=0)
+        if(d.getLikes_added()+d.getDislikes_added()!=0)
             ratio_likes.add(d.getLikes_added()/(double)(d.getLikes_added()+d.getDislikes_added()));
         user_followers.add(d.getUser_followers_count().getAverage());
         average_user_friends.add(d.getUser_friends_count().getAverage());

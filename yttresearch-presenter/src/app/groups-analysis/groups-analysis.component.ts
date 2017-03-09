@@ -18,14 +18,19 @@ export class GroupsAnalysisComponent implements OnInit {
 
   private  groupsResult: GroupsResult;
 
-  private dailyOptions = [
+  private groupsOptions = [
     "Views",
     "Tweets",
     "Likes",
     "Dislikes",
+    "Likes Ratio",
+    "Tweets Sentiment-Neutral",
+
   ]
 
-  option =  'Views';
+  groupsOption =  'Views';
+
+  errorBars = false;
 
   constructor(private service : EndpointsServiceService) { }
 
@@ -59,6 +64,6 @@ export class GroupsAnalysisComponent implements OnInit {
     this.service.loadGroups(this.category,lblWnd,perc)
       .subscribe(data => {
         this.groupsResult = data;
-      },error => this.error = error);
+      },error => this.error = "Error with request");
   }
 }

@@ -16,8 +16,7 @@ target/
 *.iml
 
 
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
+# yttresearch
 # compiled output
 yttresearch-frontend/dist
 yttresearch-frontend/tmp
@@ -56,3 +55,43 @@ yttresearch-frontend/e2e/*.map
 #System Files
 yttresearch-frontend/.DS_Store
 yttresearch-frontend/Thumbs.db
+
+# preseneter
+# compiled output
+yttresearch-presenter/dist
+yttresearch-presenter/tmp
+
+# dependencies
+yttresearch-presenter/node_modules
+
+# IDEs and editors
+yttresearch-presenter/.idea
+yttresearch-presenter/.project
+yttresearch-presenter/.classpath
+yttresearch-presenter/.c9/
+yttresearch-presenter/*.launch
+yttresearch-presenter/.settings/
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+yttresearch-presenter/.sass-cache
+yttresearch-presenter/connect.lock
+yttresearch-presenter/coverage/*
+yttresearch-presenter/libpeerconnection.log
+yttresearch-presenter/npm-debug.log
+yttresearch-presenter/testem.log
+yttresearch-presenter/typings
+
+# e2e
+yttresearch-presenter/e2e/*.js
+yttresearch-presenter/e2e/*.map
+
+#System Files
+yttresearch-presenter/.DS_Store
+yttresearch-presenter/Thumbs.db

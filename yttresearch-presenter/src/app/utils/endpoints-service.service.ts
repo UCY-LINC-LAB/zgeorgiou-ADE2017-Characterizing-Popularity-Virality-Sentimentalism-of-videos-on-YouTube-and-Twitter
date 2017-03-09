@@ -26,6 +26,7 @@ export class EndpointsServiceService {
 
   private extractGroupsResult(res:Response) : GroupsResult{
     let body =  res.json();
+
     console.log(body.data)
     if(body.error.length!=0){
       throw new Error (body.error[0]);
@@ -35,6 +36,7 @@ export class EndpointsServiceService {
 
   private handleError(error: Response | any) {
     let errMsg: string;
+    console.log(error)
     return Observable.throw("as");
   }
 }
