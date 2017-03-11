@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class SentimentBsonAnalysisTest {
 
+    /**
     @Test
     public void test() throws Exception {
 
@@ -19,4 +20,5 @@ public class SentimentBsonAnalysisTest {
         SentimentBson sentiment = sentimentAnalysis.run(list);
         System.out.println(sentiment.toBson());
     }
+    **/
 }

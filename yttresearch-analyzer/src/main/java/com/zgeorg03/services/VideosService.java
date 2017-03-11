@@ -42,7 +42,6 @@ public class VideosService extends Service {
         return  video.toJson();
     }
 
-
     public JsonArray getPopularVideos(int artificial_category, int lbl_wnd,int limit){
         return dbServices.getProcessVideoDBService().getVideosWithTheMostViews(artificial_category,lbl_wnd,limit);
     }
@@ -78,5 +77,10 @@ public class VideosService extends Service {
 
     public ProcessVideoDBService getProcessVideoDBService() {
         return processVideoDBService;
+    }
+
+    public JsonArray getVideos(int totalVideos, int category) {
+
+        return processVideoDBService.getRandomVideos(category,totalVideos);
     }
 }

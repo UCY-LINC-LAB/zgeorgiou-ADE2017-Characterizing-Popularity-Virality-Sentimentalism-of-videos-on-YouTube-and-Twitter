@@ -45,7 +45,7 @@ public class FinishedVideosMonitor implements Runnable {
 
                     //Normally we set it as processed
                     // TODO CHANGE THISSS IN PRODUCTION
-                    dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
+                   dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());
                 }

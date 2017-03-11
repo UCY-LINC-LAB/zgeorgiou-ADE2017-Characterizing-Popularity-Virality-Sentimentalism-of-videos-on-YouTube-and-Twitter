@@ -128,5 +128,6 @@ public class Calculations {
         double std = Calculations.stdInt(list,average);
         return new Stat<>(average,median,std);
     }
+
 }
 

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -20,8 +21,8 @@ public class SentimentAnalysis {
     private final static  Logger logger = LoggerFactory.getLogger(SentimentAnalysis.class);
     private final File sentimentFile;
 
-    public SentimentAnalysis(String sentimentFile) throws Exception {
-        this.sentimentFile = new File(sentimentFile);
+    public SentimentAnalysis(String scripts) throws Exception {
+        this.sentimentFile = Paths.get(scripts,"sentiment/sentiment.py").toFile();
 
         if(!this.sentimentFile.exists())
             throw new Exception("SentimentBson file doesn't exist");
@@ -65,7 +66,7 @@ public class SentimentAnalysis {
         Stat<Double> compound = new Stat<Double>((double) 0,(Document)document.get("compound"));
         return new SentimentJson(neg,pos,neu,compound);
     }
-    public class SentimentProcess implements Callable<List<String>>{
+    public class SentimentProcess implements Callable<List<String>> {
         private final List<String> list;
         BufferedReader in;
         BufferedReader error;
@@ -77,7 +78,7 @@ public class SentimentAnalysis {
 
         @Override
         public List<String> call() throws Exception {
-            ProcessBuilder builder = new ProcessBuilder("python",sentimentFile.getAbsolutePath());
+            ProcessBuilder builder = new ProcessBuilder("python", sentimentFile.getAbsolutePath());
             try {
                 Process process = builder.start();
                 in = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -88,8 +89,8 @@ public class SentimentAnalysis {
                 process.waitFor();
                 List<String> inputLines = readLines(in);
                 List<String> errorLines = readLines(error);
-                if(errorLines.size()!=0) {
-                    errorLines.add(0,"error");
+                if (errorLines.size() != 0) {
+                    errorLines.add(0, "error");
                     return errorLines;
                 }
 
@@ -98,25 +99,25 @@ public class SentimentAnalysis {
             } catch (IOException e) {
                 logger.error(e.getMessage());
                 List<String> list = new LinkedList<>();
-                list.add(0,"error");
+                list.add(0, "error");
                 return list;
             } catch (InterruptedException e) {
                 logger.error(e.getMessage());
                 List<String> list = new LinkedList<>();
-                list.add(0,"error");
+                list.add(0, "error");
                 return list;
             }
 
         }
-    }
 
-    private List<String> readLines(BufferedReader reader) throws IOException {
-        List<String> lines = new LinkedList<>();
-        String input ="";
-        while((input=reader.readLine())!=null){
-            lines.add(input);
+        private List<String> readLines(BufferedReader reader) throws IOException {
+            List<String> lines = new LinkedList<>();
+            String input = "";
+            while ((input = reader.readLine()) != null) {
+                lines.add(input);
+            }
+
+            return lines;
         }
-
-        return lines;
     }
 }

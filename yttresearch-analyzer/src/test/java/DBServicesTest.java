@@ -12,6 +12,7 @@ public class DBServicesTest {
 
     private final DBServices services;
 
+
     public DBServicesTest() {
         DBConnection connection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         services = new DBServices(connection);
@@ -19,15 +20,19 @@ public class DBServicesTest {
 
 
 
+    /**
     @Test
     public void getListUnprocessedVideos(){
         System.out.println(services.getFinishedButNotProcessedVideos(10));
     }
+    **/
+    /**
     @Test
     public void proccessVideo() throws Exception {
         String videoID = "7aASbWJS-uM";
-        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("sentiment/sentiment.py");
+        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("scripts/sentiment/sentiment.py");
         ProcessVideo processVideo= new ProcessVideo(services, videoID, sentimentAnalysis);
         services.getProcessVideoDBService().addOrReplaceProcessedVideo(processVideo.getVideo());
     }
+    **/
 }

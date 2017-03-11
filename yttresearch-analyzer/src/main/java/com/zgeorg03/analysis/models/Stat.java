@@ -83,6 +83,10 @@ public class Stat<T> implements JsonModel,BsonModel{
         return average;
     }
 
+    public Double getStd() {
+        return std;
+    }
+
     @Override
     public Document toBson() {
         Document object = new Document();

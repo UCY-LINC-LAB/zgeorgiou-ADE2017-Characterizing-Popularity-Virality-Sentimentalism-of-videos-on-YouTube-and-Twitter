@@ -35,6 +35,7 @@ public class RawDay implements BsonModel{
     private  long retweets_added;
     private  long tweets_favorites_added;
     private  long tweets_possibly_sensitive_added;
+    private  long users_verified_count;
 
     private ArrayList<Integer> list_user_days_created_before_video  = new ArrayList<>();
     private ArrayList<Long> list_user_followers_count= new ArrayList<>();
@@ -156,6 +157,7 @@ public class RawDay implements BsonModel{
         result.append("tweets_possibly_sensitive_added",tweets_possibly_sensitive_added);
         result.append("tweets_hashtags_added",hashtags.values().stream().mapToLong(i->i).sum());
         result.append("tweets_in_english_added",(long)list_english_text.size());
+        result.append("users_verified_count",users_verified_count);
 
         double avg_user_days_created_before_video = Calculations.averageInt(list_user_days_created_before_video);
         result.append("average_user_days_created_before_video",avg_user_days_created_before_video);
@@ -203,6 +205,8 @@ public class RawDay implements BsonModel{
             tweets_favorites_added++;
         if(is_possibly_sensitive)
             tweets_possibly_sensitive_added++;
+        if(user_verified)
+            users_verified_count++;
 
 
         //If its english

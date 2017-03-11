@@ -3,12 +3,14 @@ package com.zgeorg03.core;
 import com.mongodb.ServerAddress;
 import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.controllers.IndexController;
+import com.zgeorg03.controllers.PlotsController;
 import com.zgeorg03.controllers.VideosController;
 import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.FinishedVideosMonitor;
 import com.zgeorg03.services.IndexService;
+import com.zgeorg03.services.PlotsService;
 import com.zgeorg03.services.VideosService;
 
 import java.util.concurrent.ExecutorService;
@@ -24,26 +26,33 @@ import static spark.Spark.*;
 public class App {
 
     public static void main(String args[]) throws Exception {
-
+        String workingPath="/tmp/thesis";
+        String scripts="./scripts/";
 
         port(8000);
-        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis("scripts/sentiment/sentiment.py");
+
+        PlotProducer plotProducer = new PlotProducer(workingPath);
+
+        SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,100, sentimentAnalysis);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,0, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
+
 
         //Services
         final IndexService indexService = new IndexService(dbServices);
         final VideosService videosService = new VideosService(dbServices);
+        final PlotsService plotsService = new PlotsService(plotProducer);
 
 
         //Controllers
         new IndexController(indexService);
-        new VideosController(videosService);
+        new VideosController(videosService, plotProducer);
+        new PlotsController(plotsService);
 
 
 

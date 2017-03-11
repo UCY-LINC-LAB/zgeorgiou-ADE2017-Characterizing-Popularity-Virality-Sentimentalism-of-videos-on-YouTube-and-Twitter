@@ -32,6 +32,7 @@ public class Day implements JsonModel{
     private final long tweets_possibly_sensitive_added;
     private final long tweets_hashtags_added;
     private final long tweets_in_english_added;
+    private final long users_verified_count;
 
     private final Stat<Integer> user_days_created_before_video;
     private final Stat<Long> user_followers_count;
@@ -67,6 +68,7 @@ public class Day implements JsonModel{
             long tweets_possibly_sensitive_added =  document.getLong("tweets_possibly_sensitive_added");
             long tweets_hashtags_added =  document.getLong("tweets_hashtags_added");
             long tweets_in_english_added =  document.getLong("tweets_in_english_added");
+            long users_verified_count =  document.getLong("users_verified_count");
 
             double average_user_days_created_before_video =  document.getDouble("average_user_days_created_before_video");
             int median_user_days_created_before_video =  document.getInteger("median_user_days_created_before_video");
@@ -104,14 +106,14 @@ public class Day implements JsonModel{
 
             return new Day(day, date,views_added,likes_added,dislikes_added,favorites_added,comments_added,
                     channel_views_added,channel_comments_added,channel_subscribers_added,channel_videos_added,tweets_added,
-                    original_tweets_added,retweets_added,tweets_favorited_added,tweets_possibly_sensitive_added, tweets_hashtags_added, tweets_in_english_added, user_days_created_before_video, user_followers_count, user_friends_count, user_statuses_count, tweets_sentiment, language, hashtags);
+                    original_tweets_added,retweets_added,tweets_favorited_added,tweets_possibly_sensitive_added, tweets_hashtags_added, tweets_in_english_added, users_verified_count, user_days_created_before_video, user_followers_count, user_friends_count, user_statuses_count, tweets_sentiment, language, hashtags);
         }
 
     }
     private Day(int day, String date, long views_added, long likes_added, long dislikes_added, long favorites_added, long comments_added,
                 long channel_views_added, long channel_comments_added, long channel_subscribers_added, long channel_videos_added, long tweets_added, long original_tweets_added,
                 long retweets_added, long tweets_favorited_added, long tweets_possibly_sensitive_added
-            , long tweets_hashtags_added, long tweets_in_english_added, Stat<Integer> user_days_created_before_video, Stat<Long> user_followers_count, Stat<Long> user_friends_count, Stat<Long> user_statuses_count, SentimentJson tweets_sentiment, Map<String, Integer> language, Map<String, Integer> hashtags){
+            , long tweets_hashtags_added, long tweets_in_english_added, long users_verified_count, Stat<Integer> user_days_created_before_video, Stat<Long> user_followers_count, Stat<Long> user_friends_count, Stat<Long> user_statuses_count, SentimentJson tweets_sentiment, Map<String, Integer> language, Map<String, Integer> hashtags){
         this.day = day;
         this.date = date;
         this.views_added = views_added;
@@ -130,6 +132,7 @@ public class Day implements JsonModel{
         this.tweets_possibly_sensitive_added = tweets_possibly_sensitive_added;
         this.tweets_hashtags_added = tweets_hashtags_added;
         this.tweets_in_english_added = tweets_in_english_added;
+        this.users_verified_count = users_verified_count;
         this.user_days_created_before_video = user_days_created_before_video;
         this.user_followers_count = user_followers_count;
         this.user_friends_count = user_friends_count;
@@ -224,11 +227,12 @@ public class Day implements JsonModel{
         result.addProperty("tweets_possibly_sensitive_added",tweets_possibly_sensitive_added);
         result.addProperty("tweets_hashtags_added",tweets_hashtags_added);
         result.addProperty("tweets_in_english_added",tweets_in_english_added);
+        result.addProperty("users_verified_count",users_verified_count);
 
         result.add("user_days_created_before_video",user_days_created_before_video.toJson());
         result.add("user_followers_count",user_followers_count.toJson());
         result.add("user_friends_count",user_friends_count.toJson());
-        result.add("user_statuses_count",user_friends_count.toJson());
+        result.add("user_statuses_count",user_statuses_count.toJson());
 
         result.add("tweets_sentiment",tweets_sentiment.toJson());
 

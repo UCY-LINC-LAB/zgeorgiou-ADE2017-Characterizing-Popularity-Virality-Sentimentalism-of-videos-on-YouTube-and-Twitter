@@ -2,11 +2,12 @@ package com.zgeorg03.controllers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.controllers.helpers.GetRequest;
 import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.controllers.helpers.Parameter;
 import com.zgeorg03.controllers.helpers.ParseParameters;
-import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.core.PlotProducer;
 import com.zgeorg03.services.VideosService;
 import com.zgeorg03.utils.Categories;
 import spark.Request;
@@ -20,9 +21,11 @@ import java.util.*;
 public class VideosController {
 
     private final VideosService videosService;
+    private final PlotProducer plotProducer;
 
-    public VideosController(VideosService videosService) {
+    public VideosController(VideosService videosService, PlotProducer plotProducer) {
         this.videosService = videosService;
+        this.plotProducer = plotProducer;
 
         new GetRequest("/videos"){
 
@@ -47,6 +50,103 @@ public class VideosController {
             }
         };
 
+        new GetRequest("/videos/classify"){
+
+            @Parameter(description = "Specify the category",defaultValue = "0")
+            private int category;
+
+
+            @Parameter(description = "Labeling window, indicates the day to begin calculating the attributes",defaultValue = "1")
+            private int lbl_wnd;
+
+            @Parameter(description = "Training window, indicates the number of days to train the classifier",defaultValue = "2")
+            private int train_wnd;
+
+            @Parameter(description = "Offset, indicates the number of days we don't measure stats",defaultValue = "0")
+            private int offset;
+
+            @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
+            private float percentage;
+
+            private int useLimit;
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+                JsonArray popular = videosService.getPopularVideos(category,lbl_wnd, useLimit);
+                JsonArray viral = videosService.getViralVideos(category,lbl_wnd,useLimit);
+                JsonArray recent = videosService.getRecentVideos(category,2,useLimit);
+                JsonArray random = videosService.getRandomVideos(category,useLimit);
+
+
+
+                Map<String,List<Integer>> videos =new HashMap<>();
+                popular.forEach(x-> {
+                    String key = x.getAsJsonObject().get("video_id").getAsString();
+                    List<Integer> values = videos.getOrDefault(key,new LinkedList<>());
+                    values.add(0);
+                    videos.put(key,values);
+                });
+
+                viral.forEach(x-> {
+                    String key = x.getAsJsonObject().get("video_id").getAsString();
+                    List<Integer> values = videos.getOrDefault(key,new LinkedList<>());
+                    values.add(1);
+                    videos.put(key,values);
+                });
+                recent.forEach(x-> {
+                    String key = x.getAsJsonObject().get("video_id").getAsString();
+                    List<Integer> values = videos.getOrDefault(key,new LinkedList<>());
+                    values.add(2);
+                    videos.put(key,values);
+                });
+                random.forEach(x-> {
+                    String key = x.getAsJsonObject().get("video_id").getAsString();
+                    List<Integer> values = videos.getOrDefault(key,new LinkedList<>());
+                    values.add(3);
+                    videos.put(key,values);
+                });
+
+                //TODO When in production change this
+                String experimentId = UUID.randomUUID().toString().substring(0,4);
+                experimentId ="test";
+                Groups groups = new Groups(true,lbl_wnd,videosService.getProcessVideoDBService(),videos, experimentId);
+
+                JsonObject object = new JsonObject();
+                object.addProperty("experiment_id",experimentId);
+                object.addProperty("category_name", Categories.getArtificial_categories().get(category));
+                object.addProperty("number_of_videos", groups.getTotalVideos());
+                object.addProperty("category",category);
+                object.addProperty("percentage",percentage);
+                object.addProperty("train_wnd",train_wnd);
+                object.addProperty("offset", offset);
+                object.addProperty("lbl_wnd",lbl_wnd);
+                object.add("high_level_characterization_plots",plotProducer.produceHighLevelPlots(groups));
+                object.add("groups",groups.getInfo());
+                result.setData(object);
+
+
+
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+
+                category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
+
+                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<=10,"train_wnd should be from 0 to 10");
+
+                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x>=train_wnd&&x+train_wnd<=14,"offset should be from 0 until the last day of experiments");
+
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",1,x->x>=train_wnd+ offset &&x<=15,"lbl_wnd should be greater than train_wnd+offset_ 0 to 15");
+
+                percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
+
+                int totalVideos = videosService.getTotalVideos(category);
+
+                useLimit = (int) (percentage * totalVideos);
+
+            }
+        };
         new GetRequest("/videos/groups"){
 
             @Parameter(description = "Specify the category",defaultValue = "0")
@@ -98,7 +198,7 @@ public class VideosController {
                     values.add(3);
                     videos.put(key,values);
                 });
-                Groups groups = new Groups(daily,lbl_wnd,videosService.getProcessVideoDBService(),videos);
+                Groups groups = new Groups(daily,lbl_wnd,videosService.getProcessVideoDBService(),videos, "");
 
                 JsonObject object = new JsonObject();
                 object.addProperty("category_name", Categories.getArtificial_categories().get(category));
@@ -126,6 +226,7 @@ public class VideosController {
                 useLimit = (int) (percentage * videosService.getTotalVideos(category));
             }
         };
+
         new GetRequest("/videos/popular"){
 
             @Parameter(description = "Specify the category",defaultValue = "0")
@@ -160,7 +261,7 @@ public class VideosController {
 
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",1,x->x>=0&&x<=15,"lbl_wnd should be from 0 to 15");
 
-                limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"limit must be greater than 0");
+                limit = ParseParameters.parseIntegerQueryParam(request,result,"totalVideos",10,x->x>0,"totalVideos must be greater than 0");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0,x->x>0&&x<1,"Percentage must be between 0 and 1");
 
@@ -206,7 +307,7 @@ public class VideosController {
 
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",1,x->x>=0&&x<=15,"lbl_wnd should be from 0 to 15");
 
-                limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"limit must be greater than 0");
+                limit = ParseParameters.parseIntegerQueryParam(request,result,"totalVideos",10,x->x>0,"totalVideos must be greater than 0");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0,x->x>0&&x<1,"Percentage must be between 0 and 1");
 
@@ -250,7 +351,7 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
 
-                limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"limit must be greater than 0");
+                limit = ParseParameters.parseIntegerQueryParam(request,result,"totalVideos",10,x->x>0,"totalVideos must be greater than 0");
 
                 days = ParseParameters.parseIntegerQueryParam(request,result,"days",2,x->x>0,"days must be greater than 0");
 
@@ -293,7 +394,7 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
 
-                limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",10,x->x>0,"limit must be greater than 0");
+                limit = ParseParameters.parseIntegerQueryParam(request,result,"totalVideos",10,x->x>0,"totalVideos must be greater than 0");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0,x->x>0&&x<1,"Percentage must be between 0 and 1");
 

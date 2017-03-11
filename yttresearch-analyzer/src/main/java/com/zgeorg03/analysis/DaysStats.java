@@ -3,12 +3,14 @@ package com.zgeorg03.analysis;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Day;
+import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.JsonModel;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/5/17.
@@ -50,5 +52,32 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
             }
             dayStat.addDay(d);
         }
+    }
+
+    public List<Double> getViewsAverageDailyIncrease(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .map(entry-> Calculations.averageLong(entry.getValue().view_added))
+                .collect(Collectors.toList());
+    }
+
+    public List<Double> getTweetsAverageDailyIncrease(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .map(entry-> Calculations.averageLong(entry.getValue().tweets_added))
+                .collect(Collectors.toList());
+    }
+
+    public List<Double> getRatioOriginalTotalTweets(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .map(entry-> Calculations.averageDouble(entry.getValue().ratio_original_tweets_total_tweets))
+                .collect(Collectors.toList());
+    }
+    public List<Double> getAverageUsersReached(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .map(entry-> Calculations.averageDouble(entry.getValue().user_followers))
+                .collect(Collectors.toList());
     }
 }

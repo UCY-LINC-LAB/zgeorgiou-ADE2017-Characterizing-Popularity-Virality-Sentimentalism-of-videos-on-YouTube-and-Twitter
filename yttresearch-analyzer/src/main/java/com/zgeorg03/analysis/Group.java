@@ -1,13 +1,14 @@
 package com.zgeorg03.analysis;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.utils.Calculations;
+import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.utils.JsonModel;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,4 +75,44 @@ public class Group extends LinkedList<Video> implements JsonModel{
         return toJson();
     }
 
+    public List<Double> getViewsAverageDailyIncrease(int lbl_wnd) {
+        return daysStats.getViewsAverageDailyIncrease(lbl_wnd);
+    }
+    public List<Double> getTweetsAverageDailyIncrease(int lbl_wnd) {
+        return daysStats.getTweetsAverageDailyIncrease(lbl_wnd);
+    }
+    public List<Double> getRatioOriginalTotalTweets(int lbl_wnd) {
+        return daysStats.getRatioOriginalTotalTweets(lbl_wnd);
+    }
+    public List<Double> getAverageUsersReached(int lbl_wnd) {
+        return daysStats.getAverageUsersReached(lbl_wnd);
+    }
+
+    public Stat<Integer> getAverageDuration() {
+        return Calculations.getStatsInt(durationList());
+    }
+
+    public List<Map.Entry<Integer,Double>> getVideosAgeDistribution(){
+        if(size()==0)
+            return new LinkedList<>();
+        Map<Integer,Integer> freq = new HashMap<>();
+        for(Video video : this){
+            long experiment_time =  video.getCollected_at();
+            long video_time =  video.getPublished_at();
+            long diff = experiment_time - video_time;
+            int day = (int) (diff/DateUtil.dayInMillis);
+            freq.compute(day,(k,v)->(v==null)?1:v+1);
+        }
+        int sum = freq.entrySet().stream().mapToInt(x->x.getValue()).sum();
+        Map<Integer,Double> normalized = new HashMap<>();
+        freq.entrySet().stream().forEach(x-> normalized.put(x.getKey(),x.getValue()/((double) sum)));
+        return normalized.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList());
+    }
+
+
+    public JsonElement getInfo() {
+        JsonObject object = new JsonObject();
+        object.addProperty("total_videos",this.size());
+        return object;
+    }
 }

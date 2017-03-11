@@ -67,7 +67,6 @@ public class ProcessVideo {
 
 
     /**
-     * //TODO Map raw -> data
      */
     private void addDynamicInfo(){
         List<Document> days = (List<Document>) this.video.get("days");
