@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -291,6 +292,20 @@ public class ProcessVideoDBService {
 
         return new Video.Builder().create(document);
 
+    }
+    /**
+     * Retrieve videos
+     * @param
+     * @return
+     */
+    public List<Video> getVideos(){
+        List<Video> videos = new LinkedList<>();
+        Iterator<Document> iterator =  processedDBVideos.find().iterator();
+        while(iterator.hasNext()){
+            Document document = iterator.next();
+            videos.add(new Video.Builder().create(document));
+        }
+        return videos;
 
     }
 

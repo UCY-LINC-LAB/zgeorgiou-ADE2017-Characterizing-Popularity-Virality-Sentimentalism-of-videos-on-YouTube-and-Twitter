@@ -19,27 +19,27 @@ import javax.servlet.http.HttpServletResponse;
 public class PlotsController {
     private  static final Logger logger = LoggerFactory.getLogger(PlotsController.class);
 
-    public PlotsController(PlotsService plotsService){
+    public PlotsController(PlotsService plotsService) {
 
-        new GetRequest("/plots/:experiment/:plotName"){
+        new GetRequest("/plots/:experiment/:plotName") {
 
-            @Parameter(description = "Experiment Id",required = true)
+            @Parameter(description = "Experiment Id", required = true)
             String experiment;
 
-            @Parameter(description = "Plot name",required = true)
+            @Parameter(description = "Plot name", required = true)
             String plotName;
 
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
 
-                byte[] data = plotsService.readPlot(experiment,plotName);
-                if(data==null) {
+                byte[] data = plotsService.readPlot(experiment, plotName);
+                if (data == null) {
                     result.addError("Plot not found!");
                     return result.build();
                 }
 
                 HttpServletResponse raw = response.raw();
-                response.header("Content-Disposition", "attachment; filename="+plotName+".png");
+                response.header("Content-Disposition", "attachment; filename=" + plotName + ".png");
                 ///response.type("application/force-download");
                 response.type("image/png");
                 try {
@@ -54,8 +54,44 @@ public class PlotsController {
 
             @Override
             public void handleParams(Request request, Response response, JsonResult result) {
-                experiment = ParseParameters.parseStringParam(request,result,":experiment","",x->true,"Error with experiment");
-                plotName = ParseParameters.parseStringParam(request,result,":plotName","",x->true,"Error with plotName");
+                experiment = ParseParameters.parseStringParam(request, result, ":experiment", "", x -> true, "Error with experiment");
+                plotName = ParseParameters.parseStringParam(request, result, ":plotName", "", x -> true, "Error with plotName");
+
+            }
+        };
+
+        new GetRequest("/csv/:id"){
+
+            @Parameter(description = "Csv Id", required = true)
+            String id;
+
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+
+                byte[] data = plotsService.readCsv(id);
+                if (data == null) {
+                    result.addError("Csv not found!");
+                    return result.build();
+                }
+
+                HttpServletResponse raw = response.raw();
+                response.header("Content-Disposition", "attachment; filename=" + id + ".csv");
+                ///response.type("application/force-download");
+                response.type("text/csv");
+                try {
+                    raw.getOutputStream().write(data);
+                    raw.getOutputStream().flush();
+                    raw.getOutputStream().close();
+                } catch (Exception e) {
+                    logger.error(e.getLocalizedMessage());
+                }
+                return raw;
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+                id = ParseParameters.parseStringParam(request, result, ":id", "", x -> true, "Error with id");
 
             }
         };

@@ -42,6 +42,22 @@ public class Video implements JsonModel{
     private final  long total_channel_subscribers;
     private final  long total_channel_videos;
 
+    public String getCsvForm() {
+        return video_id + "\t"
+                + category +"\t"
+                + artificial_category +"\t"
+                + duration +"\t"
+                + comments_sentiment.getNeg() +"\t"
+                + comments_sentiment.getNeu() +"\t"
+                + comments_sentiment.getPos() +"\t"
+                + comments_sentiment.getCompound() +"\t"
+                + total_channel_videos +"\t"
+                + total_channel_subscribers +"\t"
+                + total_channel_views +"\t"
+                + total_channel_comments +"\t"
+                ;
+    }
+
 
     public static class Builder {
 

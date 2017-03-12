@@ -1,17 +1,27 @@
 package com.zgeorg03.services;
 
+import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.services.helpers.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zgeorg03 on 3/2/17.
  */
 public class IndexService extends Service {
 
-    public IndexService(DBServices dbServices) {
+    private Logger logger  = LoggerFactory.getLogger(IndexService.class);
+    private final CsvProducer csvProducer;
+    public IndexService(DBServices dbServices, CsvProducer csvProducer) {
         super(dbServices);
+        this.csvProducer = csvProducer;
     }
 
+    public String getCsv(long timestamp){
+        return csvProducer.writeCsv(timestamp,dbServices.getProcessVideoDBService().getVideos());
+
+    }
 
 
 

@@ -21,6 +21,8 @@ public class IndexController {
                 result.addString("database",indexService.getDatabaseName());
                 result.addNumber("videos_finished_but_not_proccesed",indexService.getFinishedButNotProcessedVideosCount());
                 result.addNumber("videos_finished_and_proccesed",indexService.getFinishedAndProcessedVideosCount());
+                long timestamp =System.currentTimeMillis();
+                result.addString("url", indexService.getCsv(timestamp));
 
 
                 return result.build();

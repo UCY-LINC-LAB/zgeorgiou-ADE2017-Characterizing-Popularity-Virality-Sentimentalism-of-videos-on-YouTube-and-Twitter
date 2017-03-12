@@ -190,6 +190,7 @@ public class Groups implements JsonModel{
         return result;
     }
 
+
     private JsonElement videosInfo() {
         JsonArray array = new JsonArray();
         allVideos.forEach(v->{

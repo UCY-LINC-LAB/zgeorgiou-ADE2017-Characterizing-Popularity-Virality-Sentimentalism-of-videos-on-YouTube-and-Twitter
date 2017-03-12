@@ -32,6 +32,7 @@ public class App {
         port(8000);
 
         PlotProducer plotProducer = new PlotProducer(workingPath);
+        CsvProducer csvProducer = new CsvProducer(workingPath);
 
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
@@ -44,9 +45,9 @@ public class App {
 
 
         //Services
-        final IndexService indexService = new IndexService(dbServices);
+        final IndexService indexService = new IndexService(dbServices, csvProducer);
         final VideosService videosService = new VideosService(dbServices);
-        final PlotsService plotsService = new PlotsService(plotProducer);
+        final PlotsService plotsService = new PlotsService(plotProducer, csvProducer);
 
 
         //Controllers
