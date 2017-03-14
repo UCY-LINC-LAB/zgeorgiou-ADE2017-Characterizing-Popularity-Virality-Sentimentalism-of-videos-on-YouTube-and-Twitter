@@ -9,6 +9,10 @@ export class Group {
         private total_tweets : Stat ,
         private total_likes : Stat ,
         public total_dislikes : Stat ,
+        public negative_sentiment : Stat ,
+        public positive_sentiment : Stat ,
+        public neutral_sentiment : Stat ,
+        public compound_sentiment : Stat ,
         public days: Array<GroupDay>
     ){}
 

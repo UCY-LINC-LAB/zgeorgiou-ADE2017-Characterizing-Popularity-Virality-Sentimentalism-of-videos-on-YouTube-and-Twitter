@@ -40,7 +40,7 @@ public class App {
         DBServices dbServices = new DBServices(dbConnection);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,100, sentimentAnalysis);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
 
 

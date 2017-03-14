@@ -80,10 +80,20 @@ public class PlotProducer {
                         groups.getVideosDistribution()));
 
         object.addProperty("vides_duration",
-                produceBar(groups.getExperimentId(),
+                produceIntegerBar(groups.getExperimentId(),
                         "videos_duration",
                         "Average duration of the videos ","Classes","Time(seconds)",
                         groups.getAverageDuration()));
+        object.addProperty("negative_sentiment",
+                produceDoubleBar(groups.getExperimentId(),
+                        "negative_sentiment",
+                        "Average negative sentiment of the videos ","Classes","Value",
+                        groups.getAverageNegativeSentiment()));
+        object.addProperty("positive_sentiment",
+                produceDoubleBar(groups.getExperimentId(),
+                        "positive_sentiment",
+                        "Average positive sentiment of the videos ","Classes","Value",
+                        groups.getAveragePositiveSentiment()));
 
         return object;
     }
@@ -126,7 +136,7 @@ public class PlotProducer {
         }
     }
 
-    private String produceBar(String experimentId, String fileName, String titleBar, String xlabel, String ylabel, Map<String,Stat<Integer>> data){
+    private String produceIntegerBar(String experimentId, String fileName, String titleBar, String xlabel, String ylabel, Map<String,Stat<Integer>> data){
         List<String> keys= new LinkedList<>();
         List<String> values = new LinkedList<>();
         List<String> err = new LinkedList<>();
@@ -138,6 +148,7 @@ public class PlotProducer {
                 });
         String objects = keys.stream().collect(Collectors.joining(",","(",")"));
         String performance = values.stream().collect(Collectors.joining(",","[","]"));
+        String colors = getColors(keys);
 
         List<String> input = Arrays.asList(
                 "import numpy as np",
@@ -145,7 +156,7 @@ public class PlotProducer {
                 "y_pos = np.arange(len(objects))",
                 "performance = " +performance,
                 "error = " +err,
-                "plt.bar(y_pos, performance,yerr=error, align='center',alpha=0.5)",
+                "plt.bar(y_pos, performance,yerr=error,color="+colors+", align='center',alpha=0.5)",
                 "plt.xticks(y_pos,objects)",
                 "plt.title('"+titleBar+"')",
                 "plt.xlabel('"+xlabel+"')",
@@ -160,6 +171,63 @@ public class PlotProducer {
             logger.error(e.getLocalizedMessage());
             return "ERROR";
         }
+    }
+    private String produceDoubleBar(String experimentId, String fileName, String titleBar, String xlabel, String ylabel, Map<String,Stat<Double>> data){
+        List<String> keys= new LinkedList<>();
+        List<String> values = new LinkedList<>();
+        List<String> err = new LinkedList<>();
+        data.entrySet().stream().sorted((e1,e2)->e2.getValue().getAverage().compareTo(e1.getValue().getAverage()))
+                .forEach(entry -> {
+                    keys.add("'"+entry.getKey()+"'");
+                    values.add(entry.getValue().getAverage()+"");
+                    err.add((entry.getValue().getStd()/2)+"");
+                });
+        String objects = keys.stream().collect(Collectors.joining(",","(",")"));
+        String performance = values.stream().collect(Collectors.joining(",","[","]"));
+        String colors = getColors(keys);
+
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "objects = "+objects,
+                "y_pos = np.arange(len(objects))",
+                "performance = " +performance,
+                "error = " +err,
+                "plt.bar(y_pos, performance,yerr=error,color="+colors+", align='center',alpha=0.5)",
+                "plt.xticks(y_pos,objects)",
+                "plt.title('"+titleBar+"')",
+                "plt.xlabel('"+xlabel+"')",
+                "plt.ylabel('"+ylabel+"')"
+        );
+
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
+
+    private String getColors(List<String> keys) {
+        List<String> colors = new LinkedList<>();
+        for(String key:keys){
+            if(key.equals("'Viral'"))
+                colors.add("'b'");
+            else if(key.equals("'Popular'"))
+                colors.add("'g'");
+            else if(key.equals("'Recent'"))
+                colors.add("'c'");
+            else if(key.equals("'Random'"))
+                colors.add("'r'");
+            else if(key.equals("'Popular & Viral'"))
+                colors.add("'m'");
+            else if(key.equals("'Popular & not Viral'"))
+                colors.add("'k'");
+            else
+                colors.add("'y'");
+        }
+        return colors.stream().collect(Collectors.joining(",","[","]"));
     }
 
     private String produceVideoDistributionGraph(String experimentId,String fileName, String titleBar,String xlabel,String ylabel, Map<String, List<Map.Entry<Integer, Double>>> map){
@@ -242,6 +310,7 @@ public class PlotProducer {
         @Override
         public String call() throws Exception {
             ProcessBuilder builder = new ProcessBuilder("python");
+
             try {
                 Process process = builder.start();
                 in = new BufferedReader(new InputStreamReader(process.getInputStream()));

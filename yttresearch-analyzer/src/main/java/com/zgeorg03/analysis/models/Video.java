@@ -262,4 +262,8 @@ public class Video implements JsonModel{
     public long getTotal_channel_videos() {
         return total_channel_videos;
     }
+
+    public SentimentJson getComments_sentiment() {
+        return comments_sentiment;
+    }
 }

@@ -161,13 +161,36 @@ public class Groups implements JsonModel{
 
     public Map<String,Stat<Integer>> getAverageDuration() {
         Map<String,Stat<Integer>> map = new HashMap<>();
-        map.put("popular",this.popular.getAverageDuration());
-        map.put("viral",this.viral.getAverageDuration());
-        map.put("recent",this.recent.getAverageDuration());
-        map.put("random",this.random.getAverageDuration());
-        map.put("popular_viral",this.popular_viral.getAverageDuration());
-        map.put("popular_not_viral",this.popular_not_viral.getAverageDuration());
-        map.put("viral_not_popular",this.viral_not_popular.getAverageDuration());
+        map.put("Popular",this.popular.getAverageDuration());
+        map.put("Viral",this.viral.getAverageDuration());
+        map.put("Recent",this.recent.getAverageDuration());
+        map.put("Random",this.random.getAverageDuration());
+        map.put("Popular & Viral",this.popular_viral.getAverageDuration());
+        map.put("Popular & not Viral",this.popular_not_viral.getAverageDuration());
+        map.put("Viral & not Popular",this.viral_not_popular.getAverageDuration());
+        return map;
+    }
+
+    public Map<String,Stat<Double>> getAverageNegativeSentiment() {
+        Map<String,Stat<Double>> map = new HashMap<>();
+        map.put("Popular",this.popular.getAverageNegativeSentiment());
+        map.put("Viral",this.viral.getAverageNegativeSentiment());
+        map.put("Recent",this.recent.getAverageNegativeSentiment());
+        map.put("Random",this.random.getAverageNegativeSentiment());
+        map.put("Popular & Viral",this.popular_viral.getAverageNegativeSentiment());
+        map.put("Popular & not Viral",this.popular_not_viral.getAverageNegativeSentiment());
+        map.put("Viral & not Popular",this.viral_not_popular.getAverageNegativeSentiment());
+        return map;
+    }
+    public Map<String,Stat<Double>> getAveragePositiveSentiment() {
+        Map<String,Stat<Double>> map = new HashMap<>();
+        map.put("Popular",this.popular.getAveragePositiveSentiment());
+        map.put("Viral",this.viral.getAveragePositiveSentiment());
+        map.put("Recent",this.recent.getAveragePositiveSentiment());
+        map.put("Random",this.random.getAveragePositiveSentiment());
+        map.put("Popular & Viral",this.popular_viral.getAveragePositiveSentiment());
+        map.put("Popular & not Viral",this.popular_not_viral.getAveragePositiveSentiment());
+        map.put("Viral & not Popular",this.viral_not_popular.getAveragePositiveSentiment());
         return map;
     }
     public String getExperimentId() {

@@ -23,7 +23,7 @@ def read(analyzer):
 	print ('average_neg={0:.7f}'.format(numpy.average(neg_list)))
 	print ('median_neg={0:.7f}'.format(numpy.median(neg_list)))
 	print ('std_neg={0:.7f}'.format(numpy.std(neg_list)))
-	print ('average_pos={0:.7f}'.format(numpy.average(neg_list)))
+	print ('average_pos={0:.7f}'.format(numpy.average(pos_list)))
 	print ('median_pos={0:.7f}'.format(numpy.median(pos_list)))
 	print ('std_pos={0:.7f}'.format(numpy.std(pos_list)))
 	print ('average_neu={0:.7f}'.format(numpy.average(neu_list)))

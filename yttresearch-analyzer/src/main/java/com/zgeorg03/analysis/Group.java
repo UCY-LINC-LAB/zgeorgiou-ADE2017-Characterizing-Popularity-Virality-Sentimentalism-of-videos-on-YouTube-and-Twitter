@@ -52,6 +52,18 @@ public class Group extends LinkedList<Video> implements JsonModel{
     private List<Integer> durationList(){
         return this.stream().map(x->((int)x.getDuration()/1000)).collect(Collectors.toList());
     }
+    private List<Double> negativeSentimentList(){
+        return this.stream().filter(x->x.getComments_sentiment().isValid()).map(x->x.getComments_sentiment().getNeg().getAverage()).collect(Collectors.toList());
+    }
+    private List<Double> positiveSentimentList(){
+        return this.stream().filter(x->x.getComments_sentiment().isValid()).map(x->x.getComments_sentiment().getPos().getAverage()).collect(Collectors.toList());
+    }
+    private List<Double> neutralSentimentList(){
+        return this.stream().filter(x->x.getComments_sentiment().isValid()).map(x->x.getComments_sentiment().getNeu().getAverage()).collect(Collectors.toList());
+    }
+    private List<Double> compoundSentimentList(){
+        return this.stream().filter(x->x.getComments_sentiment().isValid()).map(x->x.getComments_sentiment().getCompound().getAverage()).collect(Collectors.toList());
+    }
 
     @Override
     public JsonObject toJson() {
@@ -63,6 +75,10 @@ public class Group extends LinkedList<Video> implements JsonModel{
         object.add("total_tweets", Calculations.getStatsLong(totalTweetsList()).toJson());
         object.add("total_likes", Calculations.getStatsLong(totalLikesList()).toJson());
         object.add("total_dislikes", Calculations.getStatsLong(totalDislikesList()).toJson());
+        object.add("negative_sentiment", Calculations.getStatsDouble(negativeSentimentList()).toJson());
+        object.add("positive_sentiment", Calculations.getStatsDouble(positiveSentimentList()).toJson());
+        object.add("neutral_sentiment", Calculations.getStatsDouble(neutralSentimentList()).toJson());
+        object.add("compound_sentiment", Calculations.getStatsDouble(compoundSentimentList()).toJson());
         if(showDailyStats)
             object.add("days", daysStats.toJson().get("array"));
 
@@ -90,6 +106,12 @@ public class Group extends LinkedList<Video> implements JsonModel{
 
     public Stat<Integer> getAverageDuration() {
         return Calculations.getStatsInt(durationList());
+    }
+    public Stat<Double> getAverageNegativeSentiment() {
+        return Calculations.getStatsDouble(negativeSentimentList());
+    }
+    public Stat<Double> getAveragePositiveSentiment() {
+        return Calculations.getStatsDouble(positiveSentimentList());
     }
 
     public List<Map.Entry<Integer,Double>> getVideosAgeDistribution(){
