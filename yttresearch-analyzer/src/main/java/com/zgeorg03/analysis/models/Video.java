@@ -44,7 +44,7 @@ public class Video implements JsonModel{
     private final  long total_channel_videos;
 
     public String getCsvTitles() {
-        return "# video_id" + "\t"
+        return "#video_id\t"
                 + "category\t"
                 + "artificial_category\t"
                 + "published_at_timestamp\t"
@@ -65,12 +65,13 @@ public class Video implements JsonModel{
                 + collected_at +"\t"
                 + duration +"\t"
                 + ((comments_sentiment.isValid())?(
-                comments_sentiment.getNeg().getAverage()+"\t"+
-                        comments_sentiment.getNeu().getAverage()+"\t"+
-                        comments_sentiment.getPos().getAverage()+"\t"+
-                        comments_sentiment.getCompound().getAverage()+"\t"
-        ):0+"\t"+0+"\t"+0+"\t"+0) +"\t"
-                + days.stream().map(d->d.getCsvForm()).collect(Collectors.joining("\t"))
+                        String.format("%.4f\t",comments_sentiment.getNeg().getAverage())+
+                        String.format("%.4f\t",comments_sentiment.getNeu().getAverage())+
+                        String.format("%.4f\t",comments_sentiment.getPos().getAverage())+
+                        String.format("%.4f",comments_sentiment.getCompound().getAverage()))
+                :
+                ("0\t0\t0\t0"))
+                + "\t"+ days.stream().map(d->d.getCsvForm()).collect(Collectors.joining("\t"))
                 ;
     }
 
