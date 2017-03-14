@@ -21,7 +21,26 @@ public class IndexController {
                 result.addString("database",indexService.getDatabaseName());
                 result.addNumber("videos_finished_but_not_proccesed",indexService.getFinishedButNotProcessedVideosCount());
                 result.addNumber("videos_finished_and_proccesed",indexService.getFinishedAndProcessedVideosCount());
+
+
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+
+            }
+        };
+        new GetRequest("/csv"){
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+
+                result.addString("database",indexService.getDatabaseName());
+                result.addNumber("videos_finished_and_proccesed",indexService.getFinishedAndProcessedVideosCount());
                 long timestamp =System.currentTimeMillis();
+                //TODO Remove in production
+                timestamp=1;
                 result.addString("url", indexService.getCsv(timestamp));
 
 

@@ -41,8 +41,10 @@ public class CsvProducer {
         File file = Paths.get(path.getAbsolutePath(),id+".csv").toFile();
         try {
             PrintWriter pw = new PrintWriter(new FileWriter(file));
+            pw.println(videos.get(0).getCsvTitles());
             videos.stream().forEach( v-> pw.println(v.getCsvForm()));
             pw.close();
+            logger.info("Successful write to csv:"+id);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage());
             return "Failed to write to csv";

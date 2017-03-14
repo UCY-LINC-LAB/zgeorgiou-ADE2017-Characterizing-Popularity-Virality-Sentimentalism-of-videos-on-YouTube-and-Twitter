@@ -1,1 +1,1 @@
-db.getCollection('videos').updateMany({"days":{$size:5}},{$set : {"meta.processed" : false, "meta.finished":true}})
+db.getCollection('videos').updateMany({},{$set : {"meta.processed" : false, "meta.finished":true}})

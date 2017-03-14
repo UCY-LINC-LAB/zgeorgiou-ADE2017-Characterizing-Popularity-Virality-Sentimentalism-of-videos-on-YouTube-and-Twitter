@@ -10,6 +10,7 @@ import org.bson.Document;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/2/17.
@@ -42,19 +43,34 @@ public class Video implements JsonModel{
     private final  long total_channel_subscribers;
     private final  long total_channel_videos;
 
+    public String getCsvTitles() {
+        return "# video_id" + "\t"
+                + "category\t"
+                + "artificial_category\t"
+                + "published_at_timestamp\t"
+                + "collected_at_timestamp\t"
+                + "duration\t"
+                + "comments_sentiment_neg\t"
+                + "comments_sentiment_neu\t"
+                + "comments_sentiment_pos\t"
+                + "comments_sentiment_compound\t"
+                + days.stream().map(d->d.getCsvTitle()).collect(Collectors.joining("\t"))
+                ;
+    }
     public String getCsvForm() {
         return video_id + "\t"
                 + category +"\t"
                 + artificial_category +"\t"
+                + published_at +"\t"
+                + collected_at +"\t"
                 + duration +"\t"
-                + comments_sentiment.getNeg() +"\t"
-                + comments_sentiment.getNeu() +"\t"
-                + comments_sentiment.getPos() +"\t"
-                + comments_sentiment.getCompound() +"\t"
-                + total_channel_videos +"\t"
-                + total_channel_subscribers +"\t"
-                + total_channel_views +"\t"
-                + total_channel_comments +"\t"
+                + ((comments_sentiment.isValid())?(
+                comments_sentiment.getNeg().getAverage()+"\t"+
+                        comments_sentiment.getNeu().getAverage()+"\t"+
+                        comments_sentiment.getPos().getAverage()+"\t"+
+                        comments_sentiment.getCompound().getAverage()+"\t"
+        ):0+"\t"+0+"\t"+0+"\t"+0) +"\t"
+                + days.stream().map(d->d.getCsvForm()).collect(Collectors.joining("\t"))
                 ;
     }
 
