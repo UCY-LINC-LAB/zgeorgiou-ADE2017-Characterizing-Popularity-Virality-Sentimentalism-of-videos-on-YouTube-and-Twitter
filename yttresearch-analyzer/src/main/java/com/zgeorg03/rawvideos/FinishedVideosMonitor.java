@@ -46,6 +46,7 @@ public class FinishedVideosMonitor implements Runnable {
                     dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
             });
 

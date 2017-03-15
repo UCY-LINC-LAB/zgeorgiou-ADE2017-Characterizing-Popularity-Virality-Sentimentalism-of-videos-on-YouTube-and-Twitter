@@ -10,10 +10,7 @@ import com.zgeorg03.utils.JsonModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zgeorg03 on 3/5/17.
@@ -32,6 +29,7 @@ public class Groups implements JsonModel{
 
    private final int totalVideos;
    private final List<Video> allVideos= new LinkedList<>();
+   private final List<List<Boolean>> videoGroups = new LinkedList<>();
 
     public Groups(boolean showDailyStats, int lbl_wnd, ProcessVideoDBService services, Map<String, List<Integer>> videos, String experimentId){
         this.experimentId = experimentId;
@@ -52,7 +50,8 @@ public class Groups implements JsonModel{
             List<Integer> groups =  entry.getValue();
             Video video = services.getVideo(videoId);
             allVideos.add(video);
-            boolean groupsIn [] = new boolean[4];
+            Boolean []groupsIn = new Boolean[4];
+            for(int i =0;i<4;i++) groupsIn[i]=false;
             groups.forEach(i ->{
                 groupsIn[i] = true;
                 if(i==0)
@@ -64,6 +63,7 @@ public class Groups implements JsonModel{
                 if(i==3)
                     random.addVideo(video);
             });
+            videoGroups.add(Arrays.asList(groupsIn));
             if(groupsIn[0] && groupsIn[1])
                 popular_viral.addVideo(video);
             if(groupsIn[0] && !groupsIn[1])
@@ -193,6 +193,59 @@ public class Groups implements JsonModel{
         map.put("Viral & not Popular",this.viral_not_popular.getAveragePositiveSentiment());
         return map;
     }
+
+    /**
+     * 0 -> Popular
+     * 1 -> Viral
+     * 2 -> Recent
+     * 3 -> Random
+     * @return
+     */
+    public List<Double> getGroupsPercentages() {
+        List<Double> map = new LinkedList<>();
+
+        int popular=0;
+        int viral=0;
+        int popular_viral=0;
+        int recent=0;
+        int popular_recent=0;
+        int recent_viral=0;
+        int popular_viral_recent=0;
+
+        int total = videoGroups.size();
+        for(List<Boolean> groups : videoGroups) {
+            boolean p = groups.get(0);
+            boolean v = groups.get(1);
+            boolean r = groups.get(2);
+            if(p && !v && !r)
+                popular++;
+            else if(!p && v && !r)
+                viral++;
+            else if(p && v && !r)
+                popular_viral++;
+            else if(!p && !v && r)
+                recent++;
+            else if(p && !v && r)
+                popular_recent++;
+            else if(!p && v && r)
+                recent_viral++;
+            else if(p && v && r)
+                popular_viral_recent++;
+        }
+        map.add(popular/(double)total*100);
+        map.add(viral/(double)total*100);
+        map.add(popular_viral/(double)total*100);
+        map.add(recent/(double)total*100);
+        map.add(popular_recent/(double)total*100);
+        map.add(recent_viral/(double)total*100);
+        map.add(popular_viral_recent/(double)total*100);
+
+        System.out.println(map);
+        return map;
+    }
+
+
+
     public String getExperimentId() {
         return experimentId;
     }
@@ -209,7 +262,7 @@ public class Groups implements JsonModel{
         object.add("popular_not_viral",popular_not_viral.getInfo());
         object.add("viral_not_popular",viral_not_popular.getInfo());
         result.add("groups_info",object);
-        result.add("videos",videosInfo());
+        //result.add("videos",videosInfo());
         return result;
     }
 

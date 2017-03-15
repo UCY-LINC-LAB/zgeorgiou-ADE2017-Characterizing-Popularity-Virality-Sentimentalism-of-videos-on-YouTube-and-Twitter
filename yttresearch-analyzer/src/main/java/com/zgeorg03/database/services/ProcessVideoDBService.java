@@ -99,6 +99,45 @@ public class ProcessVideoDBService {
 
     }
 
+    public JsonArray getVideosWithTheMostViews(int artificial_category, int limit){
+
+        if(limit==0)
+            return new JsonArray();
+        Document match;
+        if(artificial_category!=0)
+            match = new Document("artificial_category", artificial_category) ;
+        else
+            match = new Document("artificial_category", new Document("$gt",0)) ;
+
+        List<Document> query = Arrays.asList(
+                new Document("$unwind", "$days"),
+                new Document("$match",match),
+                new Document("$group",
+                        new Document("_id", "$_id")
+                                .append("sum",
+                                        new Document("$sum", "$days.views_added"))),
+                new Document("$sort",
+                        new Document("sum", -1)),
+                new Document("$limit", limit),
+                new Document("$project",
+                        new Document("total_views", "$sum"))
+        );
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while(cursor.hasNext()){
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_views = document.getLong("total_views");
+            object.addProperty("video_id",video_id);
+            object.addProperty("total_views",total_views);
+            object.addProperty("url","/videos/"+video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
     public JsonArray getVideosWithTheMostTweets(int artificial_category, int lbl_wnd, int limit){
 
         if(limit==0)
@@ -143,6 +182,45 @@ public class ProcessVideoDBService {
 
     }
 
+    public JsonArray getVideosWithTheMostTweets(int artificial_category, int limit){
+
+        if(limit==0)
+            return new JsonArray();
+        Document match;
+        if(artificial_category!=0)
+            match = new Document("artificial_category", artificial_category);
+        else
+            match = new Document("artificial_category", new Document("$gt",0)) ;
+
+        List<Document> query = Arrays.asList(
+                new Document("$unwind", "$days"),
+                new Document("$match",match),
+                new Document("$group",
+                        new Document("_id", "$_id")
+                                .append("sum",
+                                        new Document("$sum", "$days.tweets_added"))),
+                new Document("$sort",
+                        new Document("sum", -1)),
+                new Document("$limit", limit),
+                new Document("$project",
+                        new Document("total_tweets", "$sum"))
+        );
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while(cursor.hasNext()){
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_tweets = document.getLong("total_tweets");
+            object.addProperty("video_id",video_id);
+            object.addProperty("total_tweets",total_tweets);
+            object.addProperty("url","/videos/"+video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
     public JsonArray getRecentVideos(int days, int artificial_category, int limit){
         long daysInMillis = DateUtil.dayInMillis*days;
         if(limit==0)
@@ -166,6 +244,8 @@ public class ProcessVideoDBService {
                 new Document("$match",match),
                 new Document("$project",
                         new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
+                //new Document("$sort",new Document("total_views",-1)),
+                //new Document("$limit", limit*4),
                 new Document("$sample", new Document("size",limit))
         );
 
@@ -200,6 +280,8 @@ public class ProcessVideoDBService {
                 new Document("$match",match),
                 new Document("$project",
                         new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
+                //new Document("$sort",new Document("total_views",-1)),
+                //new Document("$limit", limit*4),
                 new Document("$sample", new Document("size",limit))
         );
 

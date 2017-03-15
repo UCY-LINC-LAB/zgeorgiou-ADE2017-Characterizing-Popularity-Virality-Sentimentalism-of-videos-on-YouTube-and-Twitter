@@ -39,7 +39,7 @@ public class App {
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
         FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
 

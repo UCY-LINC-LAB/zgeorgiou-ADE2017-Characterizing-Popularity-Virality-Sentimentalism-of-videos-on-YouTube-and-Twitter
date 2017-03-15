@@ -151,6 +151,7 @@ public class ProcessVideo {
         long total_tweets=0;
         long total_original_tweets=0;
         long total_retweets=0;
+        int totalDays = rawVideo.getRawDays().size();
 
         for(Document document : tweets){
             long created_at = document.getLong("created_at");
@@ -159,6 +160,8 @@ public class ProcessVideo {
                 diff=0;
             int dayIndex = (int) (diff/millisInDay);
 
+            if(dayIndex>=totalDays)
+                continue;
             String  text = document.getString("text");
             String  lang = document.getString("lang");
             boolean is_favorited   = document.getBoolean("is_favorited");

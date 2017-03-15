@@ -55,6 +55,8 @@ public class VideosController {
             @Parameter(description = "Specify the category",defaultValue = "0")
             private int category;
 
+            @Parameter(description = "Experiment Id",defaultValue = "exp-Timestamp")
+            private String experiment;
 
             @Parameter(description = "Labeling window, indicates the day to begin calculating the attributes",defaultValue = "1")
             private int lbl_wnd;
@@ -71,8 +73,8 @@ public class VideosController {
             private int useLimit;
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
-                JsonArray popular = videosService.getPopularVideos(category,lbl_wnd, useLimit);
-                JsonArray viral = videosService.getViralVideos(category,lbl_wnd,useLimit);
+                JsonArray popular = videosService.getPopularVideos(category, useLimit);
+                JsonArray viral = videosService.getViralVideos(category,useLimit);
                 JsonArray recent = videosService.getRecentVideos(category,2,useLimit);
                 JsonArray random = videosService.getRandomVideos(category,useLimit);
 
@@ -108,10 +110,10 @@ public class VideosController {
                 //TODO When in production change this
                 String experimentId = UUID.randomUUID().toString().substring(0,4);
                 experimentId ="test";
-                Groups groups = new Groups(true,lbl_wnd,videosService.getProcessVideoDBService(),videos, experimentId);
+                Groups groups = new Groups(true,lbl_wnd,videosService.getProcessVideoDBService(),videos, experiment);
 
                 JsonObject object = new JsonObject();
-                object.addProperty("experiment_id",experimentId);
+                object.addProperty("experiment_id",experiment);
                 object.addProperty("category_name", Categories.getArtificial_categories().get(category));
                 object.addProperty("number_of_videos", groups.getTotalVideos());
                 object.addProperty("category",category);
@@ -141,6 +143,8 @@ public class VideosController {
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",1,x->x>=train_wnd+ offset &&x<=15,"lbl_wnd should be greater than train_wnd+offset_ 0 to 15");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
+
+                experiment = ParseParameters.parseStringQueryParam(request,result,"experiment","exp-"+System.currentTimeMillis(),x->true,"Experiment error");
 
                 int totalVideos = videosService.getTotalVideos(category);
 

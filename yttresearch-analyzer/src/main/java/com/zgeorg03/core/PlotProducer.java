@@ -49,6 +49,12 @@ public class PlotProducer {
 
     public JsonObject produceHighLevelPlots(Groups groups) {
         JsonObject object = new JsonObject();
+
+        object.addProperty("groups_venn",
+                produceVenn(groups.getExperimentId(),
+                        "groups_venn",
+                        "Venn Diagram",
+                        groups.getGroupsPercentages()));
         object.addProperty("views_average_daily_increase",
                 convertAndProduceGroupsPlot(groups.getExperimentId(),
                         "views_average_daily_increase",
@@ -256,6 +262,27 @@ public class PlotProducer {
                 "plt.plot(" + viral_popularX + "," + viral_popular_values + ",label='Popular & Viral')",
                 "plt.legend(loc='best',fancybox='True',framealpha=0.5)"
         );
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
+
+    private String produceVenn(String experimentId, String fileName, String titleBar, List<Double> data){
+
+        String sets = data.stream().map(x->String.format("%.2f",x)).collect(Collectors.joining(",","(",")"));
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "from matplotlib_venn import venn3, venn3_circles",
+                "sets="+sets,
+                "venn3(subsets=sets,set_labels=('Popular','Viral','Recent'))",
+                "plt.title('"+titleBar+"')"
+        );
+
         Plot plot = new Plot(input, experimentId, fileName);
         try {
             executorService.submit(plot);
