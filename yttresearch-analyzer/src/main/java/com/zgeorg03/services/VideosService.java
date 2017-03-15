@@ -2,6 +2,8 @@ package com.zgeorg03.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.services.helpers.Service;
@@ -9,6 +11,7 @@ import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.analysis.models.Video;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -17,9 +20,13 @@ import java.util.stream.Collectors;
 public class VideosService extends Service {
 
     private final ProcessVideoDBService processVideoDBService;
-    public VideosService(DBServices dbServices) {
+    private final CsvProducer csvProducer;
+    private final ExecutorService executorService;
+    public VideosService(DBServices dbServices, CsvProducer csvProducer, ExecutorService executorService) {
         super(dbServices);
         processVideoDBService = dbServices.getProcessVideoDBService();
+        this.csvProducer = csvProducer;
+        this.executorService = executorService;
     }
 
 
@@ -79,8 +86,9 @@ public class VideosService extends Service {
         return processVideoDBService;
     }
 
-    public JsonArray getVideos(int totalVideos, int category) {
-
-        return processVideoDBService.getRandomVideos(category,totalVideos);
+    public String produceCsv(Groups groups) {
+        CsvProducer.WriteCSVAnalysis analysis =  csvProducer.new WriteCSVAnalysis(groups.getExperimentId(),groups.getAllVideos());
+        executorService.submit(analysis);
+        return "/"+groups.getExperimentId()+"/videos_features";
     }
 }

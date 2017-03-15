@@ -120,6 +120,7 @@ public class VideosController {
                 object.addProperty("offset", offset);
                 object.addProperty("lbl_wnd",lbl_wnd);
                 object.add("high_level_characterization_plots",plotProducer.produceHighLevelPlots(groups));
+                object.addProperty("videos_features_csv",videosService.produceCsv(groups));
                 object.add("groups",groups.getInfo());
                 result.setData(object);
 

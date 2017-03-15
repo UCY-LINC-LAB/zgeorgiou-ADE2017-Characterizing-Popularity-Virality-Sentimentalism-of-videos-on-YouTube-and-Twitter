@@ -6,6 +6,8 @@ import com.zgeorg03.services.helpers.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * Created by zgeorg03 on 3/2/17.
  */
@@ -13,13 +15,17 @@ public class IndexService extends Service {
 
     private Logger logger  = LoggerFactory.getLogger(IndexService.class);
     private final CsvProducer csvProducer;
-    public IndexService(DBServices dbServices, CsvProducer csvProducer) {
+    private final ExecutorService executorService;
+    public IndexService(DBServices dbServices, CsvProducer csvProducer, ExecutorService executorService) {
         super(dbServices);
         this.csvProducer = csvProducer;
+        this.executorService = executorService;
     }
 
     public String getCsv(long timestamp){
-        return csvProducer.writeCsv(timestamp,dbServices.getProcessVideoDBService().getVideos());
+        CsvProducer.WriteCSV writeCSV =  csvProducer.new WriteCSV(timestamp,dbServices.getProcessVideoDBService().getVideos());
+        executorService.submit(writeCSV);
+        return "/csv/"+timestamp;
 
     }
 

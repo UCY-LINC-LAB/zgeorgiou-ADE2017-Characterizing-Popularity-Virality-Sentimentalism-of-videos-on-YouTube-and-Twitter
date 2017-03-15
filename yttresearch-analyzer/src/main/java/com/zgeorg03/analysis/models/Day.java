@@ -51,7 +51,6 @@ public class Day implements JsonModel{
         return "views_added_"+day+"\t"+
                 "likes_added_"+day+"\t"+
                 "dislikes_added_"+day+"\t"+
-                "favorites_added_"+day+"\t"+
                 "comments_added_"+day+"\t"+
                 "channel_views_added_"+day+"\t"+
                 "channel_comments_added_"+day+"\t"+
@@ -60,6 +59,7 @@ public class Day implements JsonModel{
                 "tweets_added_"+day+"\t"
                 +"original_tweets_added_"+day+"\t"
                 +"retweets_added_"+day+"\t"
+                +"tweets_favorited_added_"+day+"\t"
                 +"tweets_hashtags_added_"+day+"\t"
                 +"tweets_in_english_added_"+day+"\t"
                 +"tweets_in_spanish_added_"+day+"\t"
@@ -76,7 +76,6 @@ public class Day implements JsonModel{
         return views_added+"\t"+
                 likes_added+"\t"+
                 dislikes_added+"\t"+
-                favorites_added+"\t"+
                 comments_added+"\t"+
                 channel_views_added+"\t"+
                 channel_comments_added+"\t"+
@@ -85,6 +84,7 @@ public class Day implements JsonModel{
                 tweets_added+"\t"+
                 original_tweets_added+"\t"+
                 retweets_added+"\t"+
+                tweets_favorited_added+"\t"+
                 tweets_hashtags_added+"\t"+
                 tweets_in_english_added+"\t"+
                 tweets_in_spanish_added+"\t"+

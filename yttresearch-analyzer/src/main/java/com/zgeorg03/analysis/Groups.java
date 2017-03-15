@@ -221,4 +221,8 @@ public class Groups implements JsonModel{
         });
         return array;
     }
+
+    public List<Video> getAllVideos() {
+        return allVideos;
+    }
 }
