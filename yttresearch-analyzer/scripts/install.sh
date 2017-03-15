@@ -9,6 +9,7 @@ sudo pip install matplotlib-venn
 
 #FOr Interactive plots
 #sudo pacman -S python-pyqt4
+#sudo pip install cairocffi
 
 
 
