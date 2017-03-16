@@ -5,10 +5,7 @@ import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.classification.records.VideoData;
 import com.zgeorg03.classification.records.VideoRecord;
 
-import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/15/17.

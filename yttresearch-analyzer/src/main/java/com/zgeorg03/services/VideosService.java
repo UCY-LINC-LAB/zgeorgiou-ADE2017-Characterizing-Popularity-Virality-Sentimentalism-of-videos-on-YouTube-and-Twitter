@@ -49,19 +49,12 @@ public class VideosService extends Service {
         return  video.toJson();
     }
 
-    public JsonArray getPopularVideos(int artificial_category,int lbl_wnd,int limit){
-        return dbServices.getProcessVideoDBService().getVideosWithTheMostViews(artificial_category,lbl_wnd,limit);
+    public JsonArray getPopularVideos(int artificial_category,int offset,int lbl_wnd,int limit){
+        return dbServices.getProcessVideoDBService().getVideosWithTheMostViews(artificial_category,offset,lbl_wnd,limit);
     }
 
-    public JsonArray getViralVideos(int artificial_category,int lbl_wnd,int limit){
-        return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,lbl_wnd,limit);
-    }
-    public JsonArray getPopularVideos(int artificial_category,int limit){
-        return dbServices.getProcessVideoDBService().getVideosWithTheMostViews(artificial_category,limit);
-    }
-
-    public JsonArray getViralVideos(int artificial_category,int limit){
-        return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,limit);
+    public JsonArray getViralVideos(int artificial_category,int offset,int lbl_wnd,int limit){
+        return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,offset,lbl_wnd,limit);
     }
 
     public JsonArray getRecentVideos(int artificial_category,int days, int limit){

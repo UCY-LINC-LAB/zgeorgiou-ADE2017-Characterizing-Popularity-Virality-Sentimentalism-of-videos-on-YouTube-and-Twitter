@@ -43,8 +43,6 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
     public void add(List<Day> days) {
         for(Day d : days){
             int key = d.getDay();
-            if(key<lbl_wnd)
-                continue;
             DayStat dayStat = get(key);
             if(dayStat==null) {
                 dayStat = new DayStat(key);
@@ -54,9 +52,10 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
         }
     }
 
-    public List<Double> getViewsAverageDailyIncrease(int lbl_wnd) {
+    public List<Double> getViewsAverageDailyIncrease(int skip) {
+
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
-                .skip(lbl_wnd)
+                .skip(skip)
                 .map(entry-> Calculations.averageLong(entry.getValue().view_added))
                 .collect(Collectors.toList());
     }

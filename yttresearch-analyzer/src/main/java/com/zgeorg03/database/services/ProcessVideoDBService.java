@@ -39,35 +39,25 @@ public class ProcessVideoDBService {
         this.processedDBVideos = processedVideos;
     }
 
-    /**
-     db.getCollection('processedVideos').aggregate([
-     { "$unwind" : "$days"},
-     { "$match" : {"days.day" : {$gte : 0}}},
-     { "$group" :
-     { _id : "$_id", sum : { $sum : "$days.views_added"}
-     }},
-     { "$sort" : { "sum"  : -1}},
-     { "$limit" : 5 },
-     { "$project" : {total_views:"$sum"}}
-     ]);
-
-
-     * @param limit
-     * @return
-     */
-    public JsonArray getVideosWithTheMostViews(int artificial_category, int lbl_wnd, int limit){
-//TODO Change this ...lblwnd
+    public JsonArray getVideosWithTheMostViews(int artificial_category,int offset, int lbl_wnd, int limit){
         if(limit==0)
             return new JsonArray();
         Document match;
         if(artificial_category!=0)
-            match = new Document("$and", Arrays.asList(
-                    new Document("artificial_category", artificial_category),
-                    new Document("days.day",
-                            new Document("$gte", lbl_wnd))
-            ));
+            match = new Document("$and",
+                    Arrays.asList(
+                            new Document("artificial_category", artificial_category),
+                            new Document("days.day", new Document("$gt", offset)),
+                            new Document("days.day", new Document("$lte", lbl_wnd))
+                    )
+            );
         else
-            match = new Document("days.day", new Document("$gte", lbl_wnd));
+            match = new Document("$and",
+                    Arrays.asList(
+                            new Document("days.day", new Document("$gt", offset)),
+                            new Document("days.day", new Document("$lte", lbl_wnd))
+                    )
+            );
 
         List<Document> query = Arrays.asList(
                 new Document("$unwind", "$days"),
@@ -138,20 +128,26 @@ public class ProcessVideoDBService {
         return array;
 
     }
-    public JsonArray getVideosWithTheMostTweets(int artificial_category, int lbl_wnd, int limit){
+    public JsonArray getVideosWithTheMostTweets(int artificial_category,int offset, int lbl_wnd, int limit){
 
         if(limit==0)
             return new JsonArray();
         Document match;
         if(artificial_category!=0)
-            match = new Document("$and", Arrays.asList(
-                    new Document("artificial_category", artificial_category),
-                    new Document("days.day",
-                            new Document("$gte", lbl_wnd))
-            ));
+            match = new Document("$and",
+                    Arrays.asList(
+                            new Document("artificial_category", artificial_category),
+                            new Document("days.day", new Document("$gt", offset)),
+                            new Document("days.day", new Document("$lte", lbl_wnd))
+                    )
+            );
         else
-            match = new Document("days.day", new Document("$gte", lbl_wnd));
-
+            match = new Document("$and",
+                    Arrays.asList(
+                            new Document("days.day", new Document("$gt", offset)),
+                            new Document("days.day", new Document("$lte", lbl_wnd))
+                    )
+            );
         List<Document> query = Arrays.asList(
                 new Document("$unwind", "$days"),
                 new Document("$match",match),

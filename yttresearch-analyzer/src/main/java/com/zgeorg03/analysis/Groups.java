@@ -36,16 +36,16 @@ public class Groups implements JsonModel{
    private final List<List<Boolean>> videoGroups = new LinkedList<>();
 
 
-    public Groups(boolean showDailyStats, int lbl_wnd, ProcessVideoDBService services, Map<String, List<Integer>> videos, String experimentId){
+    public Groups(boolean showDailyStats,int offset, int lbl_wnd, ProcessVideoDBService services, Map<String, List<Integer>> videos, String experimentId){
         this.experimentId = experimentId;
 
-        popular = new Group("popular", showDailyStats,lbl_wnd);
-         viral = new Group("viral", showDailyStats,lbl_wnd);
-         recent = new Group("recent", showDailyStats,lbl_wnd);
-         random = new Group("random", showDailyStats,lbl_wnd);
-         popular_viral = new Group("popular_viral", showDailyStats,lbl_wnd);
-         popular_not_viral = new Group("popular_not_viral", showDailyStats,lbl_wnd);
-         viral_not_popular = new Group("viral_not_popular", showDailyStats,lbl_wnd);
+        popular = new Group("popular", showDailyStats,offset, lbl_wnd);
+         viral = new Group("viral", showDailyStats,offset, lbl_wnd);
+         recent = new Group("recent", showDailyStats,offset, lbl_wnd);
+         random = new Group("random", showDailyStats,offset, lbl_wnd);
+         popular_viral = new Group("popular_viral", showDailyStats,offset, lbl_wnd);
+         popular_not_viral = new Group("popular_not_viral", showDailyStats,offset, lbl_wnd);
+         viral_not_popular = new Group("viral_not_popular", showDailyStats,offset, lbl_wnd);
          totalVideos = videos.size();
 
         long last = System.currentTimeMillis();

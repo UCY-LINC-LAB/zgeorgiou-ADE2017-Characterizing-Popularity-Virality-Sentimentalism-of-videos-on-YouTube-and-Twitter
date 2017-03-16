@@ -21,12 +21,14 @@ public class Group extends LinkedList<Video> implements JsonModel{
     private final DaysStats daysStats;
 
     private final boolean showDailyStats;
+    private final int offset;
     private final int lbl_wnd;
-    public Group(String name, boolean showDailyStats,int lbl_wnd) {
+    public Group(String name, boolean showDailyStats, int offset, int lbl_wnd) {
         this.name = name;
         this.showDailyStats = showDailyStats;
-        this.lbl_wnd=lbl_wnd;
-        daysStats = new DaysStats(lbl_wnd);
+        this.offset =offset;
+        this.lbl_wnd = lbl_wnd;
+        daysStats = new DaysStats(this.lbl_wnd);
     }
 
     public void addVideo(Video video){
@@ -35,19 +37,19 @@ public class Group extends LinkedList<Video> implements JsonModel{
     }
 
     private List<Long> totalViewsList(){
-        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getViews_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getViews_added()).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalTweetsList(){
-        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getTweets_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getTweets_added()).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalLikesList(){
-        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getLikes_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getLikes_added()).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalDislikesList(){
-        return this.stream().map(x->x.getDays().stream().skip(lbl_wnd).mapToLong(y->y.getDislikes_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getDislikes_added()).sum()).collect(Collectors.toList());
     }
     private List<Integer> durationList(){
         return this.stream().map(x->((int)x.getDuration()/1000)).collect(Collectors.toList());
@@ -91,17 +93,17 @@ public class Group extends LinkedList<Video> implements JsonModel{
         return toJson();
     }
 
-    public List<Double> getViewsAverageDailyIncrease(int lbl_wnd) {
-        return daysStats.getViewsAverageDailyIncrease(lbl_wnd);
+    public List<Double> getViewsAverageDailyIncrease(int skip) {
+        return daysStats.getViewsAverageDailyIncrease(skip);
     }
-    public List<Double> getTweetsAverageDailyIncrease(int lbl_wnd) {
-        return daysStats.getTweetsAverageDailyIncrease(lbl_wnd);
+    public List<Double> getTweetsAverageDailyIncrease(int skip) {
+        return daysStats.getTweetsAverageDailyIncrease(skip);
     }
-    public List<Double> getRatioOriginalTotalTweets(int lbl_wnd) {
-        return daysStats.getRatioOriginalTotalTweets(lbl_wnd);
+    public List<Double> getRatioOriginalTotalTweets(int skip) {
+        return daysStats.getRatioOriginalTotalTweets(skip);
     }
-    public List<Double> getAverageUsersReached(int lbl_wnd) {
-        return daysStats.getAverageUsersReached(lbl_wnd);
+    public List<Double> getAverageUsersReached(int skip) {
+        return daysStats.getAverageUsersReached(skip);
     }
 
     public Stat<Integer> getAverageDuration() {
