@@ -1,7 +1,14 @@
 package com.zgeorg03.classification;
 
 
+import com.zgeorg03.analysis.models.Video;
+import com.zgeorg03.classification.records.VideoData;
 import com.zgeorg03.classification.records.VideoRecord;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/15/17.
@@ -18,6 +25,19 @@ public class Test {
         String ytFeatures = "1111111111111111111111111111111";
         String twFeatures = "1111111111111111111111111111111111111111111";
         FeatureManager featureManager = new FeatureManager(t_window, offset, l_window, split_days, labPer, ytFeatures, twFeatures);
+
+
+        Video video = null;
+        VideoRecord record = video.getAsVideoRecord();
+        VideoData videoData = new VideoData(video,featureManager.mapYouTubeFeatures(record,15),
+                featureManager.mapTwitterFeatures(record,15));
+        long oneDay = 86400000;
+
+        Predicate<VideoData> splitPredicate = (v) -> ((v.getCollected_at()-v.getYoutubeFeatures().getYt_uploaded())/oneDay < split_days);
+
+
+
+        //featureManager.populate(video,featureManager.mapTwitterFeatures(record,15),);
 
         /**
          * Zacharias Example

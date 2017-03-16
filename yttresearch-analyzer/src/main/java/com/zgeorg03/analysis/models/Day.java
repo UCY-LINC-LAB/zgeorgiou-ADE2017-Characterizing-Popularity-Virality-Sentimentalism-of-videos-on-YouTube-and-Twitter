@@ -3,6 +3,7 @@ package com.zgeorg03.analysis.models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.SentimentAnalysis;
+import com.zgeorg03.classification.records.DayRecord;
 import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
@@ -96,6 +97,34 @@ public class Day implements JsonModel{
                 String.format("%.4f",user_friends_count.getAverage())+"\t"+
                 String.format("%.4f",user_statuses_count.getAverage())
                 ;
+    }
+
+    public DayRecord getAsDayRecord() {
+        return new DayRecord(
+                views_added,
+                likes_added,
+                dislikes_added,
+                comments_added,
+                channel_views_added,
+                channel_comments_added,
+                channel_subscribers_added,
+                channel_videos_added,
+                tweets_added,
+                original_tweets_added,
+                retweets_added,
+                tweets_favorited_added,
+                tweets_hashtags_added,
+                tweets_in_english_added,
+                tweets_in_spanish_added,
+                users_in_english_added,
+                users_in_spanish_added,
+                users_verified_count,
+                user_days_created_before_video.getAverage(),
+                user_followers_count.getAverage(),
+                user_friends_count.getAverage(),
+                user_statuses_count.getAverage());
+
+
     }
 
 

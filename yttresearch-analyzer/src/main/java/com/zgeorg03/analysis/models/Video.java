@@ -3,6 +3,8 @@ package com.zgeorg03.analysis.models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.SentimentAnalysis;
+import com.zgeorg03.classification.records.DayRecord;
+import com.zgeorg03.classification.records.VideoRecord;
 import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.utils.JsonModel;
 import org.bson.Document;
@@ -146,6 +148,17 @@ public class Video implements JsonModel{
     }
 
 
+    public VideoRecord getAsVideoRecord(){
+        VideoRecord videoRecord = new
+                VideoRecord( category,artificial_category,published_at,duration,
+                comments_sentiment.getNeg().getAverage(),
+                comments_sentiment.getNeu().getAverage(),
+                comments_sentiment.getPos().getAverage(),
+                comments_sentiment.getCompound().getAverage());
+        for(Day day : days)
+            videoRecord.addDay(day.getAsDayRecord());
+        return videoRecord;
+    }
     @Override
     public JsonObject toJson() {
         JsonObject result = new JsonObject();

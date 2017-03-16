@@ -17,7 +17,7 @@ public class ratioTwitter {
     private float ratioUserFavorites;
     private float ratioTwEng;
     private float ratioUserEng;
-    private float ratioUserStatuses;
+    private double ratioUserStatuses;
     private float ratioHashtags;
     private float ratioUserSp;
     private float ratioTwSp;
@@ -40,7 +40,7 @@ public class ratioTwitter {
 
     public void createRatioTweets(){
         int total_tweets =0;
-        int tweets_n = twitterFeatures.getAllDays().get(day).getTw_tweets();
+        long tweets_n = twitterFeatures.getAllDays().get(day).getTw_tweets();
         for(int i=0;i<day-1;i++){
             total_tweets+= twitterFeatures.getAllDays().get(i).getTw_tweets();
         }
@@ -53,7 +53,7 @@ public class ratioTwitter {
 
     public void createRatioOrigTweets(){
         int total_orig_tweets =0;
-        int tweets_orig_n = twitterFeatures.getAllDays().get(day).getTw_orig_tweets();
+        long tweets_orig_n = twitterFeatures.getAllDays().get(day).getTw_orig_tweets();
         for(int i=0;i<day-1;i++){
             total_orig_tweets+= twitterFeatures.getAllDays().get(i).getTw_orig_tweets();
         }
@@ -66,7 +66,7 @@ public class ratioTwitter {
 
     public void createRatioRetweets(){
         int total_retweets =0;
-        int retweet_n = twitterFeatures.getAllDays().get(day).getTw_retweets();
+        long retweet_n = twitterFeatures.getAllDays().get(day).getTw_retweets();
         for(int i=0;i<day-1;i++){
             total_retweets+= twitterFeatures.getAllDays().get(i).getTw_retweets();
         }
@@ -80,7 +80,7 @@ public class ratioTwitter {
 
     public void createRatioUserFavorites(){
         int total_favorites =0;
-        int favorites_n = twitterFeatures.getAllDays().get(day).getTw_user_favorites();
+        long favorites_n = twitterFeatures.getAllDays().get(day).getTw_user_favorites();
         for(int i=0;i<day-1;i++){
             total_favorites+= twitterFeatures.getAllDays().get(i).getTw_user_favorites();
         }
@@ -94,7 +94,7 @@ public class ratioTwitter {
 
     public void createRatioTwEng(){
         int total_tw_eng =0;
-        int tw_eng_n = twitterFeatures.getAllDays().get(day).getTw_eng();
+        long tw_eng_n = twitterFeatures.getAllDays().get(day).getTw_eng();
         for(int i=0;i<day-1;i++){
             total_tw_eng+= twitterFeatures.getAllDays().get(i).getTw_eng();
         }
@@ -108,7 +108,7 @@ public class ratioTwitter {
 
     public void createRatioTwSp(){
         int total_tw_sp =0;
-        int tw_sp_n = twitterFeatures.getAllDays().get(day).getTw_sp();
+        long tw_sp_n = twitterFeatures.getAllDays().get(day).getTw_sp();
         for(int i=0;i<day-1;i++){
             total_tw_sp+= twitterFeatures.getAllDays().get(i).getTw_sp();
         }
@@ -122,7 +122,7 @@ public class ratioTwitter {
 
     public void createRatioUserEng(){
         int total_user_eng =0;
-        int user_eng_n = twitterFeatures.getAllDays().get(day).getTw_user_eng();
+        long user_eng_n = twitterFeatures.getAllDays().get(day).getTw_user_eng();
         for(int i=0;i<day-1;i++){
             total_user_eng+= twitterFeatures.getAllDays().get(i).getTw_user_eng();
         }
@@ -136,7 +136,7 @@ public class ratioTwitter {
 
     public void createRatioUserSp(){
         int total_user_sp =0;
-        int user_sp_n = twitterFeatures.getAllDays().get(day).getTw_user_sp();
+        long user_sp_n = twitterFeatures.getAllDays().get(day).getTw_user_sp();
         for(int i=0;i<day-1;i++){
             total_user_sp+= twitterFeatures.getAllDays().get(i).getTw_user_sp();
         }
@@ -150,7 +150,7 @@ public class ratioTwitter {
 
     public void createRatioUserStatuses(){
         int total_user_statuses =0;
-        int user_statuses_n = twitterFeatures.getAllDays().get(day).getTw_user_statuses();
+        double user_statuses_n = twitterFeatures.getAllDays().get(day).getTw_user_statuses();
         for(int i=0;i<day-1;i++){
             total_user_statuses+= twitterFeatures.getAllDays().get(i).getTw_user_statuses();
         }
@@ -164,7 +164,7 @@ public class ratioTwitter {
 
     public void createRatioHashtags(){
         int total_hashtags =0;
-        int hastags_n = twitterFeatures.getAllDays().get(day).getTw_hashtags();
+        long hastags_n = twitterFeatures.getAllDays().get(day).getTw_hashtags();
         for(int i=0;i<day-1;i++){
             total_hashtags+= twitterFeatures.getAllDays().get(i).getTw_hashtags();
         }

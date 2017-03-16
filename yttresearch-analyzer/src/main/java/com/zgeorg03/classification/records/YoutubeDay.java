@@ -5,19 +5,19 @@ package com.zgeorg03.classification.records;
  */
 public class YoutubeDay {
 
-    private int day;
-    private int yt_views;
-    private int yt_likes;
-    private int yt_dislikes;
-    private int yt_comments;
-    private long yt_channel_views;
-    private long yt_channel_comments;
-    private long yt_channel_subscribers;
-    private int yt_channel_videos;
+    private final int day;
+    private final long yt_views;
+    private final long yt_likes;
+    private final long yt_dislikes;
+    private final long yt_comments;
+    private final long yt_channel_views;
+    private final long yt_channel_comments;
+    private final long yt_channel_subscribers;
+    private final long yt_channel_videos;
 
 
-    public YoutubeDay(int day, int yt_views, int yt_likes, int yt_dislikes, int yt_comments, long yt_channel_views,
-                      long yt_channel_comments, long yt_channel_subscribers, int yt_channel_videos) {
+    public YoutubeDay(int day, long yt_views, long yt_likes, long yt_dislikes, long yt_comments, long yt_channel_views,
+                      long yt_channel_comments, long yt_channel_subscribers, long yt_channel_videos) {
         this.day = day;
         this.yt_views = yt_views;
         this.yt_likes = yt_likes;
@@ -33,19 +33,19 @@ public class YoutubeDay {
         return day;
     }
 
-    public int getYt_views() {
+    public long getYt_views() {
         return yt_views;
     }
 
-    public int getYt_likes() {
+    public long getYt_likes() {
         return yt_likes;
     }
 
-    public int getYt_dislikes() {
+    public long getYt_dislikes() {
         return yt_dislikes;
     }
 
-    public int getYt_comments() {
+    public long getYt_comments() {
         return yt_comments;
     }
 
@@ -61,18 +61,7 @@ public class YoutubeDay {
         return yt_channel_subscribers;
     }
 
-    public int getYt_channel_videos() {
+    public long getYt_channel_videos() {
         return yt_channel_videos;
-    }
-
-    @Override
-    public String toString() {
-        return "YoutubeDay{" +
-                "day=" + day +
-                ", yt_views=" + yt_views +
-                ", yt_likes=" + yt_likes +
-                ", yt_dislikes=" + yt_dislikes +
-                ", yt_comments=" + yt_comments +
-                '}';
     }
 }

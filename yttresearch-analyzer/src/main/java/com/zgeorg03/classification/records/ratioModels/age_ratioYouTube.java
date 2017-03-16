@@ -35,7 +35,7 @@ public class age_ratioYouTube {
     public void calculateAgeRatioViews(){
         long millsPassed = System.currentTimeMillis() - youtubeFeatures.getYt_uploaded();
         int daysPassed = (int)(millsPassed/(1000*60*60*24));
-        int views_n = youtubeFeatures.getFeaturesForDay(day).getYt_views();
+        long views_n = youtubeFeatures.getFeaturesForDay(day).getYt_views();
 
         if(daysPassed!=0){
             ageRatioViews= views_n/(float)daysPassed;
@@ -45,7 +45,7 @@ public class age_ratioYouTube {
     public void calculateAgeRatioLikes(){
         long millsPassed = System.currentTimeMillis() - youtubeFeatures.getYt_uploaded();
         int daysPassed = (int)(millsPassed/(1000*60*60*24));
-        int likes_n = youtubeFeatures.getFeaturesForDay(day).getYt_likes();
+        long likes_n = youtubeFeatures.getFeaturesForDay(day).getYt_likes();
 
         if(daysPassed!=0){
             ageRatioLikes = likes_n/(float)daysPassed;
@@ -55,7 +55,7 @@ public class age_ratioYouTube {
     public void calculateAgeRatioDislikes(){
         long millsPassed = System.currentTimeMillis() - youtubeFeatures.getYt_uploaded();
         int daysPassed = (int)(millsPassed/(1000*60*60*24));
-        int dislikes_n = youtubeFeatures.getFeaturesForDay(day).getYt_dislikes();
+        long dislikes_n = youtubeFeatures.getFeaturesForDay(day).getYt_dislikes();
 
         if(daysPassed!=0){
             ageRatioDislikes = dislikes_n/(float)daysPassed;
@@ -65,7 +65,7 @@ public class age_ratioYouTube {
     public void calculateAgeRatioComments(){
         long millsPassed = System.currentTimeMillis() - youtubeFeatures.getYt_uploaded();
         int daysPassed = (int)(millsPassed/(1000*60*60*24));
-        int comments_n = youtubeFeatures.getFeaturesForDay(day).getYt_comments();
+        long comments_n = youtubeFeatures.getFeaturesForDay(day).getYt_comments();
 
         if(daysPassed!=0){
             ageRatioComments= comments_n/(float)daysPassed;

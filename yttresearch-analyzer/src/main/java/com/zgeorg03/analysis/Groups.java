@@ -5,12 +5,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
+import com.zgeorg03.classification.FeatureManager;
+import com.zgeorg03.classification.records.VideoData;
+import com.zgeorg03.classification.records.VideoRecord;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.utils.JsonModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/5/17.
@@ -30,6 +34,7 @@ public class Groups implements JsonModel{
    private final int totalVideos;
    private final List<Video> allVideos= new LinkedList<>();
    private final List<List<Boolean>> videoGroups = new LinkedList<>();
+
 
     public Groups(boolean showDailyStats, int lbl_wnd, ProcessVideoDBService services, Map<String, List<Integer>> videos, String experimentId){
         this.experimentId = experimentId;
@@ -274,6 +279,21 @@ public class Groups implements JsonModel{
         });
         return array;
     }
+
+
+    /**
+     * Used for classificiation
+     * @param featureManager
+     * @return
+     */
+    public Map<String,VideoData> getVideoData(FeatureManager featureManager){
+        return allVideos.stream().map(video -> {
+            VideoRecord vr = video.getAsVideoRecord();
+            return new VideoData(video, featureManager.mapYouTubeFeatures(vr,15),featureManager.mapTwitterFeatures(vr,15));
+                }
+        ).collect(Collectors.toMap(k->k.getVideo_id(),v->v));
+    }
+
 
     public List<Video> getAllVideos() {
         return allVideos;

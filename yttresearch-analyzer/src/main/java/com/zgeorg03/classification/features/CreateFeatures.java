@@ -1,6 +1,7 @@
 package com.zgeorg03.classification.features;
 
 
+import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.classification.records.VideoData;
 
 import java.io.FileWriter;
@@ -55,23 +56,24 @@ public class CreateFeatures {
         /**
          * Getting Training data
          */
-        for(int i=0;i<uniqueVideos.size();i++){
-            String video = uniqueVideos.get(i);
+
+        videosMap.values().stream().forEachOrdered(video -> {
             TrainingFeatures training = new TrainingFeatures(videosMap.get(video),t_window,ytBinary,twBinary);
             pw.println(training.getAllYoutubeFeatures());
             pw.flush();
             pw_twitter.println(training.getAllTwitterFeatures());
             pw_twitter.flush();
-        }
+        });
 
 
         /**
          * Getting Labeling data
          */
         LabelingFeatures label = new LabelingFeatures(videosMap,labPer);
-        for(int i=0;i<uniqueVideos.size();i++){
-            label.labelKnown(videosMap.get(uniqueVideos.get(i)));
-        }
+        videosMap.values().stream().forEachOrdered(video -> {
+            label.labelKnown(videosMap.get(video));
+        });
+
         lab.println(label.getLabeledPopular());
         lab.println(label.getLabeledViral());
         lab.flush();

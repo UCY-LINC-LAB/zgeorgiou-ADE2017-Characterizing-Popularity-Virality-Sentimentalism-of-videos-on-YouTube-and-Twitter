@@ -20,19 +20,19 @@ public class AllYoutubeFeatures {
     private Date yt_uploaded;
     private int yt_category;
     private int yt_artificial_category;
-    private int duration;
-    private float comments_sentiment_neg;
-    private float comments_sentiment_neu;
-    private float comments_sentiment_pos;
-    private float comments_sentiment_compound;
-    private int channel_uploads;
+    private long duration;
+    private double comments_sentiment_neg;
+    private double comments_sentiment_neu;
+    private double comments_sentiment_pos;
+    private double comments_sentiment_compound;
+    private long channel_uploads;
     private long channel_subscribers;
     private long channel_views;
     private long channel_comments;
-    private int views_dif;
-    private int likes_dif;
-    private int dislikes_dif;
-    private int comments_dif;
+    private long views_dif;
+    private long likes_dif;
+    private long dislikes_dif;
+    private long comments_dif;
     private float views_acc;
     private float likes_acc;
     private float dislikes_acc;
@@ -72,10 +72,10 @@ public class AllYoutubeFeatures {
 
     public void calculateDifference(){
         YoutubeFeatures yt = videoData.getYoutubeFeatures();
-        int firstDayViews= yt.getFeaturesForDay(0).getYt_views()+yt.getFeaturesForDay(1).getYt_views();
-        int firstDayLikes = yt.getFeaturesForDay(0).getYt_likes()+yt.getFeaturesForDay(1).getYt_likes();
-        int firstDayDislikes = yt.getFeaturesForDay(0).getYt_dislikes()+yt.getFeaturesForDay(1).getYt_dislikes();
-        int firstDayComments = yt.getFeaturesForDay(0).getYt_comments()+yt.getFeaturesForDay(1).getYt_comments();
+        long firstDayViews= yt.getFeaturesForDay(0).getYt_views()+yt.getFeaturesForDay(1).getYt_views();
+        long firstDayLikes = yt.getFeaturesForDay(0).getYt_likes()+yt.getFeaturesForDay(1).getYt_likes();
+        long firstDayDislikes = yt.getFeaturesForDay(0).getYt_dislikes()+yt.getFeaturesForDay(1).getYt_dislikes();
+        long firstDayComments = yt.getFeaturesForDay(0).getYt_comments()+yt.getFeaturesForDay(1).getYt_comments();
         int lastDayViews=0;
         int lastDayLikes=0;
         int lastDayDislikes=0;

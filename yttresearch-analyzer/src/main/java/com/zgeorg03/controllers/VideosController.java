@@ -2,7 +2,10 @@ package com.zgeorg03.controllers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.DaysStats;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.classification.FeatureManager;
+import com.zgeorg03.classification.records.VideoData;
 import com.zgeorg03.controllers.helpers.GetRequest;
 import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.controllers.helpers.Parameter;
@@ -10,10 +13,13 @@ import com.zgeorg03.controllers.helpers.ParseParameters;
 import com.zgeorg03.core.PlotProducer;
 import com.zgeorg03.services.VideosService;
 import com.zgeorg03.utils.Categories;
+import com.zgeorg03.utils.DateUtil;
 import spark.Request;
 import spark.Response;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by zgeorg03 on 3/3/17.
@@ -124,6 +130,25 @@ public class VideosController {
                 object.add("high_level_characterization_plots",plotProducer.produceHighLevelPlots(groups));
                 object.addProperty("videos_features_csv",videosService.produceCsv(groups));
                 object.add("groups",groups.getInfo());
+
+
+                /**Classification
+                String ytFeatures = "1111111111111111111111111111111";
+                String twFeatures = "1111111111111111111111111111111111111111111";
+                int split_days = 14;
+                FeatureManager featureManager = new FeatureManager(train_wnd, offset, lbl_wnd, split_days, percentage, ytFeatures, twFeatures);
+
+                Map<String,VideoData> videoDataList  = groups.getVideoData(featureManager);
+                Predicate<VideoData> splitPredicate = (v) -> ((v.getCollected_at()-v.getYoutubeFeatures().getYt_uploaded())/ DateUtil.dayInMillis < split_days);
+                Map<Boolean, List<VideoData>> splittedVideos = videoDataList.values().stream() .collect(Collectors.partitioningBy(splitPredicate)) ;
+                Map<String,VideoData> oldVideos = splittedVideos.get(true).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
+                Map<String,VideoData> recentVideos = splittedVideos.get(false).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
+
+                //True is recent videos
+                featureManager.populate(oldVideos,recentVideos);
+                featureManager.createFeatures();
+                 **/
+
                 result.setData(object);
 
 

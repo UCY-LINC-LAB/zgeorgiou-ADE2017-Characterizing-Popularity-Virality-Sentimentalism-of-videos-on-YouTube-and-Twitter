@@ -10,16 +10,16 @@ public class YoutubeFeatures {
     private int yt_category;
     private int yt_artificial_category;
     private long yt_uploaded;
-    private int duration;
-    private float comments_sentiment_neg;
-    private float comments_sentiment_neu;
-    private float comments_sentiment_pos;
-    private float comments_sentiment_compound;
+    private long duration;
+    private double comments_sentiment_neg;
+    private double comments_sentiment_neu;
+    private double comments_sentiment_pos;
+    private double comments_sentiment_compound;
     private ArrayList<YoutubeDay> days;
 
-    public YoutubeFeatures(int yt_category, int yt_artificial_category, long yt_uploaded, int duration,
-                           float comments_sentiment_neg, float comments_sentiment_neu, float comments_sentiment_pos,
-                           float comments_sentiment_compound) {
+    public YoutubeFeatures(int yt_category, int yt_artificial_category, long yt_uploaded, long duration,
+                           double comments_sentiment_neg, double comments_sentiment_neu, double comments_sentiment_pos,
+                           double comments_sentiment_compound) {
         this.yt_category = yt_category;
         this.yt_artificial_category = yt_artificial_category;
         this.yt_uploaded = yt_uploaded;
@@ -43,23 +43,23 @@ public class YoutubeFeatures {
         return yt_uploaded;
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public float getComments_sentiment_neg() {
+    public double getComments_sentiment_neg() {
         return comments_sentiment_neg;
     }
 
-    public float getComments_sentiment_neu() {
+    public double getComments_sentiment_neu() {
         return comments_sentiment_neu;
     }
 
-    public float getComments_sentiment_pos() {
+    public double getComments_sentiment_pos() {
         return comments_sentiment_pos;
     }
 
-    public float getComments_sentiment_compound() {
+    public double getComments_sentiment_compound() {
         return comments_sentiment_compound;
     }
 

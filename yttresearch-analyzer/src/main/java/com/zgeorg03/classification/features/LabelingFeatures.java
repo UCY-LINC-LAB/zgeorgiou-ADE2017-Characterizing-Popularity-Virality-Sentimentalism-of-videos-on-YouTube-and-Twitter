@@ -28,8 +28,7 @@ public class LabelingFeatures {
         this.labeledPopular = new LinkedList<>();
         this.labeledViral = new LinkedList<>();
         this.labeledPopularAndViral = new LinkedList<>();
-        System.out.println("lab "+labPercentage);
-        int percentage = (int)(videosMap.size()*labPercentage/100);
+        int percentage = (int)(videosMap.size()*labPercentage);
         mostPopular = getSortedByTotalViews(false,percentage);
         mostViral = getSortedByTotalTweets(false,percentage);
     }
@@ -79,8 +78,8 @@ public class LabelingFeatures {
 
     public List<VideoData> getSortedByTotalViews(boolean ascending, int limit){
         return videosMap.entrySet().stream().sorted((e1,e2)->{
-            int x1 = e1.getValue().getTotalViews();
-            int x2 = e2.getValue().getTotalViews();
+            long x1 = e1.getValue().getTotalViews();
+            long x2 = e2.getValue().getTotalViews();
             int comp= (x1<x2)?-1 : (x1>x2)? 1 : 0;
             return (ascending) ? comp : comp*-1;
         }) .map( entry -> entry.getValue()).limit((limit==-1)?Long.MAX_VALUE:limit).collect(Collectors.toList());
@@ -88,8 +87,8 @@ public class LabelingFeatures {
 
     public List<VideoData> getSortedByTotalTweets(boolean ascending, int limit){
         return videosMap.entrySet().stream().sorted((e1,e2)->{
-            int x1 = e1.getValue().getTotalTweets();
-            int x2 = e2.getValue().getTotalTweets();
+            long x1 = e1.getValue().getTotalTweets();
+            long x2 = e2.getValue().getTotalTweets();
             int comp= (x1<x2)?-1 : (x1>x2)? 1 : 0;
             return (ascending) ? comp : comp*-1;
         }) .map( entry -> entry.getValue()).limit((limit==-1)?Long.MAX_VALUE:limit).collect(Collectors.toList());

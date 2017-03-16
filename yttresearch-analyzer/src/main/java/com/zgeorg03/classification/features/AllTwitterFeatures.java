@@ -27,16 +27,16 @@ public class AllTwitterFeatures {
     /**
      * Differences
      */
-    private int tw_tweets_dif;
-    private int tw_orig_tweets_dif;
-    private int tw_retweets_dif;
-    private int tw_user_favorites_dif;
-    private int tw_eng_dif;
-    private int tw_sp_dif;
-    private int tw_user_eng_dif;
-    private int tw_user_sp_dif;
-    private int tw_user_statuses_dif;
-    private int tw_hashtags_dif;
+    private long tw_tweets_dif;
+    private long tw_orig_tweets_dif;
+    private long tw_retweets_dif;
+    private long tw_user_favorites_dif;
+    private long tw_eng_dif;
+    private long tw_sp_dif;
+    private long tw_user_eng_dif;
+    private long tw_user_sp_dif;
+    private double tw_user_statuses_dif;
+    private long tw_hashtags_dif;
 
 
     /**
@@ -119,16 +119,16 @@ public class AllTwitterFeatures {
         TwitterDay td0 = tw.getAllDays().get(0);
         TwitterDay td1= tw.getAllDays().get(1);
 
-        int firstDayTweets = td0.getTw_tweets()+td1.getTw_tweets();
-        int firstDayOrigTweets= td0.getTw_orig_tweets()+td1.getTw_orig_tweets();
-        int firstDayRetweets = td0.getTw_retweets()+td1.getTw_retweets();
-        int firstDayUserFavorites = td0.getTw_user_favorites()+td1.getTw_user_favorites();
-        int firstDayEng = td0.getTw_eng()+td1.getTw_eng();
-        int firstDaySp = td0.getTw_sp() + td1.getTw_sp();
-        int firstDayUserEng = td0.getTw_user_eng()+td1.getTw_user_eng();
-        int firstDayUserSp = td0.getTw_user_sp() + td1.getTw_user_sp();
-        int firstDayUserStatuses = td0.getTw_user_statuses()+td1.getTw_user_statuses();
-        int fisrtDayHashtags = td0.getTw_hashtags()+td1.getTw_hashtags();
+        long firstDayTweets = td0.getTw_tweets()+td1.getTw_tweets();
+        long firstDayOrigTweets= td0.getTw_orig_tweets()+td1.getTw_orig_tweets();
+        long firstDayRetweets = td0.getTw_retweets()+td1.getTw_retweets();
+        long firstDayUserFavorites = td0.getTw_user_favorites()+td1.getTw_user_favorites();
+        long firstDayEng = td0.getTw_eng()+td1.getTw_eng();
+        long firstDaySp = td0.getTw_sp() + td1.getTw_sp();
+        long firstDayUserEng = td0.getTw_user_eng()+td1.getTw_user_eng();
+        long firstDayUserSp = td0.getTw_user_sp() + td1.getTw_user_sp();
+        double firstDayUserStatuses = td0.getTw_user_statuses()+td1.getTw_user_statuses();
+        long fisrtDayHashtags = td0.getTw_hashtags()+td1.getTw_hashtags();
 
         int lastDayTweets=0;
         int lastDayOrigTweets=0;

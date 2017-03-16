@@ -26,7 +26,7 @@ public class ratioYouTube {
 
     public void createRatioViews(){
         int total_views =0;
-        int views_n = youtubeFeatures.getFeaturesForDay(day).getYt_views();
+        long views_n = youtubeFeatures.getFeaturesForDay(day).getYt_views();
         for(int i=0;i<day-1;i++){
             total_views+= youtubeFeatures.getFeaturesForDay(i).getYt_views();
         }
@@ -39,7 +39,7 @@ public class ratioYouTube {
 
     public void createRatioLikes(){
         int total_likes =0;
-        int likes_n = youtubeFeatures.getFeaturesForDay(day).getYt_likes();
+        long likes_n = youtubeFeatures.getFeaturesForDay(day).getYt_likes();
         for(int i=0;i<day-1;i++){
             total_likes+= youtubeFeatures.getFeaturesForDay(i).getYt_likes();
         }
@@ -52,7 +52,7 @@ public class ratioYouTube {
 
     public void createRatioDislikes(){
         int total_dislikes =0;
-        int dislikes_n = youtubeFeatures.getFeaturesForDay(day).getYt_dislikes();
+        long dislikes_n = youtubeFeatures.getFeaturesForDay(day).getYt_dislikes();
         for(int i=0;i<day-1;i++){
             total_dislikes+= youtubeFeatures.getFeaturesForDay(i).getYt_dislikes();
         }
@@ -65,7 +65,7 @@ public class ratioYouTube {
 
     public void createRatioComments(){
         int total_comments =0;
-        int comments_n = youtubeFeatures.getFeaturesForDay(day).getYt_comments();
+        long comments_n = youtubeFeatures.getFeaturesForDay(day).getYt_comments();
         for(int i=0;i<day-1;i++){
             total_comments+= youtubeFeatures.getFeaturesForDay(i).getYt_comments();
         }
