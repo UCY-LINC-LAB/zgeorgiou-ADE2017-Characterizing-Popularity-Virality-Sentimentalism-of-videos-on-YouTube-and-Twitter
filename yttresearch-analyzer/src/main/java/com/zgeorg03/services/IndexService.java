@@ -22,12 +22,6 @@ public class IndexService extends Service {
         this.executorService = executorService;
     }
 
-    public String getCsv(long timestamp){
-        CsvProducer.WriteCSV writeCSV =  csvProducer.new WriteCSV(timestamp,dbServices.getProcessVideoDBService().getVideos());
-        executorService.submit(writeCSV);
-        return "/csv/"+timestamp;
-
-    }
 
 
 

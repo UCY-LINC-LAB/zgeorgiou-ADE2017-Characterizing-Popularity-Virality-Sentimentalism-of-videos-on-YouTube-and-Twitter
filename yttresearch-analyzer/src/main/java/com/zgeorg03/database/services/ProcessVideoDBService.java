@@ -240,8 +240,8 @@ public class ProcessVideoDBService {
                 new Document("$match",match),
                 new Document("$project",
                         new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
-                //new Document("$sort",new Document("total_views",-1)),
-                //new Document("$limit", limit*4),
+                new Document("$sort",new Document("total_views",-1)),
+                new Document("$limit", limit*2),
                 new Document("$sample", new Document("size",limit))
         );
 
@@ -276,8 +276,6 @@ public class ProcessVideoDBService {
                 new Document("$match",match),
                 new Document("$project",
                         new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
-                //new Document("$sort",new Document("total_views",-1)),
-                //new Document("$limit", limit*4),
                 new Document("$sample", new Document("size",limit))
         );
 

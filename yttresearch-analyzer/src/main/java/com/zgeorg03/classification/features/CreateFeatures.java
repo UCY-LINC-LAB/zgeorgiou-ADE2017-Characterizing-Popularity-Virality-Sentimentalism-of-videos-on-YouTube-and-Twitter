@@ -1,14 +1,15 @@
 package com.zgeorg03.classification.features;
 
 
-import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.classification.records.VideoData;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Giorgos on 04/01/2017.
@@ -17,8 +18,10 @@ import java.util.Map;
  */
 public class CreateFeatures {
 
-    private Map<String, VideoData> videosMap;
-    private ArrayList<String> uniqueVideos;
+    private final Map<String, VideoData> videosMap;
+    private final Set<String> mostPopular;
+    private final Set<String> mostViral;
+
     private int t_window;
     private int offset;
     private int l_window;
@@ -30,17 +33,20 @@ public class CreateFeatures {
     private String ytBinary;
     private String twBinary;
 
-    public CreateFeatures(boolean recent,int t,int o,int l){
+    public CreateFeatures(File path, boolean recent, int t, int o, int l, Map<String, VideoData> videosMap, Set<String> mostPopular, Set<String> mostViral){
         this.recent = recent;
+        this.videosMap = videosMap;
+        this.mostPopular = mostPopular;
+        this.mostViral = mostViral;
         try {
             if(!recent){
-                pw = new PrintWriter((new FileWriter("yt_train_all_"+t+""+o+""+l+".txt")));
-                lab = new PrintWriter(new FileWriter("labeling_"+t+""+o+""+l+".txt"));
-                pw_twitter = new PrintWriter(new FileWriter("tw_train_all_"+t+""+o+""+l+".txt"));
+                pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_all_"+t+""+o+""+l+".txt").toFile())));
+                lab = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"labeling_"+t+""+o+""+l+".txt").toFile())));
+                pw_twitter = new PrintWriter(new FileWriter(Paths.get(path.getAbsolutePath(),"tw_train_all_"+t+""+o+""+l+".txt").toFile()));
             }else{
-                pw = new PrintWriter((new FileWriter("yt_train_all_recent_"+t+""+o+""+l+".txt")));
-                lab = new PrintWriter(new FileWriter("labeling_recent_"+t+""+o+""+l+".txt"));
-                pw_twitter = new PrintWriter(new FileWriter("tw_train_all_recent_"+t+""+o+""+l+".txt"));
+                pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_all_recent_"+t+""+o+""+l+".txt").toFile())));
+                lab = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"labeling_recent_"+t+""+o+""+l+".txt").toFile())));
+                pw_twitter = new PrintWriter(new FileWriter(Paths.get(path.getAbsolutePath(),"tw_train_all_recent_"+t+""+o+""+l+".txt").toFile()));
             }
 
         } catch (IOException e) {
@@ -57,8 +63,8 @@ public class CreateFeatures {
          * Getting Training data
          */
 
-        videosMap.values().stream().forEachOrdered(video -> {
-            TrainingFeatures training = new TrainingFeatures(videosMap.get(video),t_window,ytBinary,twBinary);
+        videosMap.values().stream().sorted().forEachOrdered(video -> {
+            TrainingFeatures training = new TrainingFeatures(video,t_window,ytBinary,twBinary);
             pw.println(training.getAllYoutubeFeatures());
             pw.flush();
             pw_twitter.println(training.getAllTwitterFeatures());
@@ -69,9 +75,9 @@ public class CreateFeatures {
         /**
          * Getting Labeling data
          */
-        LabelingFeatures label = new LabelingFeatures(videosMap,labPer);
-        videosMap.values().stream().forEachOrdered(video -> {
-            label.labelKnown(videosMap.get(video));
+        LabelingFeatures label = new LabelingFeatures(videosMap,mostPopular,mostViral);
+        videosMap.values().stream().sorted().forEachOrdered(video -> {
+            label.labelKnown(video.getVideo_id());
         });
 
         lab.println(label.getLabeledPopular());
@@ -81,14 +87,6 @@ public class CreateFeatures {
         pw.close();
         pw_twitter.close();
         lab.close();
-    }
-
-    public void setVideosMap(Map<String, VideoData> videosMap) {
-        this.videosMap = videosMap;
-    }
-
-    public void setUniqueVideos(ArrayList<String> uniqueVideos) {
-        this.uniqueVideos = uniqueVideos;
     }
 
     public void setT_window(int t_window) {

@@ -4,11 +4,15 @@ import com.zgeorg03.analysis.models.Video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -52,41 +56,19 @@ public class CsvProducer {
         return null;
     }
 
-    public class WriteCSV implements Callable<String>{
-
-        private final long id;
-        private final List<Video> videos;
-
-        public WriteCSV(long id, List<Video> videos) {
-            this.id = id;
-            this.videos = videos;
-        }
-
-        @Override
-        public String call() throws Exception {
-            File file = Paths.get(path.getAbsolutePath(),id+".csv").toFile();
-            try {
-                PrintWriter pw = new PrintWriter(new FileWriter(file));
-                pw.println(videos.get(0).getCsvTitles());
-                videos.stream().forEach( v-> pw.println(v.getCsvForm()));
-                pw.close();
-                logger.info("Successful write to csv:"+id);
-            } catch (IOException e) {
-                logger.error(e.getLocalizedMessage());
-                return "Failed to write to csv";
-            }
-
-            return "/csv/"+id;
-        }
-    }
     public class WriteCSVAnalysis implements Callable<String>{
 
         private final String experimentId;
         private final List<Video> videos;
 
-        public WriteCSVAnalysis(String experimentId,  List<Video> videos) {
+        private final Set<String> popular;
+        private final Set<String> viral;
+
+        public WriteCSVAnalysis(String experimentId, List<Video> videos, Set<String> popular, Set<String> viral) {
             this.experimentId = experimentId;
             this.videos = videos;
+            this.popular = popular;
+            this.viral = viral;
         }
 
         @Override
@@ -100,7 +82,12 @@ public class CsvProducer {
             try {
                 PrintWriter pw = new PrintWriter(new FileWriter(file));
                 pw.println(videos.get(0).getCsvTitles());
-                videos.stream().forEach( v-> pw.println(v.getCsvForm()));
+                videos.stream().forEach( v-> {
+                    boolean isPopular = popular.contains(v.getVideo_id());
+                    boolean isViral = viral.contains(v.getVideo_id());
+                    pw.println(v.getCsvForm(isPopular,isViral));
+
+                });
                 pw.close();
                 logger.info("Successful write to csv:videos_features.csv");
             } catch (IOException e) {

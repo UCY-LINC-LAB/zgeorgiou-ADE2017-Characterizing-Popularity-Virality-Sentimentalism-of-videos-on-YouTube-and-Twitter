@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Giorgos on 06-Nov-16.
  */
-public class VideoData {
+public class VideoData implements Comparable<VideoData>{
 
     private long published_at;
     private long collected_at;
@@ -50,20 +50,15 @@ public class VideoData {
      * in Labeling
      *
      * */
-    public void calculateTotals(int t_win,int offset,int l_win){
+    public void calculateTotals(int offset,int l_win){
 
-        for(int i=0;i<=t_win;i++) {
+        for(int i=offset+1;i<=l_win;i++) {
             totalViews += youtubeFeatures.getFeaturesForDay(i).getYt_views();
-            totalTweets+= twitterDayMap.get(i).getTw_tweets();
+            totalTweets += twitterDayMap.get(i).getTw_tweets();
             channel_uploads+= youtubeFeatures.getFeaturesForDay(i).getYt_channel_videos();
             channel_subscribers+= youtubeFeatures.getFeaturesForDay(i).getYt_channel_subscribers();
             channel_comments+= youtubeFeatures.getFeaturesForDay(i).getYt_channel_comments();
             channel_views+= youtubeFeatures.getFeaturesForDay(i).getYt_channel_views();
-        }
-
-        for(int i=t_win+offset+1;i<=t_win+offset+l_win;i++) {
-            totalViews += youtubeFeatures.getFeaturesForDay(i).getYt_views();
-            totalTweets += twitterDayMap.get(i).getTw_tweets();
         }
 
     }
@@ -99,5 +94,11 @@ public class VideoData {
 
     public long getCollected_at() {
         return collected_at;
+    }
+
+    @Override
+    public int compareTo(VideoData videoData) {
+
+        return this.getVideo_id().compareTo(videoData.getVideo_id());
     }
 }

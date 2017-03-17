@@ -59,7 +59,7 @@ public class Video implements JsonModel{
                 + days.stream().map(d->d.getCsvTitle()).collect(Collectors.joining("\t"))
                 ;
     }
-    public String getCsvForm() {
+    public String getCsvForm(boolean isPopular,boolean isViral) {
         return video_id + "\t"
                 + category +"\t"
                 + artificial_category +"\t"
@@ -74,6 +74,8 @@ public class Video implements JsonModel{
                 :
                 ("0\t0\t0\t0"))
                 + "\t"+ days.stream().map(d->d.getCsvForm()).collect(Collectors.joining("\t"))
+                +"\t"+ ((isPopular)?1:0)
+                +"\t"+ ((isViral)?1:0)
                 ;
     }
 
@@ -151,10 +153,10 @@ public class Video implements JsonModel{
     public VideoRecord getAsVideoRecord(){
         VideoRecord videoRecord = new
                 VideoRecord( category,artificial_category,published_at,duration,
-                comments_sentiment.getNeg().getAverage(),
-                comments_sentiment.getNeu().getAverage(),
-                comments_sentiment.getPos().getAverage(),
-                comments_sentiment.getCompound().getAverage());
+                (comments_sentiment.isValid())?comments_sentiment.getNeg().getAverage():0,
+                (comments_sentiment.isValid())?comments_sentiment.getNeu().getAverage():0,
+                (comments_sentiment.isValid())?comments_sentiment.getPos().getAverage():0,
+                (comments_sentiment.isValid())?comments_sentiment.getCompound().getAverage():0);
         for(Day day : days)
             videoRecord.addDay(day.getAsDayRecord());
         return videoRecord;

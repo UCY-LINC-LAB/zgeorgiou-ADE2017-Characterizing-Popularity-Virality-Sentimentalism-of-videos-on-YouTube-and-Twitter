@@ -378,4 +378,7 @@ public class PlotProducer {
         }
     }
 
+    public File getPath() {
+        return path;
+    }
 }

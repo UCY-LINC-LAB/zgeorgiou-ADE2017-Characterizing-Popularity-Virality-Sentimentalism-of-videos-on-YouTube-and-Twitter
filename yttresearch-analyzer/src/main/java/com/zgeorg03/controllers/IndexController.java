@@ -31,6 +31,7 @@ public class IndexController {
 
             }
         };
+        /**
         new GetRequest("/csv"){
 
             @Override
@@ -41,7 +42,7 @@ public class IndexController {
                 long timestamp =System.currentTimeMillis();
                 //TODO Remove in production
                 timestamp=1;
-                result.addString("url", indexService.getCsv(timestamp));
+                //result.addString("url", indexService.getCsv(timestamp));
 
 
                 return result.build();
@@ -52,5 +53,6 @@ public class IndexController {
 
             }
         };
+         **/
     }
 }

@@ -3,9 +3,11 @@ package com.zgeorg03.classification.features;
 
 import com.zgeorg03.classification.records.VideoData;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -18,7 +20,6 @@ import java.util.Map;
 public class CreateBaseFeatures {
 
     private Map<String, VideoData> videosMap;
-    private ArrayList<String> uniqueVideos;
     private int t_window;
     private int offset;
     private int l_window;
@@ -27,15 +28,15 @@ public class CreateBaseFeatures {
     private boolean recent;
     private float labPer;
 
-    public CreateBaseFeatures(boolean recent,int t,int o,int l){
+    public CreateBaseFeatures(File path, boolean recent, int t, int o, int l){
         this.recent=recent;
         try {
             if(!recent){
-                pw = new PrintWriter((new FileWriter("yt_train_base_"+t+""+o+""+l+".txt")));
-                pw_twitter = new PrintWriter(new FileWriter("tw_train_base_"+t+""+o+""+l+".txt"));
+                pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_base_"+t+""+o+""+l+".txt").toFile())));
+                pw_twitter = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"tw_train_base_"+t+""+o+""+l+".txt").toFile())));
             }else{
-                pw = new PrintWriter((new FileWriter("yt_train_base_recent_"+t+""+o+""+l+".txt")));
-                pw_twitter = new PrintWriter(new FileWriter("tw_train_base_recent_"+t+""+o+""+l+".txt"));
+                pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_base_recent_"+t+""+o+""+l+".txt").toFile())));
+                pw_twitter = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"tw_train_base_recent_"+t+""+o+""+l+".txt").toFile())));
             }
 
         } catch (IOException e) {
@@ -47,14 +48,13 @@ public class CreateBaseFeatures {
         /**
          * Getting Training data of 90%
          */
-        for(int i=0;i<uniqueVideos.size();i++){
-            String video = uniqueVideos.get(i);
-            TrainingBaseFeatures training = new TrainingBaseFeatures(videosMap.get(video),t_window);
+        videosMap.values().stream().sorted().forEachOrdered(video -> {
+            TrainingBaseFeatures training = new TrainingBaseFeatures(video,t_window);
             pw.println(training.getBaseYoutubeFeatures());
             pw.flush();
             pw_twitter.println(training.getBaseTwitterFeatures());
             pw_twitter.flush();
-        }
+        });
 
         pw.close();
         pw_twitter.close();
@@ -66,10 +66,6 @@ public class CreateBaseFeatures {
 
     public void setVideosMap(Map<String, VideoData> videosMap) {
         this.videosMap = videosMap;
-    }
-
-    public void setUniqueVideos(ArrayList<String> uniqueVideos) {
-        this.uniqueVideos = uniqueVideos;
     }
 
     public void setT_window(int t_window) {

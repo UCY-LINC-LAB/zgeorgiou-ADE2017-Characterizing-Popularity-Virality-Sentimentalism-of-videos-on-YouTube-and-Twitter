@@ -11,6 +11,7 @@ import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.analysis.models.Video;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -86,9 +87,14 @@ public class VideosService extends Service {
         return processVideoDBService;
     }
 
-    public String produceCsv(Groups groups) {
-        CsvProducer.WriteCSVAnalysis analysis =  csvProducer.new WriteCSVAnalysis(groups.getExperimentId(),groups.getAllVideos());
+    public String produceCsv(Groups groups, Set<String> popular, Set<String> viral) {
+        CsvProducer.WriteCSVAnalysis analysis =  csvProducer.new WriteCSVAnalysis(groups.getExperimentId(),groups.getAllVideos(),popular,viral);
         executorService.submit(analysis);
         return "/"+groups.getExperimentId()+"/videos_features";
+    }
+
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 }

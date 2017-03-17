@@ -36,6 +36,7 @@ public class Groups implements JsonModel{
    private final List<List<Boolean>> videoGroups = new LinkedList<>();
 
 
+   private int minDays=15;
     public Groups(boolean showDailyStats,int offset, int lbl_wnd, ProcessVideoDBService services, Map<String, List<Integer>> videos, String experimentId){
         this.experimentId = experimentId;
 
@@ -55,6 +56,9 @@ public class Groups implements JsonModel{
             List<Integer> groups =  entry.getValue();
             Video video = services.getVideo(videoId);
             allVideos.add(video);
+            int days = video.getDays().size();
+            if(days<minDays)
+                minDays=days;
             Boolean []groupsIn = new Boolean[4];
             for(int i =0;i<4;i++) groupsIn[i]=false;
             groups.forEach(i ->{
@@ -289,7 +293,7 @@ public class Groups implements JsonModel{
     public Map<String,VideoData> getVideoData(FeatureManager featureManager){
         return allVideos.stream().map(video -> {
             VideoRecord vr = video.getAsVideoRecord();
-            return new VideoData(video, featureManager.mapYouTubeFeatures(vr,15),featureManager.mapTwitterFeatures(vr,15));
+            return new VideoData(video, featureManager.mapYouTubeFeatures(vr,minDays),featureManager.mapTwitterFeatures(vr,minDays));
                 }
         ).collect(Collectors.toMap(k->k.getVideo_id(),v->v));
     }
@@ -297,5 +301,13 @@ public class Groups implements JsonModel{
 
     public List<Video> getAllVideos() {
         return allVideos;
+    }
+
+    public Group getPopular() {
+        return popular;
+    }
+
+    public Group getViral() {
+        return viral;
     }
 }
