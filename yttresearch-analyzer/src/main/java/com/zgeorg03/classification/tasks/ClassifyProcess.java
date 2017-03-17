@@ -49,7 +49,8 @@ public class ClassifyProcess implements Callable<List<String>> {
 
     @Override
     public List<String> call() throws Exception {
-        ProcessBuilder builder = new ProcessBuilder("python ",scriptPath, getArguments());
+        System.out.println("python "+scriptPath+getArguments());
+        ProcessBuilder builder = new ProcessBuilder("bash","-c","python "+scriptPath+getArguments());
         try {
             Process process = builder.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));

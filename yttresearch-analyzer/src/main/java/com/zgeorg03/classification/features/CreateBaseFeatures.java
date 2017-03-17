@@ -30,6 +30,8 @@ public class CreateBaseFeatures {
 
     public CreateBaseFeatures(File path, boolean recent, int t, int o, int l){
         this.recent=recent;
+        l-=o;
+        o-=t;
         try {
             if(!recent){
                 pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_base_"+t+""+o+""+l+".txt").toFile())));

@@ -14,12 +14,8 @@ import java.util.concurrent.ExecutorService;
 public class IndexService extends Service {
 
     private Logger logger  = LoggerFactory.getLogger(IndexService.class);
-    private final CsvProducer csvProducer;
-    private final ExecutorService executorService;
-    public IndexService(DBServices dbServices, CsvProducer csvProducer, ExecutorService executorService) {
+    public IndexService(DBServices dbServices){
         super(dbServices);
-        this.csvProducer = csvProducer;
-        this.executorService = executorService;
     }
 
 

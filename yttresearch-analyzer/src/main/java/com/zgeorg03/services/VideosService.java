@@ -3,6 +3,7 @@ package com.zgeorg03.services;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.classification.tasks.ClassifyTasks;
 import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
@@ -23,11 +24,13 @@ public class VideosService extends Service {
     private final ProcessVideoDBService processVideoDBService;
     private final CsvProducer csvProducer;
     private final ExecutorService executorService;
-    public VideosService(DBServices dbServices, CsvProducer csvProducer, ExecutorService executorService) {
+    private final ClassifyTasks classifyTasks;
+    public VideosService(DBServices dbServices, CsvProducer csvProducer, ExecutorService executorService, ClassifyTasks classifyTasks) {
         super(dbServices);
         processVideoDBService = dbServices.getProcessVideoDBService();
         this.csvProducer = csvProducer;
         this.executorService = executorService;
+        this.classifyTasks = classifyTasks;
     }
 
 
@@ -96,5 +99,9 @@ public class VideosService extends Service {
 
     public ExecutorService getExecutorService() {
         return executorService;
+    }
+
+    public ClassifyTasks getClassifyTasks() {
+        return classifyTasks;
     }
 }

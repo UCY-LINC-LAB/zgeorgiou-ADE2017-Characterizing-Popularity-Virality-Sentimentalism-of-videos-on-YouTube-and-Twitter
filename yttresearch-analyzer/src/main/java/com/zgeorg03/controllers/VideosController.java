@@ -125,16 +125,18 @@ public class VideosController {
                 object.addProperty("lbl_wnd","From day "+(offset+1)+" until day " +lbl_wnd);
                 object.add("high_level_characterization_plots",plotProducer.produceHighLevelPlots(groups));
                 object.addProperty("videos_features_csv",videosService.produceCsv(groups,mostPopular,mostViral));
-                object.add("groups",groups.getInfo());
 
 
                 //Classification
                 String ytFeatures = "1111111111111111111111111111111";
                 String twFeatures = "1111111111111111111111111111111111111111111";
                 int split_days = 14;
-                FeatureManager featureManager = new FeatureManager(plotProducer.getPath(),experiment,groups,train_wnd, offset, lbl_wnd, split_days, percentage, ytFeatures, twFeatures);
+                FeatureManager featureManager = new FeatureManager(plotProducer.getPath(),experiment, videosService.getClassifyTasks(), groups,train_wnd, offset, lbl_wnd, split_days, percentage, ytFeatures, twFeatures);
                 videosService.getExecutorService().execute(featureManager);
 
+                object.addProperty("classification","/classification/"+experiment);
+
+                object.add("groups",groups.getInfo());
 
                 result.setData(object);
 

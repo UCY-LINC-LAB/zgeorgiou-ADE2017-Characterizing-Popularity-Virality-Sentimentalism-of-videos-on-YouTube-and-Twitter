@@ -2,6 +2,9 @@ package com.zgeorg03.core;
 
 import com.mongodb.ServerAddress;
 import com.zgeorg03.analysis.SentimentAnalysis;
+import com.zgeorg03.classification.ClassManager;
+import com.zgeorg03.classification.tasks.ClassifyTasks;
+import com.zgeorg03.controllers.ClassificationController;
 import com.zgeorg03.controllers.IndexController;
 import com.zgeorg03.controllers.PlotsController;
 import com.zgeorg03.controllers.VideosController;
@@ -9,6 +12,7 @@ import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.FinishedVideosMonitor;
+import com.zgeorg03.services.ClassificationService;
 import com.zgeorg03.services.IndexService;
 import com.zgeorg03.services.PlotsService;
 import com.zgeorg03.services.VideosService;
@@ -31,22 +35,27 @@ public class App {
 
         port(8000);
 
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
         PlotProducer plotProducer = new PlotProducer(workingPath);
         CsvProducer csvProducer = new CsvProducer(workingPath);
+        ClassifyTasks classifyTasks = new ClassifyTasks(scripts);
+        executorService.submit(classifyTasks);
+
+        ClassManager classManager= new ClassManager(workingPath);
 
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
         DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
         FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
 
 
         //Services
-        final IndexService indexService = new IndexService(dbServices, csvProducer, executorService);
-        final VideosService videosService = new VideosService(dbServices, csvProducer, executorService);
+        final ClassificationService classificationService = new ClassificationService(dbServices,classManager);
+        final IndexService indexService = new IndexService(dbServices);
+        final VideosService videosService = new VideosService(dbServices, csvProducer, executorService, classifyTasks);
         final PlotsService plotsService = new PlotsService(plotProducer, csvProducer);
 
 
@@ -54,8 +63,10 @@ public class App {
         new IndexController(indexService);
         new VideosController(videosService, plotProducer);
         new PlotsController(plotsService);
+        new ClassificationController(classificationService);
 
 
+        new Thread(classManager).start();
 
         CORSEnable();
     }

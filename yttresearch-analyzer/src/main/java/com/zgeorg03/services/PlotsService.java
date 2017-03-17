@@ -19,9 +19,6 @@ public class PlotsService{
         return plotProducer.readPlot(experimentId,plotName);
     }
 
-    public byte[]readCsv(String id){
-        return csvProducer.readCsv(id);
-    }
 
     public byte[]readExperimentCsv(String id,String title){
         return csvProducer.readExperimentCsv(id,title);

@@ -59,41 +59,6 @@ public class PlotsController {
             }
         };
 
-        new GetRequest("/csv/:id"){
-
-            @Parameter(description = "Csv Id", required = true)
-            String id;
-
-
-            @Override
-            public Object execute(Request request, Response response, JsonResult result) {
-
-                byte[] data = plotsService.readCsv(id);
-                if (data == null) {
-                    result.addError("Csv not found!");
-                    return result.build();
-                }
-
-                HttpServletResponse raw = response.raw();
-                response.header("Content-Disposition", "attachment; filename=" + id + ".csv");
-                ///response.type("application/force-download");
-                response.type("text/csv");
-                try {
-                    raw.getOutputStream().write(data);
-                    raw.getOutputStream().flush();
-                    raw.getOutputStream().close();
-                } catch (Exception e) {
-                    logger.error(e.getLocalizedMessage());
-                }
-                return raw;
-            }
-
-            @Override
-            public void handleParams(Request request, Response response, JsonResult result) {
-                id = ParseParameters.parseStringParam(request, result, ":id", "", x -> true, "Error with id");
-
-            }
-        };
 
         new GetRequest("/:experiment/videos_features"){
 

@@ -1,10 +1,10 @@
 package com.zgeorg03.classification;
 
 import com.zgeorg03.analysis.Groups;
-import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.classification.features.CreateBaseFeatures;
 import com.zgeorg03.classification.features.CreateFeatures;
 import com.zgeorg03.classification.records.*;
+import com.zgeorg03.classification.tasks.ClassifyTasks;
 import com.zgeorg03.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class FeatureManager implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(FeatureManager.class);
 
+    private final ClassifyTasks monitor;
     private int t_window;
     private int offset;
     private int l_window;
@@ -39,7 +40,9 @@ public class FeatureManager implements Runnable {
 
     private Set<String> mostPopular;
     private Set<String> mostViral;
-    public FeatureManager(File root,String experiment,Groups groups,int t, int o, int l, int split, float per, String yt, String tw){
+
+    public FeatureManager(File root, String experiment, ClassifyTasks monitor, Groups groups, int t, int o, int l, int split, float per, String yt, String tw){
+        this.monitor = monitor;
         this.groups = groups;
         this.t_window = t;
         this.offset = o;
@@ -127,7 +130,7 @@ public class FeatureManager implements Runnable {
         return tw;
     }
 
-    public void createFeatures(){
+    public boolean createFeatures(){
         CreateFeatures features = new CreateFeatures(path,false,t_window,offset,l_window, videosMap, mostPopular, mostViral);
         features.setLabPer(labPer);
         features.setT_window(t_window);
@@ -161,7 +164,8 @@ public class FeatureManager implements Runnable {
         baseFeaturesRecent.setL_window(l_window);
         baseFeaturesRecent.setVideosMap(videosMapRecent);
         baseFeaturesRecent.create();
-        logger.error("Features have been created");
+        logger.info("Features for " +groups.getExperimentId()+" have been created");
+        return true;
     }
 
 
@@ -177,7 +181,12 @@ public class FeatureManager implements Runnable {
         Map<Boolean, List<VideoData>> splittedVideos = videoDataList.values().stream().collect(Collectors.partitioningBy(splitPredicate)) ;
         videosMap = splittedVideos.get(true).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
         videosMapRecent = splittedVideos.get(false).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
-
         createFeatures();
+
+        System.out.println("T.W: "+t_window);
+        System.out.println("O.W: "+(offset-t_window));
+        System.out.println("L.W: "+(l_window-offset));
+        monitor.addTask(path.getAbsolutePath(),t_window,offset-t_window,l_window-offset,ytFeatures,twFeatures);
+
     }
 }

@@ -3,12 +3,15 @@
 # @author Giorgos Demosthenous                             #
 ############################################################
 
+import matplotlib as mpl
+mpl.use('Agg')
+
+
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 from sklearn.model_selection import KFold
 from sklearn.metrics import f1_score
-import threading
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -631,7 +634,6 @@ def main():
 
         # Input
         if len(sys.argv) <6:
-                print(len(sys.argv))
                 print ("Arguments needed")
                 print ("Arg1:\t Data Directory")
                 print ("Arg2:\t Training Window")

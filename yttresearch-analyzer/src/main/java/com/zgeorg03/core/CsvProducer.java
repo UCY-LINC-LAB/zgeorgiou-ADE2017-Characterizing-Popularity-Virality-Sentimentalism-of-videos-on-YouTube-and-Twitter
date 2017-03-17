@@ -22,28 +22,11 @@ public class CsvProducer {
     private  static final Logger logger = LoggerFactory.getLogger(CsvProducer.class);
 
     private final File root;
-    private final File path;
 
     public CsvProducer(String path) {
-        this.path = Paths.get(path,"csv").toFile();
-        if(!this.path.exists()||!this.path .isDirectory()){
-            if(this.path.mkdirs())
-                logger.info("Created:"+this.path.getAbsolutePath());
-        }
         this.root = Paths.get(path).toFile();
     }
 
-
-    public byte[] readCsv(String id) {
-        Path path = Paths.get(this.path.getAbsolutePath(),id+".csv");
-        try {
-            return  Files.readAllBytes(path);
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
-        }
-
-        return null;
-    }
 
     public byte[] readExperimentCsv(String id, String title) {
         Path path = Paths.get(this.root.getAbsolutePath(),id,title+".csv");

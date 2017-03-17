@@ -38,6 +38,8 @@ public class CreateFeatures {
         this.videosMap = videosMap;
         this.mostPopular = mostPopular;
         this.mostViral = mostViral;
+        l-=o;
+        o-=t;
         try {
             if(!recent){
                 pw = new PrintWriter((new FileWriter(Paths.get(path.getAbsolutePath(),"yt_train_all_"+t+""+o+""+l+".txt").toFile())));
