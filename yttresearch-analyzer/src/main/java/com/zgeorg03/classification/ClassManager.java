@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,15 +40,19 @@ public class ClassManager implements Runnable{
 
             checkExperiments();
 
-            try { TimeUnit.SECONDS.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+            try { TimeUnit.SECONDS.sleep(30); } catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
     private void checkExperiments() {
-        experiments.entrySet().stream().forEach(entry->{
+        experiments.entrySet().stream().forEach(entry -> {
             ClassificationFiles classificationFiles = entry.getValue();
-            if(!classificationFiles.isReady()){
-                if(classificationFiles.process())
+            if (classificationFiles.getPath().exists())
+                if (classificationFiles.isModified())
+                    classificationFiles.setReady(false);
+
+            if (!classificationFiles.isReady()) {
+                if (classificationFiles.process())
                     logger.info("Experiment: " + entry.getKey() + " is ready!");
             }
         });
@@ -73,8 +75,10 @@ public class ClassManager implements Runnable{
             result.addProperty("msg", "Experiment " + id + " doesn't exist");
             return result;
         }
-        if(!files.isReady())
+        if(!files.isReady()) {
             result.addProperty("msg", "Experiment " + id + " is not ready. Please be patient");
+            return result;
+        }
 
        return files.toJson();
 
@@ -84,7 +88,10 @@ public class ClassManager implements Runnable{
     class ClassificationFiles implements JsonModel {
         private final File classificationPath;
         boolean ready;
+        boolean changed;
         private Map<String,JsonObject> evaluations = new HashMap<>();
+
+        private Map<String,Long> lastModified = new HashMap<>();
 
         ClassificationFiles(File root) {
             classificationPath = Paths.get(root.getAbsolutePath(),"classification_data").toFile();
@@ -97,7 +104,7 @@ public class ClassManager implements Runnable{
 
             for(File file : classificationPath.listFiles((dir, name) -> name.endsWith(".eva"))){
                 String name = getName(file);
-                if(!evaluations.containsKey(name)){
+                if(changed || !evaluations.containsKey(name)){
                     try {
                         List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
                         if(lines.size()!=5) {
@@ -111,6 +118,7 @@ public class ClassManager implements Runnable{
                         object.addProperty("baseline_recent",Double.parseDouble(lines.get(3).split("\t")[1]));
                         object.addProperty("f1_score",Double.parseDouble(lines.get(4).split("\t")[1]));
                         evaluations.put(name,object);
+                        lastModified.put(name,file.lastModified());
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -118,8 +126,10 @@ public class ClassManager implements Runnable{
                 }
             }
 
-            if(ready)
-                this.ready=true;
+            if(ready) {
+                this.ready = true;
+                this.changed=false;
+            }
             return ready;
         }
         public boolean isReady() {
@@ -161,6 +171,29 @@ public class ClassManager implements Runnable{
         @Override
         public JsonObject toJson(Map<String, Integer> view) {
             return toJson();
+        }
+
+        public void setReady(boolean ready) {
+            this.ready = ready;
+        }
+
+        public boolean isModified() {
+            for(File file : classificationPath.listFiles((dir, name) -> name.endsWith(".eva"))){
+                String name = getName(file);
+                if(lastModified.containsKey(name)){
+                     if(lastModified.get(name)!=file.lastModified()) {
+                         lastModified.put(name,file.lastModified());
+                         System.out.println(file.lastModified());
+                         changed=true;
+                         return true;
+                     }
+                }
+            }
+            return false;
+        }
+
+        public File getPath() {
+            return classificationPath;
         }
     }
 }

@@ -75,10 +75,14 @@ public class VideosController {
             private int useLimit;
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
+                if(videosService.exists(experiment)){
+                    return result.addString("msg","Experiment already exists...").build();
+                }
                 JsonArray popular = videosService.getPopularVideos(category,offset,lbl_wnd, useLimit);
                 JsonArray viral = videosService.getViralVideos(category,offset,lbl_wnd,useLimit);
                 JsonArray recent = videosService.getRecentVideos(category,2,useLimit);
                 JsonArray random = videosService.getRandomVideos(category,useLimit);
+
 
 
 

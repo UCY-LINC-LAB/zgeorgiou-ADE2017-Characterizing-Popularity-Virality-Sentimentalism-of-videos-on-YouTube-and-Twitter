@@ -39,6 +39,10 @@ public class CsvProducer {
         return null;
     }
 
+    public boolean exists(String experiment) {
+        return Paths.get(root.getAbsolutePath(),experiment).toFile().exists();
+    }
+
     public class WriteCSVAnalysis implements Callable<String>{
 
         private final String experimentId;

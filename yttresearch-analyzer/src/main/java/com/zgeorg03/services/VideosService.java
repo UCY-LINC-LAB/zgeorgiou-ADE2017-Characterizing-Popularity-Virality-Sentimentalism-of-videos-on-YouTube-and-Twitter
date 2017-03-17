@@ -104,4 +104,8 @@ public class VideosService extends Service {
     public ClassifyTasks getClassifyTasks() {
         return classifyTasks;
     }
+
+    public boolean exists(String experiment) {
+       return csvProducer.exists(experiment);
+    }
 }
