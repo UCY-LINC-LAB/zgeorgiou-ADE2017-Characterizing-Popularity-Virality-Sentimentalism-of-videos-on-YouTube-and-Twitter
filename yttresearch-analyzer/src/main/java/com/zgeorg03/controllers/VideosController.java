@@ -57,8 +57,6 @@ public class VideosController {
             @Parameter(description = "Specify the category",defaultValue = "0")
             private int category;
 
-            @Parameter(description = "Experiment Id",defaultValue = "exp-Timestamp")
-            private String experiment;
 
             @Parameter(description = "Labeling window, indicates the number of days for the attributes calculation",defaultValue = "1")
             private int lbl_wnd;
@@ -72,9 +70,16 @@ public class VideosController {
             @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
             private float percentage;
 
+            private String experiment;
             private int useLimit;
             @Override
             public Object execute(Request request, Response response, JsonResult result) {
+
+                String category_name = Categories.getArtificial_categories().get(category);
+                int per = (int)(percentage*1000);
+                int perRest = per%10;
+                experiment = "exp_"+category_name+"_"+(per/10)+"-"+perRest+"_"+train_wnd+"_"+(offset-train_wnd)+"_"+(lbl_wnd-offset);
+
                 if(videosService.exists(experiment)){
                     return result.addString("msg","Experiment already exists...").build();
                 }
@@ -160,7 +165,6 @@ public class VideosController {
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
 
-                experiment = ParseParameters.parseStringQueryParam(request,result,"experiment","exp-"+System.currentTimeMillis(),x->true,"Experiment error");
 
                 offset+=train_wnd;
                 lbl_wnd+=offset;

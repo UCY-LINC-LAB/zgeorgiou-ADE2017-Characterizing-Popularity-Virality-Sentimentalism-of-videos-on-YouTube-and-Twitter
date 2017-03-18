@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class FeatureManager implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(FeatureManager.class);
 
-    private final ClassifyTasks monitor;
+    private final ClassifyTasks classifyTasks;
     private int t_window;
     private int offset;
     private int l_window;
@@ -41,8 +41,8 @@ public class FeatureManager implements Runnable {
     private Set<String> mostPopular;
     private Set<String> mostViral;
 
-    public FeatureManager(File root, String experiment, ClassifyTasks monitor, Groups groups, int t, int o, int l, int split, float per, String yt, String tw){
-        this.monitor = monitor;
+    public FeatureManager(File root, String experiment, ClassifyTasks classifyTasks, Groups groups, int t, int o, int l, int split, float per, String yt, String tw){
+        this.classifyTasks = classifyTasks;
         this.groups = groups;
         this.t_window = t;
         this.offset = o;
@@ -186,7 +186,7 @@ public class FeatureManager implements Runnable {
         System.out.println("T.W: "+t_window);
         System.out.println("O.W: "+(offset-t_window));
         System.out.println("L.W: "+(l_window-offset));
-        monitor.addTask(path.getAbsolutePath(),t_window,offset-t_window,l_window-offset,ytFeatures,twFeatures);
+        classifyTasks.addTask(path.getAbsolutePath(),t_window,offset-t_window,l_window-offset,ytFeatures,twFeatures);
 
     }
 }

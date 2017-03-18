@@ -23,4 +23,9 @@ public class PlotsService{
     public byte[]readExperimentCsv(String id,String title){
         return csvProducer.readExperimentCsv(id,title);
     }
+
+    public byte[] readClassificationPlot(String experiment, String plotName) {
+
+        return plotProducer.readClassificationPlot(experiment,plotName);
+    }
 }

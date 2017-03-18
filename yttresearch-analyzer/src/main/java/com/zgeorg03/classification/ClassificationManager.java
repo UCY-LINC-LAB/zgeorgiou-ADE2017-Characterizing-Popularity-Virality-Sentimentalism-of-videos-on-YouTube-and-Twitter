@@ -2,6 +2,7 @@ package com.zgeorg03.classification;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.zgeorg03.utils.JsonModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,301 +10,229 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * Created by zgeorg03 on 2/2/17.
+ * Created by zgeorg03 on 3/17/17.
  */
-public class ClassificationManager implements Runnable {
-
+public class ClassificationManager implements Runnable{
     private final Logger logger = LoggerFactory.getLogger(ClassificationManager.class);
     private final File root;
 
-    private final Map<String,ClassificationFiles> directories;
-    public ClassificationManager(String path) {
-        this.root = Paths.get(path).toFile();
-        directories = new HashMap<>();
+    private final Map<String,ClassificationFiles> experiments = new HashMap<>();
 
-
-        findDirectories();
+    public ClassificationManager(String workingDir) {
+        this.root = Paths.get(workingDir).toFile();
+        if(!this.root.exists()){
+            if(this.root.mkdirs())
+                logger.info("Created dir:"+root.getAbsolutePath());
+        }
     }
 
-    private boolean findDirectories(){
-        boolean found = false;
-        File[] fileList =root.listFiles((file, s) -> file.isDirectory() && s.startsWith("classify"));
-        for(File dir : fileList){
-            if(directories.putIfAbsent(dir.getName(),new ClassificationFiles(dir))==null)
-                found=true;
-        }
-
-        //Check if someting is deleted
-        for( String name : directories.keySet()){
-            boolean toRemove=true;
-            for(File dir : fileList){
-                if(dir.getName().equals(name))
-                    toRemove =false;
-            }
-            if(toRemove) {
-                if(directories.remove(name)!=null){
-                    logger.info("Removed: "+name );
-                }
-            }
-        }
-
-        return found;
-    }
 
     @Override
     public void run() {
-        long sleepTime = 5000;
-        boolean foundNewFile;
+        logger.info("Starting Classification Manager...");
+        while (true){
 
-        while(true){
+            checkDirs();
 
-            //logger.info("Running...");
+            checkExperiments();
 
-            //Reset SleepTime
-            foundNewFile = findDirectories();
+            try { TimeUnit.SECONDS.sleep(30); } catch (InterruptedException e) { e.printStackTrace(); }
+        }
+    }
 
+    private void checkExperiments() {
+        experiments.entrySet().stream().forEach(entry -> {
+            ClassificationFiles classificationFiles = entry.getValue();
+            if (classificationFiles.getPath().exists())
+                if (classificationFiles.isModified())
+                    classificationFiles.setReady(false);
 
-            processDirectories();
-
-            if(foundNewFile) {
-                logger.info("New dirs,found!");
-                sleepTime = 5000;
-            }else{
-                if(sleepTime<10000)
-                    sleepTime *=2;
+            if (!classificationFiles.isReady()) {
+                if (classificationFiles.process())
+                    logger.info("Experiment: " + entry.getKey() + " is ready!");
             }
+        });
+    }
 
-
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private void checkDirs() {
+        for(File dir :root.listFiles((dir, name) -> dir.isDirectory())){
+            String experimentId = dir.getName();
+            if(!experiments.containsKey(experimentId)) {
+                logger.info("Found new experiment:" + experimentId);
+                experiments.put(experimentId,new ClassificationFiles(dir, experimentId));
             }
         }
-
     }
 
-    public ClassificationFiles getClassificationFiles(String dir){
-        return  directories.get(dir);
-    }
-
-    public JsonObject getAUC_PRplots(int category, long seed, String auc){
-        String dir = "classify-"+category+"-"+seed;
-        JsonObject object = new JsonObject();
-        ClassificationFiles classificationFiles  = directories.get(dir);
-        if(classificationFiles==null) {
-            object.addProperty("info", "Classification for: " + dir + " doesn't exist");
-            return object;
-        }
-        JsonObject aucObject = classificationFiles.getStats(auc);
-        if(aucObject == null){
-            object.addProperty("info", "Not available yet");
-            return object;
-        }
-        JsonObject features_young = classificationFiles.getFeatures(auc+"_all_recent");
-        JsonObject features_old = classificationFiles.getFeatures(auc+"_all_old");
-        if(features_young == null)
-            aucObject.addProperty("features_recent", "Not available yet");
-        else
-            aucObject.add("features_recent", features_young);
-        if(features_old == null)
-            aucObject.addProperty("features_old", "Not available yet");
-        else
-            aucObject.add("features_old", features_old);
-
-
-        aucObject.addProperty("precision_recall_plot","/classify-plots/"+category+"/"+seed+"/"+auc);
-        object.add(auc,aucObject);
-        object.addProperty("info","OK");
-        return object;
-    }
-
-    public byte[] getAUCPlot(String dir, String name){
-        ClassificationFiles classificationFiles  = directories.get(dir);
-        if(classificationFiles==null) {
-            logger.error("Classification for: " + dir + " doesn't exist");
-            return null;
-        }
-        JsonElement element = classificationFiles.getStats(name);
-        if(element == null){
-            logger.error("Classification Stats for: " + dir + " doesn't exist");
-            return null;
-        }
-        String toks[] = name.split("_");
-        String plot = toks[1]+"_"+toks[0]+"_features";
-        try {
-            return Files.readAllBytes(Paths.get(this.root.getAbsolutePath(),dir,plot+".png"));
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
-            return null;
-        }
-    }
-    private void processDirectories() {
-       directories.entrySet().stream().forEach(entry->{
-           ClassificationFiles classificationFiles = entry.getValue();
-           try {
-               for (File statsFile : classificationFiles.getDirectory().listFiles((file, s) -> s.endsWith(".eva"))) {
-                   String fileName = statsFile.getName();
-                   String stats = statsFile.getName().substring(0, fileName.length() - 4);
-
-                   List<String> statsLines = getStatsFile(statsFile);
-                   if (statsLines.size() == 5) {
-                       if (classificationFiles.addStats(stats, statsLines))
-                           logger.info("Stats:" + stats + " is ready and added");
-                   } else {
-                       /* TODO
-
-                       String png = auc + ".png";
-                       File pngFile = Paths.get(statsFile.getParent(), png).toFile();
-                       boolean pngExists = pngFile.exists();
-                       if (pngExists && statsFile.delete() && pngFile.delete()) {
-                           logger.info("File: " + statsFile.getAbsolutePath() + " erased");
-                           logger.info("File: " + pngFile.getAbsolutePath() + " erased");
-                       }
-                   */ }
-               }
-               for (File featuresFile : classificationFiles.getDirectory().listFiles((file, s) -> s.endsWith(".imp"))) {
-                   String fileName = featuresFile.getName();
-                   String features = fileName.substring(0, fileName.length() - 4);
-
-                   List<String> featuresLines = getStatsFile(featuresFile);
-                   if (classificationFiles.addFeatures(features, featuresLines))
-                       logger.info("Feature:" + features + " is ready and added");
-
-               }
-           }
-           catch(Exception e){
-               logger.error("File system changed!");
-
-           }
-
-       });
-    }
-
-    private List<String> getStatsFile(File fp){
-        List<String> lines = new LinkedList<>();
-        try {
-            lines = Files.readAllLines(fp.toPath());
-            return lines;
-        } catch (IOException e) {
-            logger.error("File: "+fp.getAbsolutePath()+" couldn't be opened");
-            return  lines;
-        }
-    }
-
-
-    public String mapToFile(int type,int feature){
-       if(type ==0 && feature ==0)
-           return "twitter_viral";
-        if(type ==0 && feature ==1)
-            return "youtube_viral";
-        if(type ==0 && feature ==2)
-            return "both_viral";
-
-        if(type ==1 && feature ==0)
-            return "twitter_popular";
-        if(type ==1 && feature ==1)
-            return "youtube_popular";
-        if(type ==1 && feature ==2)
-            return "both_popular";
-
-        if(type ==2 && feature ==0)
-            return "twitter_popular-viral";
-        if(type ==2 && feature ==1)
-            return "youtube_popular-viral";
-        if(type ==2 && feature ==2)
-            return "both_popular-viral";
-
-        return "unknown";
-    }
-
-    public JsonObject getAnalysisGraphs(int category, long seed) {
-        String dir = "classify-"+category+"-"+seed;
+    public JsonObject getClassificationResults(String id) {
         JsonObject result = new JsonObject();
-        ClassificationFiles classificationFiles  = directories.get(dir);
-        if(classificationFiles==null) {
-            result.addProperty("info", "Classification for: " + dir + " doesn't exist");
+        ClassificationFiles files = experiments.get(id);
+        if(files==null) {
+            result.addProperty("msg", "Experiment " + id + " doesn't exist");
             return result;
         }
-        result.addProperty("average_daily_views_increase","/analysis-plots/"+category+"/"+seed+"/"+"average-daily-views-increase");
-        result.addProperty("average_daily_tweets_increase","/analysis-plots/"+category+"/"+seed+"/"+"average-daily-tweets-increase");
-        result.addProperty("average_ratio_original_tweets","/analysis-plots/"+category+"/"+seed+"/"+"average-ratio-original-tweets");
-        result.addProperty("average_users_reached","/analysis-plots/"+category+"/"+seed+"/"+"average-users-reached");
-        result.addProperty("videos_age_distribution","/analysis-plots/"+category+"/"+seed+"/"+"videos-age-distribution");
-        return result;
+        if(!files.isReady()) {
+            result.addProperty("msg", "Experiment " + id + " is not ready. Please be patient");
+            return result;
+        }
+
+       return files.toJson();
+
     }
 
-    public byte[] getAnalysisPlot(String dir, String plot_name) {
-        try {
-            return Files.readAllBytes(Paths.get(this.root.getAbsolutePath(),dir,plot_name+".png"));
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
-            return null;
+
+    class ClassificationFiles implements JsonModel {
+        private final File classificationPath;
+        boolean ready;
+        boolean changed;
+        private Map<String,JsonObject> evaluations = new HashMap<>();
+        private Map<String,JsonObject> features = new HashMap<>();
+
+        private Map<String,Long> lastModified = new HashMap<>();
+        private final String experiment;
+
+        ClassificationFiles(File root, String experiment) {
+            classificationPath = Paths.get(root.getAbsolutePath(),"classification_data").toFile();
+            this.experiment = experiment;
+        }
+
+        public boolean process() {
+            if(!classificationPath.exists())
+                return false;
+            boolean ready = true;
+
+            for(File file : classificationPath.listFiles((dir, name) -> name.endsWith(".eva"))){
+                String name = getName(file);
+
+                if(changed || !evaluations.containsKey(name)){
+                    try {
+                        List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
+                        if(lines.size()!=5) {
+                            ready = false;
+                            continue;
+                        }
+                        JsonObject object = new JsonObject();
+                        object.addProperty("all_old",Double.parseDouble(lines.get(0).split("\t")[1]));
+                        object.addProperty("baseline_old",Double.parseDouble(lines.get(1).split("\t")[1]));
+                        object.addProperty("all_recent",Double.parseDouble(lines.get(2).split("\t")[1]));
+                        object.addProperty("baseline_recent",Double.parseDouble(lines.get(3).split("\t")[1]));
+                        object.addProperty("f1_score",Double.parseDouble(lines.get(4).split("\t")[1]));
+                        evaluations.put(name,object);
+                        lastModified.put(name,file.lastModified());
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if(ready) {
+                for(File file : classificationPath.listFiles((dir, name) -> name.endsWith(".imp"))){
+                    String name = getName(file);
+                    try {
+                        List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
+                        if(lines.isEmpty()){
+                            ready=false;
+                            continue;
+                        }
+                        JsonObject object = new JsonObject();
+                        lines.stream().forEach(line->{
+                            String toks[]=line.split("\t");
+                            double value = Double.parseDouble(toks[2]);
+                            object.addProperty(toks[1],value);
+                        });
+                        features.put(name,object);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(ready) {
+                    this.ready = true;
+                    this.changed = false;
+                }
+            }
+            return ready;
+        }
+        public boolean isReady() {
+            return ready;
+        }
+
+        public String getName(File file){
+            List<String> list = Arrays.asList(file.getName().split("[.]")[0].split("_"));
+            List<String>res = new LinkedList<>();
+            for(int i=0;i<list.size()-1;i++)
+                res.add(list.get(i));
+            return res.stream().collect(Collectors.joining("_"));
+        }
+
+        @Override
+        public JsonObject toJson() {
+            JsonObject object = new JsonObject();
+            object.add("popular_youtube",allToJson("youtube_popular"));
+            object.add("popular_twitter",allToJson("twitter_popular"));
+            object.add("popular_both",allToJson("both_popular"));
+
+            object.add("viral_youtube",allToJson("youtube_viral"));
+            object.add("viral_twitter",allToJson("twitter_viral"));
+            object.add("viral_both",allToJson("both_viral"));
+
+            object.add("popular_viral_youtube",allToJson("youtube_viral_and_popular"));
+            object.add("popular_viral_twitter",allToJson("twitter_viral_and_popular"));
+            object.add("popular_viral_both",allToJson("both_viral_and_popular"));
+
+
+            return object;
+        }
+
+        JsonObject allToJson(String key){
+            JsonObject object = new JsonObject();
+            object.add("evaluation", evaluations.get(key));
+            object.addProperty("graph", "/plots/classification/"+experiment+"/"+key);
+            object.add("features_importance", getFeatureImportance(key));
+            return object;
+        }
+
+        private JsonElement getFeatureImportance(String key) {
+            JsonObject object = new JsonObject();
+            object.add("all_old",features.get(key+"_all_old"));
+            object.add("all_recent",features.get(key+"_all_recent"));
+
+            return object;
+        }
+
+        @Override
+        public JsonObject toJson(Map<String, Integer> view) {
+            return toJson();
+        }
+
+        public void setReady(boolean ready) {
+            this.ready = ready;
+        }
+
+        public boolean isModified() {
+            for(File file : classificationPath.listFiles((dir, name) -> name.endsWith(".eva"))){
+                String name = getName(file);
+                if(lastModified.containsKey(name)){
+                     if(lastModified.get(name)!=file.lastModified()) {
+                         lastModified.put(name,file.lastModified());
+                         changed=true;
+                         return true;
+                     }
+                }
+            }
+            return false;
+        }
+
+        public File getPath() {
+            return classificationPath;
         }
     }
+
+
 }
-
-class ClassificationFiles {
-
-    private final File directory;
-
-    private final Map<String,JsonObject> stats;
-    private final Map<String,JsonObject> features;
-
-    public ClassificationFiles(File directory) {
-        this.directory = directory;
-        stats = new HashMap<>();
-        features = new HashMap<>();
-    }
-
-    public File getDirectory() {
-        return directory;
-    }
-
-    public boolean addStats(String auc, List<String> lines){
-        JsonObject jsonObject = new JsonObject();
-        lines.stream().map(line -> line.split("\t"))
-                .filter(x->x.length==2)
-                .forEach(x ->{
-                    String toks[] = x[0].split("_");
-                    if(toks.length!=4)
-                        return;
-                    String name;
-                    if(!toks[2].startsWith("f1"))
-                        name = "auc_" + toks[2]+"_"+toks[3];
-                    else
-                        name = toks[2]+"_"+toks[3];
-                    jsonObject.addProperty(name,x[1]);
-                });
-
-        return stats.putIfAbsent(auc,jsonObject)==null;
-    }
-
-    public boolean addFeatures(String features,List<String> lines){
-        JsonObject jsonObject = new JsonObject();
-        lines.stream().map(line -> line.split("\t"))
-                .filter(x->x.length==3)
-                .forEach(x -> jsonObject.addProperty(x[1],x[2]) );
-
-        return this.features.putIfAbsent(features,jsonObject)==null;
-    }
-
-    public JsonObject getFeatures(String fatures){ return  features.get(fatures);}
-    public JsonObject getStats(String auc){
-       return stats.get(auc);
-    }
-
-    @Override
-    public String toString() {
-
-        return stats.toString();
-
-    }
-}
-

@@ -303,6 +303,20 @@ public class PlotProducer {
         return null;
     }
 
+    public byte[] readClassificationPlot(String experiment, String plotName) {
+        String toks[]=experiment.split("_");
+        String l="_"+toks[toks.length-3]+toks[toks.length-2]+toks[toks.length-1];
+
+        Path path = Paths.get(this.path.getAbsolutePath(),experiment,"classification_data",plotName+l+".png");
+        try {
+            return  Files.readAllBytes(path);
+        } catch (IOException e) {
+            logger.error(e.getLocalizedMessage());
+        }
+
+        return null;
+    }
+
 
     /**
      * Produce a plot and return its file path

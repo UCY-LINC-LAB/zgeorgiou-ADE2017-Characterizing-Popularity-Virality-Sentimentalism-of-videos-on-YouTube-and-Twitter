@@ -453,7 +453,7 @@ def popular(dir,t,o,l,m,train,k,ytBin,twBin):
         text = m+ ' popular'
         plt.title(text)
         plt.legend(loc='best', fancybox='True', framealpha=0.5, fontsize=8);
-        text = 'popular_'+m+'_features_'+str(t)+str(o)+str(l)+'.png'
+        text = m+'_popular_'+str(t)+str(o)+str(l)+'.png'
         fig.savefig(os.path.join(dir,text))
         plt.close(fig)
                 
@@ -538,7 +538,7 @@ def viral(dir,t,o,l,m,train,k,ytBin,twBin):
         text = m+ ' viral'
         plt.title(text)
         plt.legend(loc='best', fancybox='True', framealpha=0.5, fontsize=8);
-        text = 'viral_'+m+'_features_'+str(t)+str(o)+str(l)+'.png'
+        text = m+'_viral_'+str(t)+str(o)+str(l)+'.png'
         fig.savefig(os.path.join(dir,text))
         plt.close(fig)
                 
@@ -624,7 +624,7 @@ def viralAndPopular(dir,t,o,l,m,train,k,ytBin,twBin):
         text = m+ ' viral and popular'
         plt.title(text)
         plt.legend(loc='best', fancybox='True', framealpha=0.5, fontsize=8);
-        text = 'popular-viral_'+m+'_features_'+str(t)+str(o)+str(l)+'.png'
+        text = m+'_viral_and_popular_'+str(t)+str(o)+str(l)+'.png'
         fig.savefig(os.path.join(dir,text))
         plt.close(fig)
                 

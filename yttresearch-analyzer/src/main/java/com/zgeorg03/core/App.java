@@ -2,7 +2,7 @@ package com.zgeorg03.core;
 
 import com.mongodb.ServerAddress;
 import com.zgeorg03.analysis.SentimentAnalysis;
-import com.zgeorg03.classification.ClassManager;
+import com.zgeorg03.classification.ClassificationManager;
 import com.zgeorg03.classification.tasks.ClassifyTasks;
 import com.zgeorg03.controllers.ClassificationController;
 import com.zgeorg03.controllers.IndexController;
@@ -41,7 +41,7 @@ public class App {
         ClassifyTasks classifyTasks = new ClassifyTasks(scripts);
         executorService.submit(classifyTasks);
 
-        ClassManager classManager= new ClassManager(workingPath);
+        ClassificationManager classificationManager = new ClassificationManager(workingPath);
 
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
@@ -53,7 +53,7 @@ public class App {
 
 
         //Services
-        final ClassificationService classificationService = new ClassificationService(dbServices,classManager);
+        final ClassificationService classificationService = new ClassificationService(dbServices, classificationManager);
         final IndexService indexService = new IndexService(dbServices);
         final VideosService videosService = new VideosService(dbServices, csvProducer, executorService, classifyTasks);
         final PlotsService plotsService = new PlotsService(plotProducer, csvProducer);
@@ -66,7 +66,7 @@ public class App {
         new ClassificationController(classificationService);
 
 
-        new Thread(classManager).start();
+        new Thread(classificationManager).start();
 
         CORSEnable();
     }
