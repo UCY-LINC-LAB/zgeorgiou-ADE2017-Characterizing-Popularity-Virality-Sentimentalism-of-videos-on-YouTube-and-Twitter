@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.classification.FeatureManager;
-import com.zgeorg03.controllers.helpers.GetRequest;
-import com.zgeorg03.controllers.helpers.JsonResult;
-import com.zgeorg03.controllers.helpers.Parameter;
-import com.zgeorg03.controllers.helpers.ParseParameters;
+import com.zgeorg03.controllers.helpers.*;
 import com.zgeorg03.core.PlotProducer;
 import com.zgeorg03.services.VideosService;
 import com.zgeorg03.utils.Categories;
@@ -52,11 +49,63 @@ public class VideosController {
             }
         };
 
-        new GetRequest("/videos/classify"){
+        new PutRequest("/videos/classify"){
 
             @Parameter(description = "Specify the category",defaultValue = "0")
             private int category;
 
+            @Parameter(description = "Labeling window, indicates the number of days for the attributes calculation",defaultValue = "1")
+            private int lbl_wnd;
+
+            @Parameter(description = "Training window, indicates the number of days to train the classifier",defaultValue = "2")
+            private int train_wnd;
+
+            @Parameter(description = "Offset, indicates the number of days we don't measure stats",defaultValue = "0")
+            private int offset;
+
+            @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
+            private float percentage;
+
+            private String experiment;
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+
+                String category_name = Categories.getArtificial_categories().get(category);
+                int per = (int)(percentage*1000);
+                int perRest = per%10;
+                experiment = "exp_"+category_name+"_"+(per/10)+"-"+perRest+"_"+train_wnd+"_"+(offset-train_wnd)+"_"+(lbl_wnd-offset);
+                if(videosService.removeExperiment(experiment))
+                    result.addString("msg","Successfully removed experiment:"+experiment);
+                else
+                    result.addString("msg","Failed to remove experiment:"+experiment);
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+
+                category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
+
+                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<14,"train_wnd should in the range of the collected data");
+
+                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x+train_wnd<=14,"offset should be in the range of the collected data");
+
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>1&&x+train_wnd+offset<=15,"lbl_wnd should be in the range of the collected data");
+
+                percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
+
+
+                offset+=train_wnd;
+                lbl_wnd+=offset;
+
+
+            }
+        };
+        new GetRequest("/videos/classify"){
+
+            @Parameter(description = "Specify the category",defaultValue = "0")
+            private int category;
 
             @Parameter(description = "Labeling window, indicates the number of days for the attributes calculation",defaultValue = "1")
             private int lbl_wnd;
@@ -145,7 +194,7 @@ public class VideosController {
 
                 object.addProperty("classification","/classification/"+experiment);
 
-                object.add("groups",groups.getInfo());
+                object.add("groups",groups.toJson());
 
                 result.setData(object);
 

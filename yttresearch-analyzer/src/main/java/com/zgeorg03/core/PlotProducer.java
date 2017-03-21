@@ -342,7 +342,7 @@ public class PlotProducer {
             this.input.add("import matplotlib as mpl");
             this.input.add("mpl.use('Agg')");
             this.input.add("import matplotlib.pyplot as plt");
-            this.input.add("plt.figure(figsize=(12, 9), dpi=600)");
+            this.input.add("plt.figure(figsize=(12, 9))");
             this.input.addAll(input);
             this.input.add("plt.savefig('"+ path +"')");
             url = "/plots/"+experimentId+"/"+plotName;

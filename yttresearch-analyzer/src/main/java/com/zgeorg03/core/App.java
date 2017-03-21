@@ -55,7 +55,7 @@ public class App {
         //Services
         final ClassificationService classificationService = new ClassificationService(dbServices, classificationManager);
         final IndexService indexService = new IndexService(dbServices);
-        final VideosService videosService = new VideosService(dbServices, csvProducer, executorService, classifyTasks);
+        final VideosService videosService = new VideosService(dbServices, csvProducer, executorService, classifyTasks, classificationManager);
         final PlotsService plotsService = new PlotsService(plotProducer, csvProducer);
 
 
