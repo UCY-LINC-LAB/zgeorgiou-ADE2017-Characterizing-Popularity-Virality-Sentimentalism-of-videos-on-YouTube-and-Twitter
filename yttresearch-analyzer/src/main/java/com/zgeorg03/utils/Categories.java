@@ -49,9 +49,9 @@ public class Categories {
         artificial_categories.put(0,"All");
         artificial_categories.put(1,"Music");
         artificial_categories.put(2,"Games");
-        artificial_categories.put(3,"People & Blogs");
+        artificial_categories.put(3,"People_Blogs");
         artificial_categories.put(4,"Entertainment");
-        artificial_categories.put(5,"News & Politics");
+        artificial_categories.put(5,"News_Politics");
         artificial_categories.put(6,"Others");
     }
 

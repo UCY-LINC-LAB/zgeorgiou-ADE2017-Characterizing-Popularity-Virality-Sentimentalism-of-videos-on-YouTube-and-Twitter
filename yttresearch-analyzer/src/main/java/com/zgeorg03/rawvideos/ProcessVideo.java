@@ -70,7 +70,7 @@ public class ProcessVideo {
      */
     private void addDynamicInfo(){
         List<Document> days = (List<Document>) this.video.get("days");
-        if(days.size()!=15)
+        if(days.size()!=16)
             logger.error("RawVideo: "+ videoID+" doesn't have 15 days. This shouldn't have happen.");
         long total_views = 0;
         long total_likes = 0;

@@ -31,6 +31,19 @@ public class ClassificationManager implements Runnable{
         }
     }
 
+    boolean deleteDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                deleteDir(f);
+            }
+        }
+        return file.delete();
+    }
+    public boolean removeExperiment(String experiment){
+        return deleteDir(experiments.get(experiment).getPath().getParentFile());
+
+    }
 
     @Override
     public void run() {
