@@ -48,7 +48,14 @@ public class DynamicInfoMonitor implements Runnable {
                     YouTubeRequests requests = new YouTubeRequests(video, key);
                     String channelId = dbServices.getDbVideosService().getChannelId(video);
                     JsonObject dynamicData = requests.getDynamicData(channelId);
-                    if (dynamicData.get("error") != null) {
+
+                    //Checking if a video reached 15th day
+                    if (dbServices.getDbVideosService().checkVideoIsFinished(video)) {
+                        if (dbServices.getDbVideosService().setVideoAsFinished(video))
+                            logger.info("Video:" + video + " has finished!");
+                        if (dbServices.getDbVideosService().addDynamicData(video, dynamicData))
+                        logger.info("Dynamic data added for " + video);
+                    }else if (dynamicData.get("error") != null) {
                         logger.error("Dynamic data couldn't be fetched for " + video + " because " + dynamicData.get("error").getAsString());
                         if (dbServices.getDbVideosService().setVideoAsIncomplete(video)) {
                             logger.error(video + " is set as incomplete");
@@ -57,11 +64,6 @@ public class DynamicInfoMonitor implements Runnable {
                     } else if (dbServices.getDbVideosService().addDynamicData(video, dynamicData))
                         logger.info("Dynamic data added for " + video);
 
-                    //Checking if a video reached 15th day
-                    if (dbServices.getDbVideosService().checkVideoIsFinished(video)) {
-                        if (dbServices.getDbVideosService().setVideoAsFinished(video))
-                            logger.info("Video:" + video + " has finished!");
-                    }
                 }else {
                     logger.error("YouTube key not available");
                 }

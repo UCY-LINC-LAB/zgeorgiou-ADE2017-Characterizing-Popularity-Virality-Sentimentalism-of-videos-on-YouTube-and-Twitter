@@ -75,8 +75,11 @@ public class DBVideosService implements DBVideosI {
     @Override
     public List<String> getVideosThatAreIncomplete() {
         List<String> list = new LinkedList<>();
-        MongoCursor<Document> cursor = videos.find(and(eq("meta.incomplete",true),
-                eq("meta.finished",false)))
+        MongoCursor<Document> cursor = videos.find(
+                and(
+                        eq("meta.incomplete",true),
+                        eq("meta.finished",false)
+                ))
                 .projection(fields(include("_id"))).iterator();
 
         while(cursor.hasNext()){
@@ -94,7 +97,12 @@ public class DBVideosService implements DBVideosI {
         long time = System.currentTimeMillis();
 
         Document projection = new Document("meta",1).append("_id",1);
-        Collection documents = videos.find(eq("meta.monitored",true)).projection(projection).into(new LinkedList<Document>());
+        Collection documents = videos.find(and(
+                eq("meta.monitored",true),
+                eq("meta.finished",false)
+                )
+
+        ).projection(projection).into(new LinkedList<Document>());
         List<String> videos = new LinkedList<>();
 
         for(Object obj : documents){

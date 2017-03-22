@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
  */
 public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
 
-    private final int lbl_wnd;
 
-    public DaysStats(int lbl_wnd) {
-        this.lbl_wnd = lbl_wnd;
+    public DaysStats() {
     }
 
     @Override
@@ -56,6 +54,7 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
 
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(skip)
+                .limit(14)
                 .map(entry-> Calculations.averageLong(entry.getValue().view_added))
                 .collect(Collectors.toList());
     }
@@ -63,6 +62,7 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
     public List<Double> getTweetsAverageDailyIncrease(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
+                .limit(14)
                 .map(entry-> Calculations.averageLong(entry.getValue().tweets_added))
                 .collect(Collectors.toList());
     }
@@ -70,12 +70,14 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
     public List<Double> getRatioOriginalTotalTweets(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
+                .limit(14)
                 .map(entry-> Calculations.averageDouble(entry.getValue().ratio_original_tweets_total_tweets))
                 .collect(Collectors.toList());
     }
     public List<Double> getAverageUsersReached(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
+                .limit(14)
                 .map(entry-> Calculations.averageDouble(entry.getValue().user_followers))
                 .collect(Collectors.toList());
     }

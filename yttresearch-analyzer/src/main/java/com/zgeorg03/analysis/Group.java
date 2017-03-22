@@ -28,7 +28,7 @@ public class Group extends LinkedList<Video> implements JsonModel{
         this.showDailyStats = showDailyStats;
         this.offset =offset;
         this.lbl_wnd = lbl_wnd;
-        daysStats = new DaysStats(this.lbl_wnd);
+        daysStats = new DaysStats();
     }
 
     public void addVideo(Video video){
