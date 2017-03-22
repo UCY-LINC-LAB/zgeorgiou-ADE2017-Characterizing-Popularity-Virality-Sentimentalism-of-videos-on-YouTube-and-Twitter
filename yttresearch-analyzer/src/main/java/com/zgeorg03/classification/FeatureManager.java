@@ -179,8 +179,8 @@ public class FeatureManager implements Runnable {
 
         Predicate<VideoData> splitPredicate = (v) -> ((v.getCollected_at()-v.getYoutubeFeatures().getYt_uploaded())/ DateUtil.dayInMillis < split_days);
         Map<Boolean, List<VideoData>> splittedVideos = videoDataList.values().stream().collect(Collectors.partitioningBy(splitPredicate)) ;
-        videosMap = splittedVideos.get(true).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
-        videosMapRecent = splittedVideos.get(false).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
+        videosMap = splittedVideos.get(false).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
+        videosMapRecent = splittedVideos.get(true).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
         createFeatures();
 
         System.out.println("T.W: "+t_window);
