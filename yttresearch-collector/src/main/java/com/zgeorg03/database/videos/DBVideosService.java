@@ -249,13 +249,16 @@ public class DBVideosService implements DBVideosI {
                     .append("channel_subscriber_count", dynamicData.get("channel_subscriber_count").getAsLong())
                     .append("channel_video_count", dynamicData.get("channel_video_count").getAsLong());
             days.add(day);
-            meta.put("last_update",System.currentTimeMillis());
-            meta.put("comments_finished",false); //Request new comments
-            meta.put("current_date",current_date+1);
-            video.put("days",days);
-            video.put("meta",meta);
-            videos.replaceOne(eq("_id",video_id),video);
+            meta.put("last_update", System.currentTimeMillis());
+            meta.put("comments_finished", false); //Request new comments
+            meta.put("current_date", current_date + 1);
+            video.put("days", days);
+            video.put("meta", meta);
+            videos.replaceOne(eq("_id", video_id), video);
             return true;
+        }catch (UnsupportedOperationException ex){
+            logger.error("Missing fields from the object");
+            return  false;
         } catch(NullPointerException ex){
             ex.printStackTrace();
             logger.error("Missing fields from the object");
