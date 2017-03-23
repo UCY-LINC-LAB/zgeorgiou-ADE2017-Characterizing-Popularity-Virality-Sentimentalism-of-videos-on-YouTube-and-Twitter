@@ -6,14 +6,16 @@ $(document).ready(function(){
 
     $("#graph-option").click(function(){
         var option = $("#graph-option option:selected").val();
-        if(option =="Features"){
-            $("#class").show();
+        if(option =="Features1"){
+            $("#class-features1").show();
+            $("#class-features2").hide();
+        }else if(option =='Features2'){
+            $("#class-features1").hide();
+            $("#class-features2").show();
         }else{
-            $("#class").hide();
+            $("#class-features1").hide();
+            $("#class-features2").hide();
         }
-
-        console.log('cliked');
-
     });
 
     //Load data Information
@@ -37,7 +39,6 @@ $(document).ready(function(){
     $.getJSON("./static/data/classification.json", function(result, status){
             classification = result.data;
             console.log(classification);
-            classification.popular_youtube.evaluation.all_old
 
     });
 
@@ -59,15 +60,22 @@ function graph(e){
     var option = $("#graph-option option:selected").val();
     if(option =="Area Under Curve"){
         buildAuc('graph');
-    }else if(option =="Features"){
-        var classz = $("#class-option option:selected").val();
+    }else if(option =="Features1"){
+        var classz = $("#class-features1-option option:selected").val();
         classz = classz.toLowerCase();
-        buildFeatures('graph',classz);
+        var key = $("#key-features1-option option:selected").val();
+        key = key.toLowerCase();
+        buildFeatures1('graph',key,classz);
+    }else if(option =="Features2"){
+        var classz = $("#class-features2-option option:selected").val();
+        classz = classz.toLowerCase();
+        var key = $("#key-features2-option option:selected").val();
+        key = key.toLowerCase();
+        buildFeatures2('graph',classz,key);
     }
-    //$("#auc-graph").append(buildAuc(option));
     return false;
 }
-function buildFeatures(id,classz){
+function buildFeatures1(id,key,classz){
     var myChart = Highcharts.chart(id, {
         chart: {
             type: 'column'
@@ -76,7 +84,7 @@ function buildFeatures(id,classz){
             text: 'Features Importance for ' + classz
         },
         xAxis: {
-            categories: populateFeaturesLabels(classz,'all_old',10),
+            categories: populateFeaturesLabels(classz,key,10),
             title: {
                 text: 'Features'
             }
@@ -89,25 +97,22 @@ function buildFeatures(id,classz){
         series: [
             { 
                 name: 'Features',
-                data: populateFeaturesValues(classz,'all_old',10)
+                data: populateFeaturesValues(classz,key,10)
             },
         ]
     });
-    return 
 }
 
 function populateFeaturesLabels(classz,key,num){
     var obj =   classification[classz].features_importance[key];
     var lbls = Object.keys(obj).map(function (key) { return key; });
     lbls = lbls.slice(0,num);
-    console.log(lbls);
     return lbls;
 }
 function populateFeaturesValues(classz,key,num){
     var obj =   classification[classz].features_importance[key];
     var vals = Object.keys(obj).map(function (key) { return obj[key]; });
     vals = vals.slice(0,num);
-    console.log(vals);
     return vals;
 }
 
@@ -168,4 +173,80 @@ function getClassificationValues(key){
         classification.popular_viral_twitter.evaluation[key],
         classification.popular_viral_both.evaluation[key],
         ]
+}
+
+
+function buildFeatures2(id,classz,key){
+    var series = getAllFeaturesSeries(classz,key);
+    var myChart = Highcharts.chart(id, {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Features'
+        },
+        xAxis: {
+            categories: getAllFeaturesCategories(classz) ,
+            title: {
+                text: 'Features'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Percentage'
+            }
+        },
+        series: series
+    });
+}
+function getAllFeaturesCategories(classz){
+    if(classz.endsWith("youtube")){
+        return ['Views_2','Likes_2','Views_1','Likes_1','Video_duration'];
+    }
+    if(classz.endsWith("twitter")){
+        return ['User_Followers','User_Friends']
+    }
+}
+
+function getAllFeaturesSeries(classz,key){
+    if(classz == "youtube"){
+        var py = getAllFeatures('popular_youtube', key);
+        var vy = getAllFeatures('viral_youtube', key);
+        var pvy = getAllFeatures('popular_viral_youtube', key);
+        var t = [{ name: 'Popular-YouTube', data: py },
+            { name: 'Viral-YouTube', data: vy},
+            { name: 'Popular-Viral-YouTube', data: pvy}
+        ];
+        return t;
+    }
+    if(classz == "twitter"){
+        var py = getAllFeatures('popular_twitter', key);
+        var vy = getAllFeatures('viral_twitter', key);
+        var pvy = getAllFeatures('popular_viral_twitter', key);
+        var t = [{ name: 'Popular-Twitter', data: py },
+            { name: 'Viral-Twitter', data: vy},
+            { name: 'Popular-Viral-Twitter', data: pvy}
+        ];
+        return t;
+    }
+    return 1;
+}
+function getAllFeatures(classz,key){
+    if(classz.endsWith("youtube")){
+        var x= [ 
+            classification[classz].features_importance[key].views_2,
+            classification[classz].features_importance[key].likes_2,
+            classification[classz].features_importance[key].views_1,
+            classification[classz].features_importance[key].likes_1,
+            classification[classz].features_importance[key].video_duration,
+        ];
+        return x;
+    }
+    if(classz.endsWith("twitter")){
+        var x= [ 
+            classification[classz].features_importance[key].tw_user_followers,
+            classification[classz].features_importance[key].tw_user_friends,
+        ];
+        return x;
+    }
 }

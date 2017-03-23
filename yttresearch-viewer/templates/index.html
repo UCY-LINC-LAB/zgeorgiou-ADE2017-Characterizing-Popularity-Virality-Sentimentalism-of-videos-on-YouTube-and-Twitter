@@ -13,28 +13,24 @@
             <h1>YouTube Videos Dissemination through Twitter </h1>
         </div>
         <div class="container">
-            <div id="experiment" class="row">
-            </div>
-
-            
-
+            <div id="experiment" class="row"> </div>
             <div class="row">
-                <div class="col-md-4 col-sm-4">
-                    <form onsubmit="return graph(event);" class="form-horizontal">
-
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="graph-option">Graph</label>
-                            <div class="col-sm-10">
-                                <select id="graph-option">
-                                    <option value="Area Under Curve"> Area Under Curve </option>
-                                    <option value="Features"> Features Importance </option>
-                                </select>
-                            </div>
+                <form onsubmit="return graph(event);" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="graph-option">Graph</label>
+                        <div class="col-sm-10">
+                            <select id="graph-option">
+                                <option value="Area Under Curve"> Area Under Curve </option>
+                                <option value="Features1"> Features Importance for Each Group</option>
+                                <option value="Features2"> Features Importance </option>
+                            </select>
                         </div>
-                        <div id="class" class="form-group" style="display: none">
-                            <label class="control-label col-sm-2" for="class-option">AUC Option</label>
+                    </div>
+                    <div id ="class-features1" style="display: none">
+                        <div  class="form-group">
+                            <label class="control-label col-sm-2" for="class-features1-option">AUC Option</label>
                             <div class="col-sm-10">
-                                <select id="class-option">
+                                <select id="class-features1-option">
                                     <option value="Popular_YouTube">Popular-YouTube </option>
                                     <option value="Popular_Twitter">Popular-Twitter </option>
                                     <option value="Popular_Both">Popular-Both </option>
@@ -47,18 +43,48 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div class="form-group"> 
-                            <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-default">Submit</button>
+                        <div  class="form-group">
+                            <label class="control-label col-sm-2" for="key-features1-option">Age</label>
+                            <div class="col-sm-10">
+                                <select id="key-features1-option">
+                                    <option value="all_old">Old </option>
+                                    <option value="all_recent">Recent </option>
+                                </select>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="col-md-8 col-sm-8">
-                    <div id="graph" style="height: 600px"> </div>
+                    </div>
+                    <div id ="class-features2" style="display: none">
+                        <div  class="form-group">
+                            <label class="control-label col-sm-2" for="class-features2-option">Features</label>
+                            <div class="col-sm-10">
+                                <select id="class-features2-option">
+                                    <option value="youtube">YouTube Features </option>
+                                    <option value="twitter">Twitter Features </option>
+                                    <option value="both"> Both Features </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="key-features2-option">Age</label>
+                            <div class="col-sm-10">
+                                <select id="key-features2-option">
+                                    <option value="all_old">Old </option>
+                                    <option value="all_recent">Recent </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-                </div>
+                    <div class="form-group"> 
+                        <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <div id="graph" style="height: 600px"> </div>
 
             </div>
         </div>
