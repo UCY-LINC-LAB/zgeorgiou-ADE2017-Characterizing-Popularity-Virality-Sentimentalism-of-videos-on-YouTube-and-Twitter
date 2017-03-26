@@ -32,7 +32,10 @@ public class App {
     public static void main(String args[]) throws Exception {
         String workingPath="/tmp/thesis";
         String scripts="./scripts/";
+        String db="yttresearch";
 
+        if(args.length==1)
+            db= args[0];
         port(8000);
 
         ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -45,7 +48,7 @@ public class App {
 
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
-        DBConnection dbConnection = new DBConnection("yttresearch",new ServerAddress("localhost"));
+        DBConnection dbConnection = new DBConnection(db,new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);
