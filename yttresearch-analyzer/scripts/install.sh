@@ -3,11 +3,12 @@ sudo pip install vaderSentiment
 
 # For Arch
 sudo pacman -S  python-numpy
+sudo pacman -S --force python-scipy
 sudo pacman -S  python-scikit-learn
 sudo pacman -S gnuplot
 sudo pacman -S xorg-fonts-100dpi
 sudo pip install matplotlib-venn
-sudo pacman -S --force python-scipy
+
 
 
 #FOr Interactive plots

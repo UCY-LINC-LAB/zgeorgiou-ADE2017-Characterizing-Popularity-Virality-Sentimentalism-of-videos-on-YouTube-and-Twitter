@@ -18,30 +18,6 @@ $(document).ready(function(){
         }
     });
 
-    //Load data Information
-    $.getJSON("./static/data/data.json", function(result, status){
-            data = result.data;
-            console.log(data);
-            var table = $('<table class="table table-striped"></table>');
-            table.append('<tr><th>Key</th><th>Value</th></tr>');
-
-            table.append(getRow('Experiment Id',data.experiment_id));
-            table.append(getRow('Category',data.category_name));
-            table.append(getRow('Number of Videos',data.number_of_videos));
-            table.append(getRow('Percentage used',(Number(data.percentage) * 100)+'%'));
-            table.append(getRow('Train window',data.train_wnd));
-            table.append(getRow('Offset window',data.offset));
-            table.append(getRow('Labeling window',data.lbl_wnd));
-            $('#experiment').append(table);
-
-    });
-
-    $.getJSON("./static/data/classification.json", function(result, status){
-            classification = result.data;
-            console.log(classification);
-
-    });
-
 });
 
 
@@ -250,3 +226,33 @@ function getAllFeatures(classz,key){
         return x;
     }
 }
+
+
+
+function loadFile(){
+        var option = $("#experiment-select option:selected").val();
+    //Load data Information
+    $.getJSON("./static/data/"+option+"-data.json", function(result, status){
+            data = result.data;
+            console.log(data);
+            var table = $('<table class="table table-striped"></table>');
+            table.append('<tr><th>Key</th><th>Value</th></tr>');
+
+            table.append(getRow('Experiment Id',data.experiment_id));
+            table.append(getRow('Category',data.category_name));
+            table.append(getRow('Number of Videos',data.number_of_videos));
+            table.append(getRow('Percentage used',(Number(data.percentage) * 100)+'%'));
+            table.append(getRow('Train window',data.train_wnd));
+            table.append(getRow('Offset window',data.offset));
+            table.append(getRow('Labeling window',data.lbl_wnd));
+            $('#experiment').append(table);
+
+    });
+
+    $.getJSON("./static/data/"+option+"-classification.json", function(result, status){
+            classification = result.data;
+            console.log(classification);
+
+    });
+
+};

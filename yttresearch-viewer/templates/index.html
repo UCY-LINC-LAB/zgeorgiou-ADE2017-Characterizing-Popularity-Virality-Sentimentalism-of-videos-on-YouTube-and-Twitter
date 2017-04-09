@@ -14,6 +14,18 @@
         </div>
         <div class="container">
             <div id="experiment" class="row"> </div>
+            <div >
+                <select id="experiment-select">
+                    <option value="0">All</option>
+                    <option value="1">Music</option>
+                    <option value="2">Games </option>
+                    <option value="3">People and Blogs </option>
+                    <option value="4">Entertainment</option>
+                    <option value="5">News and Politics </option>
+                    <option value="6">Others</option>
+                </select>
+                <button onclick="loadFile();" class="btn btn-default">Load</button>
+            </div>
             <div class="row">
                 <form onsubmit="return graph(event);" class="form-horizontal">
                     <div class="form-group">
