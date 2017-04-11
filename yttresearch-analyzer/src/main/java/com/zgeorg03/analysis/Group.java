@@ -139,4 +139,9 @@ public class Group extends LinkedList<Video> implements JsonModel{
         object.addProperty("total_videos",this.size());
         return object;
     }
+
+
+    public String getName() {
+        return name;
+    }
 }

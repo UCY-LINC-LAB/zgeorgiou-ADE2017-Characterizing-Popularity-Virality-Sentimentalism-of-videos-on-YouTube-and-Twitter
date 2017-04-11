@@ -1,8 +1,11 @@
 package com.zgeorg03.core;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.Group;
 import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.analysis.models.Stat;
+import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +88,7 @@ public class PlotProducer {
                         "Distribution of video age for different classes","Time(Days)","Count",
                         groups.getVideosDistribution()));
 
-        object.addProperty("vides_duration",
+        object.addProperty("videos_duration",
                 produceIntegerBar(groups.getExperimentId(),
                         "videos_duration",
                         "Average duration of the videos ","Classes","Time(seconds)",
@@ -100,8 +103,52 @@ public class PlotProducer {
                         "positive_sentiment",
                         "Average positive sentiment of the videos ","Classes","Value",
                         groups.getAveragePositiveSentiment()));
+        object.add("tweets_vs_sentiment",produceTweetsVsSentiment(groups));
 
         return object;
+    }
+
+    private JsonObject produceTweetsVsSentiment(Groups groups) {
+        Map<String, SentimentVideo> sentimentVideos = groups.toSentimentVideos();
+        JsonObject result = new JsonObject();
+        result.addProperty("popular",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular()));
+        result.addProperty("viral",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getViral()));
+        result.addProperty("popular_viral",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular_viral()));
+        result.addProperty("popular_not_viral",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular_not_viral()));
+        result.addProperty("viral_not_popular",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getViral_not_popular()));
+        result.addProperty("random",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRandom()));
+        result.addProperty("recent",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRecent()));
+
+
+        return result;
+    }
+
+    private String getTweetsVsSentiment(String experimentId,Map<String,SentimentVideo> sentimentVideos, Group group) {
+        Map<Boolean,List<Double>> values= getTweetsVsSentimentXY(sentimentVideos,group);
+
+        return producePointsGraph(experimentId, "tweets_vs_sentiment_"+group.getName(),
+                "Tweets Vs Negative Sentiment for"+ group.getName(),"Negative Sentiment","Tweets",
+                values.get(false),values.get(true));
+
+    }
+
+    private Map<Boolean,List<Double>> getTweetsVsSentimentXY(Map<String,SentimentVideo> sentimentVideos,Group group) {
+        Map<Boolean,List<Double>> map=new LinkedHashMap<>();
+        List<Double> xx=new LinkedList<>();
+        List<Double> yy=new LinkedList<>();
+        group.stream().forEach(v ->{
+            SentimentVideo video=sentimentVideos.get(v.getVideo_id());
+            if(video!=null) {
+                double x = video.getNegative();
+                double y = video.getTweets();
+                xx.add(x);
+                yy.add(y);
+            }
+        });
+        map.put(false,xx);
+        map.put(true,yy);
+        return map;
+
     }
 
 
@@ -317,6 +364,29 @@ public class PlotProducer {
         return null;
     }
 
+    private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y){
+        String xx = x.stream().map(p->p.toString()).collect(Collectors.joining(",","[","]"));
+        String yy = y.stream().map(p->p.toString()).collect(Collectors.joining(",","[","]"));
+
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "x = "+xx,
+                "y = "+yy,
+                "plt.plot(x,y,'+')",
+                "plt.title('"+titleBar+"')",
+                "plt.xlabel('"+xlabel+"')",
+                "plt.ylabel('"+ylabel+"')"
+        );
+
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
 
     /**
      * Produce a plot and return its file path
@@ -391,6 +461,7 @@ public class PlotProducer {
             return lines;
         }
     }
+
 
     public File getPath() {
         return path;

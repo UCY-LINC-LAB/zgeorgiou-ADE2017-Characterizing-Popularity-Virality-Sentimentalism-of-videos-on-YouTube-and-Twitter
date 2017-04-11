@@ -79,6 +79,16 @@ public class Video implements JsonModel{
                 ;
     }
 
+    public double getAverageViewsPerDay() {
+        return days.stream().skip(1).mapToLong(x->x.getViews_added()).average().getAsDouble();
+    }
+    public double getAverageTweetsPerDay() {
+        return days.stream().skip(1).mapToLong(x->x.getTweets_added()).average().getAsDouble();
+    }
+    public double getAverageRetweetsPerDay() {
+        return days.stream().skip(1).mapToLong(x->x.getRetweets_added()).average().getAsDouble();
+    }
+
 
     public static class Builder {
 

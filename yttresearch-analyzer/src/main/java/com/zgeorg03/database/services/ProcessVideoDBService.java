@@ -6,6 +6,7 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.models.RawVideo;
 import com.zgeorg03.utils.DateUtil;
@@ -374,12 +375,45 @@ public class ProcessVideoDBService {
      * @param
      * @return
      */
-    public List<Video> getVideos(){
-        List<Video> videos = new LinkedList<>();
-        Iterator<Document> iterator =  processedDBVideos.find().iterator();
+    public List<SentimentVideo> getVideos(int n,int category){
+        List<SentimentVideo> videos = new LinkedList<>();
+        //Iterator<Document> iterator =  processedDBVideos.find().iterator();
+
+        Document match;
+        if(category!=0)
+            match = new Document("$and", Arrays.asList(
+                    new Document("artificial_category", category),
+                    new Document("comments_sentiment",
+                            new Document("$not",
+                                    new Document("$eq","Not enough comments")))
+            ));
+        else
+            match = new Document("$and", Arrays.asList(
+                    new Document("artificial_category", new Document("$gt",0)),
+                    new Document("comments_sentiment",
+                            new Document("$not",
+                                    new Document("$eq","Not enough comments")))
+            ));
+
+        List<Document> query = Arrays.asList(
+                new Document("$match",match),
+                new Document("$sample", new Document("size",n))
+        );
+        MongoCursor iterator = processedDBVideos.aggregate(query).iterator();
         while(iterator.hasNext()){
-            Document document = iterator.next();
-            videos.add(new Video.Builder().create(document));
+            Document document = (Document) iterator.next();
+            Video video = new Video.Builder().create(document);
+            double views=video.getAverageViewsPerDay();
+            double tweets=video.getAverageTweetsPerDay();
+            double retweets=video.getAverageRetweetsPerDay();
+            SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(),views
+                    ,tweets,retweets
+                    ,video.getComments_sentiment().getNeg().getAverage()
+                    ,video.getComments_sentiment().getPos().getAverage()
+                    ,video.getComments_sentiment().getNeg().getAverage()
+                    ,video.getComments_sentiment().getCompound().getAverage()
+                    );
+            videos.add(sentimentVideo);
         }
         return videos;
 

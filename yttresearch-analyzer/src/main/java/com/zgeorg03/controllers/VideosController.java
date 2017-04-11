@@ -3,6 +3,7 @@ package com.zgeorg03.controllers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.FeatureManager;
 import com.zgeorg03.controllers.helpers.*;
 import com.zgeorg03.core.PlotProducer;
@@ -11,6 +12,7 @@ import com.zgeorg03.utils.Categories;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -523,6 +525,35 @@ public class VideosController {
                 video_id = ParseParameters.parseStringParam(request,result,":id","", x->true,"");
                 comments = ParseParameters.parseIntegerQueryParam(request,result,"comments",-1,x-> x>0 && x<=100,"Comments could be from 0 to 100");
 
+
+            }
+        };
+
+        new GetRequest("/sentiment/all") {
+            @Parameter(description = "Specify the category",defaultValue = "0")
+            private int category;
+
+            @Parameter(description = "Number of videos to pick",defaultValue = "100")
+            private int limit;
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+                List<SentimentVideo> videos = videosService.getVideosForSentiment(limit,category);
+                result.addNumber("size",videos.size());
+                try {
+                    videosService.proccessSentiment(videos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+
+                category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
+
+                limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",100,x->x>0,"limit must be positive");
 
             }
         };

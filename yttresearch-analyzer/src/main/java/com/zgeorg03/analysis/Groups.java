@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
+import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.FeatureManager;
 import com.zgeorg03.classification.records.VideoData;
 import com.zgeorg03.classification.records.VideoRecord;
@@ -309,5 +310,46 @@ public class Groups implements JsonModel{
 
     public Group getViral() {
         return viral;
+    }
+
+    public Map<String,SentimentVideo> toSentimentVideos() {
+        Map<String,SentimentVideo> videos = new HashMap<>();
+        allVideos.stream().forEach(video-> {
+            double views = video.getAverageViewsPerDay();
+            double tweets = video.getAverageTweetsPerDay();
+            double retweets = video.getAverageRetweetsPerDay();
+            if(video.getComments_sentiment().isValid()) {
+                SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(), views
+                        , tweets, retweets
+                        , video.getComments_sentiment().getNeg().getAverage()
+                        , video.getComments_sentiment().getPos().getAverage()
+                        , video.getComments_sentiment().getNeg().getAverage()
+                        , video.getComments_sentiment().getCompound().getAverage()
+                );
+                videos.put(video.getVideo_id(),sentimentVideo);
+            }
+        });
+        return videos;
+
+    }
+
+    public Group getPopular_not_viral() {
+        return popular_not_viral;
+    }
+
+    public Group getPopular_viral() {
+        return popular_viral;
+    }
+
+    public Group getRandom() {
+        return random;
+    }
+
+    public Group getRecent() {
+        return recent;
+    }
+
+    public Group getViral_not_popular() {
+        return viral_not_popular;
     }
 }

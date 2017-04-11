@@ -3,6 +3,7 @@ package com.zgeorg03.services;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.ClassificationManager;
 import com.zgeorg03.classification.tasks.ClassifyTasks;
 import com.zgeorg03.core.CsvProducer;
@@ -12,6 +13,10 @@ import com.zgeorg03.services.helpers.Service;
 import com.zgeorg03.utils.DateUtil;
 import com.zgeorg03.analysis.models.Video;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -54,6 +59,9 @@ public class VideosService extends Service {
             return object;
         }
         return  video.toJson();
+    }
+    public List<SentimentVideo> getVideosForSentiment(int n,int category){
+        return processVideoDBService.getVideos(n,category);
     }
 
     public JsonArray getPopularVideos(int artificial_category,int offset,int lbl_wnd,int limit){
@@ -114,5 +122,27 @@ public class VideosService extends Service {
 
     public boolean removeExperiment(String experiment) {
         return  manager.removeExperiment(experiment);
+    }
+
+    public void proccessSentiment(List<SentimentVideo> videos) throws IOException {
+        PrintWriter pw0 = new PrintWriter(new FileWriter(new File("/tmp/thesis/v.txt")));
+        PrintWriter pw1 = new PrintWriter(new FileWriter(new File("/tmp/thesis/t.txt")));
+        PrintWriter pw2 = new PrintWriter(new FileWriter(new File("/tmp/thesis/r.txt")));
+        videos.stream().sorted((e1,e2)-> {
+            double v1 = e1.getNegative();
+            double v2 = e2.getNegative();
+            if(v1<v2)
+                return 1;
+            if(v1>v2)
+                return -1;
+            return 0;
+        }) .forEach(x->{
+            pw0.print(x.getViews()+"\t"+x.getNegative()+"\n");
+            pw1.print(x.getTweets()+"\t"+x.getNegative()+"\n");
+            pw2.print(x.getRetweets()+"\t"+x.getNegative()+"\n");
+        });
+        pw0.close();
+        pw1.close();
+        pw2.close();
     }
 }
