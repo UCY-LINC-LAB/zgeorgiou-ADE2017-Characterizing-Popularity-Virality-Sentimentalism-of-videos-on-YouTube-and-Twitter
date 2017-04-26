@@ -27,7 +27,7 @@ public class App {
 
         port(8001);
 
-        String db="yttresearch";
+        String db="yttresearch1";
         if(args.length==1)
             db = args[0];
 

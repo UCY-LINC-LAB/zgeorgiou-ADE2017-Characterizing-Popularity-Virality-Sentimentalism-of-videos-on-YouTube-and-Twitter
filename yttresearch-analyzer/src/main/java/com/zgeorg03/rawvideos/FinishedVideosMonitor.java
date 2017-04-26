@@ -42,7 +42,6 @@ public class FinishedVideosMonitor implements Runnable {
                     ProcessVideo processVideo = new ProcessVideo(dbServices, videoId, sentimentAnalysis);
                     RawVideo rawVideo = processVideo.getVideo();
                     dbServices.getProcessVideoDBService().addOrReplaceProcessedVideo(rawVideo);
-
                     dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());

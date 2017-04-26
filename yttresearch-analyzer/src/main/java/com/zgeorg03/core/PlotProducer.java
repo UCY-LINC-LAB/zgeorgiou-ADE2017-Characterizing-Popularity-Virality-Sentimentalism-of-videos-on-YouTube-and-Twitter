@@ -262,6 +262,33 @@ public class PlotProducer {
         }
     }
 
+    private String produceDoubleBar(String experimentId, String fileName, String titleBar, String xlabel, String ylabel, List<Stat<Double>> values){
+        String objects = IntStream.range(0,values.size()).boxed().map(x->x+"").collect(Collectors.joining(",","(",")"));
+        String performance = values.stream().map(x->x.getAverage().toString()).collect(Collectors.joining(",","[","]"));
+        String err = values.stream().map(x->(x.getStd()/2)+"").collect(Collectors.joining(",","[","]"));
+
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "objects = "+objects,
+                "y_pos = np.arange(len(objects))",
+                "performance = " +performance,
+                "error = " +err,
+                "plt.bar(y_pos,performance, yerr=error,align='edge',alpha=0.5)",
+                "plt.xticks(y_pos,objects)",
+                "plt.title('"+titleBar+"')",
+                "plt.xlabel('"+xlabel+"')",
+                "plt.ylabel('"+ylabel+"')"
+        );
+
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
     private String getColors(List<String> keys) {
         List<String> colors = new LinkedList<>();
         for(String key:keys){
@@ -364,18 +391,18 @@ public class PlotProducer {
         return null;
     }
 
-    private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y){
-        String xx = x.stream().map(p->p.toString()).collect(Collectors.joining(",","[","]"));
-        String yy = y.stream().map(p->p.toString()).collect(Collectors.joining(",","[","]"));
+    private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y) {
+        String xx = x.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy = y.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
 
         List<String> input = Arrays.asList(
                 "import numpy as np",
-                "x = "+xx,
-                "y = "+yy,
+                "x = " + xx,
+                "y = " + yy,
                 "plt.plot(x,y,'+')",
-                "plt.title('"+titleBar+"')",
-                "plt.xlabel('"+xlabel+"')",
-                "plt.ylabel('"+ylabel+"')"
+                "plt.title('" + titleBar + "')",
+                "plt.xlabel('" + xlabel + "')",
+                "plt.ylabel('" + ylabel + "')"
         );
 
         Plot plot = new Plot(input, experimentId, fileName);
@@ -386,6 +413,9 @@ public class PlotProducer {
             logger.error(e.getLocalizedMessage());
             return "ERROR";
         }
+    }
+    public String produceSentimentBucketsBar(List<Stat<Double>> values) {
+        return produceDoubleBar("0", "sentimentBar", "Sentiment ", "x", "y", values);
     }
 
     /**

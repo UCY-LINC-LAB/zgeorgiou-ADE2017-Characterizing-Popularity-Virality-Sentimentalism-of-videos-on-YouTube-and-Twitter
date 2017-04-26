@@ -3,6 +3,8 @@ package com.zgeorg03.controllers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.analysis.models.Stat;
+import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.FeatureManager;
 import com.zgeorg03.controllers.helpers.*;
@@ -555,6 +557,32 @@ public class VideosController {
 
                 limit = ParseParameters.parseIntegerQueryParam(request,result,"limit",100,x->x>0,"limit must be positive");
 
+            }
+        };
+
+        new GetRequest("/sentiment/test"){
+
+            @Parameter(description = "Number of tweets to group together",defaultValue = "100")
+            private int n;
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+                try {
+                    List<SentimentVideo> videos = videosService.getVideosWithComments(n);
+                    List<Stat<Double>> values = videosService.proccessSentimentBuckets(videos,n);
+                    String graph = plotProducer.produceSentimentBucketsBar(values);
+                    result.addString("graph",graph);
+                    result.addNumber("videos",videos.size());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+                n = ParseParameters.parseIntegerQueryParam(request,result,"n",100,x->x>0&&x<=10000,"" +
+                        "n should be from 1 to 10k");
             }
         };
     }

@@ -449,4 +449,29 @@ public class ProcessVideoDBService {
         }
         return list;
     }
+
+    /**
+     * Retrieve a list of videos  with the specified number of comments
+     * @param
+     * @return
+     */
+    public List<String> getVideosWithComments(int n){
+        List<String> videos = new LinkedList<>();
+        List<Document> query = Arrays.asList(
+                new Document("$group",
+                        new Document("_id","$video_id")
+                                .append("sum",new Document("$sum",1) )
+                ),
+                new Document("$match", new Document("sum",n)),
+                new Document("$project",new Document("_id",1))
+        );
+        MongoCursor iterator = comments.aggregate(query).iterator();
+        while(iterator.hasNext()){
+            Document document = (Document) iterator.next();
+            String videoId = document.getString("_id");
+            videos.add(videoId);
+        }
+        return videos;
+
+    }
 }

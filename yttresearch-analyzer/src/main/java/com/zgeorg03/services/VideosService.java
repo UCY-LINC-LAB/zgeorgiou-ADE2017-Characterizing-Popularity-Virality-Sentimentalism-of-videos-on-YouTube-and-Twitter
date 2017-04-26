@@ -3,6 +3,8 @@ package com.zgeorg03.services;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.analysis.models.Stat;
+import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.ClassificationManager;
 import com.zgeorg03.classification.tasks.ClassifyTasks;
@@ -10,13 +12,15 @@ import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.services.helpers.Service;
+import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.DateUtil;
-import com.zgeorg03.analysis.models.Video;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -145,4 +149,71 @@ public class VideosService extends Service {
         pw1.close();
         pw2.close();
     }
+
+    public List<Stat<Double>> proccessSentimentBuckets(List<SentimentVideo> videos,int n) throws IOException {
+        PrintWriter pw1 = new PrintWriter(new FileWriter(new File("/tmp/thesis/t.txt")));
+        double max =videos.stream().mapToDouble(x->x.getTweets()).max().getAsDouble();
+        int buckets= (int) Math.ceil(max/n);
+        Double negativeArray[]=new Double[buckets];
+        Double stds[]=new Double[buckets];
+        int totalArray[]=new int[buckets];
+        for(int i=0;i<buckets;i++) {
+            negativeArray[i]=0d;
+            stds[i]=0d;
+        }
+        videos.stream().forEach(x->{
+            int bucket = (int) (x.getTweets()/n);
+            negativeArray[bucket]+=x.getNegative();
+            totalArray[bucket]++;
+        });
+
+        for(int i=0;i<buckets;i++) {
+            negativeArray[i]/=(float)totalArray[i];
+            if(negativeArray[i].isNaN()) {
+                negativeArray[i]=0d;
+            }
+            pw1.print(i+"\t"+negativeArray[i]+"\n");
+        }
+        videos.stream().forEach(x->{
+            int bucket = (int) (x.getTweets()/n);
+            double avg=negativeArray[bucket];
+            stds[bucket]+=(x.getNegative()-avg)*(x.getNegative()-avg);
+        });
+        List<Stat<Double>> stats= new LinkedList<>();
+        for(int i=0;i<buckets;i++) {
+            Double sum = Math.sqrt(stds[i]/totalArray[i]);
+            if(sum.isNaN())
+                sum=0d;
+            Stat<Double> x = new Stat<Double>(negativeArray[i],-1d,sum);
+            stats.add(x);
+        }
+        pw1.close();
+
+        return stats;
+    }
+
+    public List<SentimentVideo> getVideosWithComments(int n){
+        List<String> videos =  processVideoDBService.getVideosWithComments(n);
+        List<SentimentVideo> allVideos = new LinkedList<>();
+        videos.stream().forEach(videoId -> {
+            Video video = processVideoDBService.getVideo(videoId);
+            if(video!=null) {
+                double views = video.getAverageViewsPerDay();
+                double tweets = video.getAverageTweetsPerDay();
+                double retweets = video.getAverageRetweetsPerDay();
+                if(tweets>=1 && tweets<=600) {
+                    SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(), views
+                            , tweets, retweets
+                            , video.getComments_sentiment().getNeg().getAverage()
+                            , video.getComments_sentiment().getPos().getAverage()
+                            , video.getComments_sentiment().getNeg().getAverage()
+                            , video.getComments_sentiment().getCompound().getAverage()
+                    );
+                    allVideos.add(sentimentVideo);
+                }
+            }
+        });
+        return allVideos;
+    }
+
 }
