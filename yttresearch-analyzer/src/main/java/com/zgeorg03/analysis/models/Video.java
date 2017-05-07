@@ -88,6 +88,15 @@ public class Video implements JsonModel{
     public double getAverageRetweetsPerDay() {
         return days.stream().skip(1).mapToLong(x->x.getRetweets_added()).average().getAsDouble();
     }
+    public double getAverageLikesPerDay() {
+        return days.stream().skip(1).mapToLong(x->x.getLikes_added()).average().getAsDouble();
+    }
+    public double getAverageFollowersPerDay() {
+        return days.stream().skip(1).mapToDouble(x->x.getUser_followers_count().getAverage()).average().getAsDouble();
+    }
+    public double getAverageFriendsPerDay() {
+        return days.stream().skip(1).mapToDouble(x->x.getUser_friends_count().getAverage()).average().getAsDouble();
+    }
 
 
     public static class Builder {

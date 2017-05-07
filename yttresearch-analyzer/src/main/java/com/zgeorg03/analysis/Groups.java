@@ -203,6 +203,17 @@ public class Groups implements JsonModel{
         map.put("Viral & not Popular",this.viral_not_popular.getAveragePositiveSentiment());
         return map;
     }
+    public Map<String,Stat<Double>> getAverageNeutralSentiment() {
+        Map<String,Stat<Double>> map = new HashMap<>();
+        map.put("Popular",this.popular.getAverageNeutralSentiment());
+        map.put("Viral",this.viral.getAverageNeutralSentiment());
+        map.put("Recent",this.recent.getAverageNeutralSentiment());
+        map.put("Random",this.random.getAverageNeutralSentiment());
+        map.put("Popular & Viral",this.popular_viral.getAverageNeutralSentiment());
+        map.put("Popular & not Viral",this.popular_not_viral.getAverageNeutralSentiment());
+        map.put("Viral & not Popular",this.viral_not_popular.getAverageNeutralSentiment());
+        return map;
+    }
 
     /**
      * 0 -> Popular
@@ -318,14 +329,17 @@ public class Groups implements JsonModel{
             double views = video.getAverageViewsPerDay();
             double tweets = video.getAverageTweetsPerDay();
             double retweets = video.getAverageRetweetsPerDay();
+            double likes = video.getAverageLikesPerDay();
+            double friends = video.getAverageFriendsPerDay();
+            double followers = video.getAverageFollowersPerDay();
             if(video.getComments_sentiment().isValid()) {
                 SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(), views
                         , tweets, retweets
                         , video.getComments_sentiment().getNeg().getAverage()
                         , video.getComments_sentiment().getPos().getAverage()
-                        , video.getComments_sentiment().getNeg().getAverage()
-                        , video.getComments_sentiment().getCompound().getAverage()
-                );
+                        , video.getComments_sentiment().getNeu().getAverage()
+                        , video.getComments_sentiment().getCompound().getAverage(),
+                        likes, friends, followers);
                 videos.put(video.getVideo_id(),sentimentVideo);
             }
         });

@@ -12,14 +12,12 @@ import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.services.helpers.Service;
-import com.zgeorg03.utils.Calculations;
 import com.zgeorg03.utils.DateUtil;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +50,14 @@ public class VideosService extends Service {
      */
     public int getTotalVideos(int artificialCategory){
         return dbServices.getProcessVideoDBService().getTotalVideos(artificialCategory);
+    }
+
+    /**
+     * Total number of videos ready for analysis, for each category
+     * @return
+     */
+    public int getTotalVideosBaseCategory(int category){
+        return dbServices.getProcessVideoDBService().getTotalVideosBaseCategory(category);
     }
 
 
@@ -201,14 +207,17 @@ public class VideosService extends Service {
                 double views = video.getAverageViewsPerDay();
                 double tweets = video.getAverageTweetsPerDay();
                 double retweets = video.getAverageRetweetsPerDay();
+                double likes = video.getAverageLikesPerDay();
+                double friends = video.getAverageFriendsPerDay();
+                double followers = video.getAverageFollowersPerDay();
                 if(tweets>=1 && tweets<=600) {
                     SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(), views
                             , tweets, retweets
                             , video.getComments_sentiment().getNeg().getAverage()
                             , video.getComments_sentiment().getPos().getAverage()
                             , video.getComments_sentiment().getNeg().getAverage()
-                            , video.getComments_sentiment().getCompound().getAverage()
-                    );
+                            , video.getComments_sentiment().getCompound().getAverage(),
+                            likes, friends, followers);
                     allVideos.add(sentimentVideo);
                 }
             }

@@ -29,6 +29,25 @@ public class VideosController {
     public VideosController(VideosService videosService, PlotProducer plotProducer) {
         this.videosService = videosService;
         this.plotProducer = plotProducer;
+        new GetRequest("/videos/categories"){
+
+            @Override
+            public Object execute(Request request, Response response, JsonResult result) {
+
+                result.addNumber("total_videos",videosService.getTotalVideos(0));
+                Categories.getCategories().entrySet().forEach(entry->{
+
+                    result.addNumber(entry.getValue(),videosService.getTotalVideosBaseCategory(entry.getKey()));
+                });
+
+                return result.build();
+            }
+
+            @Override
+            public void handleParams(Request request, Response response, JsonResult result) {
+
+            }
+        };
 
         new GetRequest("/videos"){
 
@@ -192,7 +211,7 @@ public class VideosController {
                 //Classification
                 String ytFeatures = "1111111111111111111111111111111";
                 String twFeatures = "1111111111111111111111111111111111111111111";
-                int split_days = 14;
+                int split_days = 10000;
                 FeatureManager featureManager = new FeatureManager(plotProducer.getPath(),experiment, videosService.getClassifyTasks(), groups,train_wnd, offset, lbl_wnd, split_days, percentage, ytFeatures, twFeatures);
                 videosService.getExecutorService().execute(featureManager);
 
@@ -242,7 +261,7 @@ public class VideosController {
             @Parameter(description = "Offset, indicates the number of days we don't measure stats",defaultValue = "0")
             private int offset;
 
-            @Parameter(description = "If set to 1, it returns the daily statistics",defaultValue = "1")
+            @Parameter(description = "If set to 1, it returns the daily statistics",defaultValue = "0")
             private boolean daily;
 
             @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
@@ -285,13 +304,14 @@ public class VideosController {
                     values.add(3);
                     videos.put(key,values);
                 });
-                Groups groups = new Groups(daily,offset,lbl_wnd,videosService.getProcessVideoDBService(),videos, "");
+                Groups groups = new Groups(daily,offset,lbl_wnd,videosService.getProcessVideoDBService(),videos, "plots");
 
                 JsonObject object = new JsonObject();
                 object.addProperty("category_name", Categories.getArtificial_categories().get(category));
                 object.addProperty("category",category);
                 object.addProperty("percentage",percentage);
                 object.addProperty("lbl_wnd",lbl_wnd);
+                object.add("high_level_characterization_plots",plotProducer.produceHighLevelPlots(groups));
                 object.add("groups",groups.toJson());
 
                 result.setData(object);
@@ -310,7 +330,7 @@ public class VideosController {
 
                 lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x+train_wnd+offset<=15,"lbl_wnd should be in the range of the collected data");
 
-                daily = ParseParameters.parseBooleanQueryParam(request,result,"daily",true,x->x==0 || x==1 ,"daily must be either 0 or 1");
+                daily = ParseParameters.parseBooleanQueryParam(request,result,"daily",false,x->x==0 || x==1 ,"daily must be either 0 or 1");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
 

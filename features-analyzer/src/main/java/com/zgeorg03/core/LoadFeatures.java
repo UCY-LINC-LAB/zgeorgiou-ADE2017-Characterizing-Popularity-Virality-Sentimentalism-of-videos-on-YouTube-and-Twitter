@@ -1,7 +1,9 @@
 package com.zgeorg03.core;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,10 +15,12 @@ import java.util.stream.Collectors;
  */
 public class LoadFeatures {
     private final Path path;
+    private final String key;
     private Map<String,FeatureValue> features = new HashMap<>();
 
-    public LoadFeatures(String directory) throws IOException {
+    public LoadFeatures(String directory,String key) throws IOException {
         path = Paths.get(directory);
+        this.key=key;
         List<File> files = loadFiles();
         for (File file : files) {
             addFile(file);
@@ -24,9 +28,16 @@ public class LoadFeatures {
 
     }
 
+
+    public void writeAll(String name) throws IOException {
+        PrintWriter pw = new PrintWriter(new FileWriter(new File(name+"_"+key+"_features.csv")));
+        pw.print(this);
+        pw.close();
+    }
+
     public List<File> loadFiles(){
         List<File> files = new LinkedList<>();
-        for(File fp : path.toFile().listFiles((dir, name) -> name.endsWith(".imp")))
+        for(File fp : path.toFile().listFiles((dir, name) -> name.endsWith(".imp") && name.contains(key)))
             files.add(fp);
         return files;
     }
@@ -44,17 +55,12 @@ public class LoadFeatures {
     }
 
     private void addFeature(String feature, String name, float value) {
-        FeatureValue val = features.get(feature);
-        if(val==null){
-            val = new FeatureValue();
-            val.put(name,value);
-            features.put(feature,val);
-        }else{
-            val.put(name,value);
-        }
+        FeatureValue val = features.getOrDefault(feature,new FeatureValue());
+        val.put(name,value);
+        features.putIfAbsent(feature,val);
     }
     public String toString(){
-        String top = "\t"+features.get("likes_1").entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+        String top = "\t"+features.values().stream().findFirst().get().entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
                 .map(k->k.getKey()).collect(Collectors.joining("\t"));
         return top+"\n"+this.features.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
                 .map(k->k.getKey()+"\t"+k.getValue()).collect(Collectors.joining("\n"));

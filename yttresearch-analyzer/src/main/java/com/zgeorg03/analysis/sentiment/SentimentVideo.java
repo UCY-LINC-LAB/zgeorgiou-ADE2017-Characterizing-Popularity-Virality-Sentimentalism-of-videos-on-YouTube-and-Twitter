@@ -12,8 +12,11 @@ public class SentimentVideo {
     private final double positive;
     private final double neutral;
     private final double compound;
+    private final double likes;
+    private final double friends;
+    private final double followers;
 
-    public SentimentVideo(String videoId, double views, double tweets, double retweets, double negative, double positive, double neutral, double compound) {
+    public SentimentVideo(String videoId, double views, double tweets, double retweets, double negative, double positive, double neutral, double compound, double likes, double friends, double followers) {
         this.videoId = videoId;
         this.views = views;
         this.tweets = tweets;
@@ -22,6 +25,9 @@ public class SentimentVideo {
         this.positive = positive;
         this.neutral = neutral;
         this.compound = compound;
+        this.likes = likes;
+        this.friends = friends;
+        this.followers = followers;
     }
 
     @Override
@@ -66,7 +72,21 @@ public class SentimentVideo {
         return neutral;
     }
 
+
     public double getCompound() {
         return compound;
     }
+
+    public double getLikes() {
+        return likes;
+    }
+
+    public double getFriends() {
+        return friends;
+    }
+
+    public double getFollowers() {
+        return followers;
+    }
 }
+

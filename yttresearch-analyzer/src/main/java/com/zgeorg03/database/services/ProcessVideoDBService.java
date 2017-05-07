@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -357,6 +356,17 @@ public class ProcessVideoDBService {
     }
 
     /**
+     * Get total number of videos ready for analysis
+     * @return
+     */
+    public int getTotalVideosBaseCategory(int category){
+        if(category==0)
+            return (int) processedDBVideos.count();
+        else
+            return (int) processedDBVideos.count(eq("category",category));
+    }
+
+    /**
      * Retrieve video
      * @param videoId
      * @return
@@ -406,13 +416,16 @@ public class ProcessVideoDBService {
             double views=video.getAverageViewsPerDay();
             double tweets=video.getAverageTweetsPerDay();
             double retweets=video.getAverageRetweetsPerDay();
+            double likes=video.getAverageLikesPerDay();
+            double friends=video.getAverageFriendsPerDay();
+            double followers=video.getAverageFollowersPerDay();
             SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(),views
                     ,tweets,retweets
                     ,video.getComments_sentiment().getNeg().getAverage()
                     ,video.getComments_sentiment().getPos().getAverage()
                     ,video.getComments_sentiment().getNeg().getAverage()
-                    ,video.getComments_sentiment().getCompound().getAverage()
-                    );
+                    ,video.getComments_sentiment().getCompound().getAverage(),
+                    likes, friends, followers);
             videos.add(sentimentVideo);
         }
         return videos;
@@ -474,4 +487,5 @@ public class ProcessVideoDBService {
         return videos;
 
     }
+
 }

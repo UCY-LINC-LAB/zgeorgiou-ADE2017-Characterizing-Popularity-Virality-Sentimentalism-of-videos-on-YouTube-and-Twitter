@@ -96,6 +96,32 @@ public class DBServices {
 
 
     }
+    /**
+     * Get a list of videos that are finished and processed
+     * @param max Max number of videos to return
+     * @return
+     */
+    public List<String> getFinishedAndProcessedVideos(int max){
+        if(max==0)
+            return  new LinkedList<>();
+        try( MongoCursor cursor = videos.find(
+                and(
+                        eq("meta.finished",true),
+                        eq("meta.processed",true)
+                )
+        ).projection(include("_id")).limit(max).iterator()){
+            List<String> videos = new LinkedList<>();
+            while(cursor.hasNext()){
+                videos.add (((Document) cursor.next()).getString("_id"));
+            }
+            return  videos;
+        }catch (MongoException ex){
+            logger.error(ex.getLocalizedMessage());
+            return  new LinkedList<>();
+        }
+
+
+    }
 
     public String getDatabaseName() {
         return databaseName;

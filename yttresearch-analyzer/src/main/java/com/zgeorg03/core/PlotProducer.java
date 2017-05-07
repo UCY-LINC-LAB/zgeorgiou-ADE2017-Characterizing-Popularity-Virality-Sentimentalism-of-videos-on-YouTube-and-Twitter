@@ -51,13 +51,18 @@ public class PlotProducer {
     }
 
     public JsonObject produceHighLevelPlots(Groups groups) {
+        Map<String, SentimentVideo> sentimentVideos = groups.toSentimentVideos();
         JsonObject object = new JsonObject();
+
+        object.add("popular_viral_graphs",
+                produce3GroupsSentiment(groups.getPopular_not_viral(),groups.getViral_not_popular(),groups.getPopular_viral(),sentimentVideos));
 
         object.addProperty("groups_venn",
                 produceVenn(groups.getExperimentId(),
                         "groups_venn",
                         "Venn Diagram",
                         groups.getGroupsPercentages()));
+
         object.addProperty("views_average_daily_increase",
                 convertAndProduceGroupsPlot(groups.getExperimentId(),
                         "views_average_daily_increase",
@@ -93,19 +98,118 @@ public class PlotProducer {
                         "videos_duration",
                         "Average duration of the videos ","Classes","Time(seconds)",
                         groups.getAverageDuration()));
+
         object.addProperty("negative_sentiment",
                 produceDoubleBar(groups.getExperimentId(),
                         "negative_sentiment",
                         "Average negative sentiment of the videos ","Classes","Value",
                         groups.getAverageNegativeSentiment()));
+
         object.addProperty("positive_sentiment",
                 produceDoubleBar(groups.getExperimentId(),
                         "positive_sentiment",
                         "Average positive sentiment of the videos ","Classes","Value",
                         groups.getAveragePositiveSentiment()));
-        object.add("tweets_vs_sentiment",produceTweetsVsSentiment(groups));
 
+        object.addProperty("neutral_sentiment",
+                produceDoubleBar(groups.getExperimentId(),
+                        "neutral_sentiment",
+                        "Average neutral sentiment of the videos ","Classes","Value",
+                        groups.getAverageNeutralSentiment()));
+        /**
+        object.add("tweets_vs_sentiment",produceTweetsVsSentiment(groups));
+        object.add("views_vs_sentiment",produceViewsVsSentiment(groups));
+         **/
         return object;
+    }
+
+    private JsonElement produce3GroupsSentiment(Group g1, Group g2, Group g3, Map<String, SentimentVideo> sentimentVideos) {
+        JsonObject result = new JsonObject();
+        result.addProperty("views_vs_negative",get3GroupsGraph("views","negative",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("tweets_vs_negative",get3GroupsGraph("tweets","negative",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("friends_vs_negative",get3GroupsGraph("friends","negative",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("followers_vs_negative",get3GroupsGraph("followers","negative",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("likes_vs_negative",get3GroupsGraph("likes","negative",g1,g2,g3,sentimentVideos,false,true));
+
+        result.addProperty("views_vs_positive",get3GroupsGraph("views","positive",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("tweets_vs_positive",get3GroupsGraph("tweets","positive",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("friends_vs_positive",get3GroupsGraph("friends","positive",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("followers_vs_positive",get3GroupsGraph("followers","positive",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("likes_vs_positive",get3GroupsGraph("likes","positive",g1,g2,g3,sentimentVideos,false,true));
+
+        result.addProperty("views_vs_neutral",get3GroupsGraph("views","neutral",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("tweets_vs_neutral",get3GroupsGraph("tweets","neutral",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("friends_vs_neutral",get3GroupsGraph("friends","neutral",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("followers_vs_neutral",get3GroupsGraph("followers","neutral",g1,g2,g3,sentimentVideos,false,true));
+        result.addProperty("likes_vs_neutral",get3GroupsGraph("likes","neutral",g1,g2,g3,sentimentVideos,false,true));
+
+        result.addProperty("tweets_vs_views",get3GroupsGraph("views","tweets",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("tweets_vs_retweets",get3GroupsGraph("retweets","tweets",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("tweets_vs_likes",get3GroupsGraph("likes","tweets",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("tweets_vs_friends",get3GroupsGraph("friends","tweets",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("tweets_vs_followers",get3GroupsGraph("followers","tweets",g1,g2,g3,sentimentVideos,true,true));
+
+        result.addProperty("views_vs_retweets",get3GroupsGraph("retweets","views",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("views_vs_likes",get3GroupsGraph("likes","views",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("views_vs_friends",get3GroupsGraph("friends","views",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("views_vs_followers",get3GroupsGraph("followers","views",g1,g2,g3,sentimentVideos,true,true));
+
+        result.addProperty("likes_vs_retweets",get3GroupsGraph("retweets","likes",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("likes_vs_friends",get3GroupsGraph("friends","likes",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("likes_vs_followers",get3GroupsGraph("followers","likes",g1,g2,g3,sentimentVideos,true,true));
+
+        result.addProperty("followers_vs_retweets",get3GroupsGraph("retweets","followers",g1,g2,g3,sentimentVideos,true,true));
+        result.addProperty("followers_vs_friends",get3GroupsGraph("friends","followers",g1,g2,g3,sentimentVideos,true,true));
+
+        result.addProperty("friends_vs_retweets",get3GroupsGraph("retweets","friends",g1,g2,g3,sentimentVideos,true,true));
+
+        return result;
+    }
+
+    private JsonObject produce2GroupsSentiment(Group group1, Group  group2,Map<String,SentimentVideo> videos){
+        JsonObject result = new JsonObject();
+        result.addProperty("views_vs_negative",get2GroupsGraph("negative","views",group1,group2,videos));
+        return result;
+    }
+    private String get3GroupsGraph(String axisX, String axisY, Group group1, Group group2,Group group3,Map<String,SentimentVideo> videos,boolean logY,boolean logX) {
+        Map<Boolean,List<Double>> g1= getXYPoints(axisX,axisY,videos,group1);
+        Map<Boolean,List<Double>> g2= getXYPoints(axisX,axisY,videos,group2);
+        Map<Boolean,List<Double>> g3= getXYPoints(axisX,axisY,videos,group3);
+
+        return producePointsGraph3("plots",
+                "class3_"+axisY+"_"+axisX+"_popular_viral",
+                axisY+"_"+axisX+"_popular_viral",
+                axisX,axisY,
+                g1.get(false),g1.get(true),
+                g2.get(false),g2.get(true),
+                g3.get(false),g3.get(true)
+                ,logX,logY);
+    }
+
+    private String get2GroupsGraph(String axisX, String axisY, Group group1, Group group2,Map<String,SentimentVideo> videos) {
+        Map<Boolean,List<Double>> g1= getXYPoints(axisX,axisY,videos,group1);
+        Map<Boolean,List<Double>> g2= getXYPoints(axisX,axisY,videos,group2);
+
+        return producePointsGraph2("plots",
+                "class2_tweets_vs_sentiment_"+group1.getName()+"_"+group2.getName(),
+                "tweets_vs_sentiment_"+group1.getName()+"_"+group2.getName(),
+                axisX,axisY,
+                g1.get(false),g1.get(true),
+                g2.get(false),g2.get(true)
+                ,true);
+    }
+
+    private JsonObject produceViewsVsSentiment(Groups groups) {
+        Map<String, SentimentVideo> sentimentVideos = groups.toSentimentVideos();
+        JsonObject result = new JsonObject();
+        result.addProperty("popular",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular()));
+        result.addProperty("viral",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getViral()));
+        result.addProperty("popular_viral",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular_viral()));
+        result.addProperty("popular_not_viral",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getPopular_not_viral()));
+        result.addProperty("viral_not_popular",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getViral_not_popular()));
+        result.addProperty("random",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRandom()));
+        result.addProperty("recent",getViewsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRecent()));
+        return result;
     }
 
     private JsonObject produceTweetsVsSentiment(Groups groups) {
@@ -118,29 +222,35 @@ public class PlotProducer {
         result.addProperty("viral_not_popular",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getViral_not_popular()));
         result.addProperty("random",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRandom()));
         result.addProperty("recent",getTweetsVsSentiment(groups.getExperimentId(),sentimentVideos,groups.getRecent()));
-
-
         return result;
     }
 
     private String getTweetsVsSentiment(String experimentId,Map<String,SentimentVideo> sentimentVideos, Group group) {
-        Map<Boolean,List<Double>> values= getTweetsVsSentimentXY(sentimentVideos,group);
+        Map<Boolean,List<Double>> values= getXYPoints("negative","tweets",sentimentVideos,group);
 
         return producePointsGraph(experimentId, "tweets_vs_sentiment_"+group.getName(),
-                "Tweets Vs Negative Sentiment for"+ group.getName(),"Negative Sentiment","Tweets",
-                values.get(false),values.get(true));
+                "Tweets Vs Negative Sentiment for "+ group.getName(),"Negative Sentiment","Tweets",
+                values.get(false),values.get(true),true);
+
+    }
+    private String getViewsVsSentiment(String experimentId,Map<String,SentimentVideo> sentimentVideos, Group group) {
+        Map<Boolean,List<Double>> values= getXYPoints("negative","views",sentimentVideos,group);
+
+        return producePointsGraph(experimentId, "views_vs_negative_"+group.getName(),
+                "Views Vs Negative Sentiment for "+ group.getName(),"Negative Sentiment","Views",
+                values.get(false),values.get(true),true);
 
     }
 
-    private Map<Boolean,List<Double>> getTweetsVsSentimentXY(Map<String,SentimentVideo> sentimentVideos,Group group) {
+    private Map<Boolean,List<Double>> getXYPoints(String axisX, String axisY, Map<String,SentimentVideo> sentimentVideos, Group group) {
         Map<Boolean,List<Double>> map=new LinkedHashMap<>();
         List<Double> xx=new LinkedList<>();
         List<Double> yy=new LinkedList<>();
         group.stream().forEach(v ->{
             SentimentVideo video=sentimentVideos.get(v.getVideo_id());
             if(video!=null) {
-                double x = video.getNegative();
-                double y = video.getTweets();
+                double x =getValue(video,axisX);
+                double y =getValue(video,axisY);
                 xx.add(x);
                 yy.add(y);
             }
@@ -149,6 +259,20 @@ public class PlotProducer {
         map.put(true,yy);
         return map;
 
+    }
+
+    double getValue(SentimentVideo video,String feature){
+        if(feature.equals("negative")) return video.getNegative();
+        if (feature.equals("positive")) return  video.getPositive();
+        if (feature.equals("neutral")) return video.getNeutral();
+        if(feature.equals("views")) return video.getViews();
+        if(feature.equals("tweets")) return video.getTweets();
+        if(feature.equals("retweets")) return video.getRetweets();
+        if(feature.equals("likes")) return video.getLikes();
+        if(feature.equals("friends")) return video.getFriends();
+        if(feature.equals("followers")) return video.getFollowers();
+
+        return 0;
     }
 
 
@@ -390,15 +514,88 @@ public class PlotProducer {
 
         return null;
     }
+    private String producePointsGraph3(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x1,List<Double>y1,List<Double> x2,List<Double>y2,
+                                       List<Double> x3,List<Double> y3,boolean logX,boolean logY) {
+        String xx1 = x1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy1 = y1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx2 = x2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy2 = y2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx3 = x3.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy3 = y3.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
 
-    private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y) {
+        String logy = (logY)?"plt.yscale('log')":"";
+        String logx = (logX)?"plt.xscale('log')":"";
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "x1 = " + xx1,
+                "y1 = " + yy1,
+                "x2 = " + xx2,
+                "y2 = " + yy2,
+                "x3 = " + xx3,
+                "y3 = " + yy3,
+                logy,
+                logx,
+                "plt.plot(x3,y3,'+',c='green',label='Popular and Viral')",
+                "plt.plot(x2,y2,'+',c='blue',label='Viral')",
+                "plt.plot(x1,y1,'+',c='red',label='Popular')",
+                "plt.title('" + titleBar + "')",
+                "plt.xlabel('" + xlabel + "')",
+                "plt.ylabel('" + ylabel + "')",
+                "plt.legend(loc='best',fancybox='True',framealpha=0.5)"
+        );
+
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
+
+    private String producePointsGraph2(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x1,List<Double>y1,List<Double> x2,List<Double>y2,boolean logY) {
+        String xx1 = x1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy1 = y1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx2 = x2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String yy2 = y2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+
+        String log = (logY)?"plt.yscale('log')":"";
+        List<String> input = Arrays.asList(
+                "import numpy as np",
+                "x1 = " + xx1,
+                "y1 = " + yy1,
+                "x2 = " + xx2,
+                "y2 = " + yy2,
+                log,
+                "plt.plot(x2,y2,'o',c='blue',label='Viral')",
+                "plt.plot(x1,y1,'+',c='red',label='Popular')",
+                "plt.title('" + titleBar + "')",
+                "plt.xlabel('" + xlabel + "')",
+                "plt.ylabel('" + ylabel + "')",
+                "plt.legend(loc='best',fancybox='True',framealpha=0.5)"
+        );
+
+        Plot plot = new Plot(input, experimentId, fileName);
+        try {
+            executorService.submit(plot);
+            return plot.url;
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return "ERROR";
+        }
+    }
+
+    private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y,boolean logY) {
         String xx = x.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
         String yy = y.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
 
+        String log = (logY)?"plt.yscale('log')":"";
         List<String> input = Arrays.asList(
                 "import numpy as np",
                 "x = " + xx,
                 "y = " + yy,
+                log,
                 "plt.plot(x,y,'+')",
                 "plt.title('" + titleBar + "')",
                 "plt.xlabel('" + xlabel + "')",
