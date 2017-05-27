@@ -1,7 +1,7 @@
 #!/bin/bash
 ###################################################################
 #																																	#
-# This scripts assumes that collector service runs on port 8001		#
+# This script assume that collector service runs on port 8001		#
 #																																	#
 ###################################################################
 

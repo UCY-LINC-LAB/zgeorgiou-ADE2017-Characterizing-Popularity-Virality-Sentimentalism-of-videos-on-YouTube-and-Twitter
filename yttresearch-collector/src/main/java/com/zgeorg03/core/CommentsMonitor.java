@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Monitor Comments Service
  * Created by zgeorg03 on 2/25/17.
  */
 public class CommentsMonitor implements Runnable {
@@ -31,7 +32,7 @@ public class CommentsMonitor implements Runnable {
             if(videos.size()==0){
                 try {
                     logger.info("Comments Monitor: Sleeping for "+ count+" minutes");
-                    TimeUnit.MINUTES.sleep(1*count);
+                    TimeUnit.MINUTES.sleep(count);
                     if(count<60)
                         count*=2;
                 } catch (InterruptedException e) { e.printStackTrace(); }
@@ -41,18 +42,16 @@ public class CommentsMonitor implements Runnable {
 
 
 
-            videos.entrySet().forEach(entry -> {
+            videos.forEach((video, value) -> {
                 //This is a new video
                 String key = dbServices.getYouTubeAPIKey();
                 if (!key.isEmpty()) {
-                    String video = entry.getKey();
-                    int max = entry.getValue();
+                    int max = value;
                     YouTubeRequests requests = new YouTubeRequests(video, key);
                     JsonObject commentsData = requests.getLatestComments(max);
                     int added = dbServices.addComments(video, commentsData);
                     logger.info((video + ": added " + added + " of " + max + " comments"));
-                }
-                else{
+                } else {
                     logger.error("YouTube key not available");
                 }
             });

@@ -18,7 +18,7 @@ public class ParseParameters {
                 continue;
             String v = param.substring(2);
             String valParam = request.queryParams(param);
-            int val=1;
+            int val;
             try {
                 val = Integer.parseInt(valParam);
                 if(val!=0 && val!=1)
@@ -32,12 +32,12 @@ public class ParseParameters {
 
     /**
      * Parse an integer parameter
-     * @param request
-     * @param result
-     * @param id
-     * @param defaultValue
-     * @param validation
-     * @param errorMsg
+     * @param request The request
+     * @param result The result
+     * @param id The id
+     * @param defaultValue Default value
+     * @param validation Validation function
+     * @param errorMsg Error message
      * @return
      */
     public static int parseIntegerParam(final Request request, final JsonResult result, String id, int defaultValue, Predicate<Integer> validation, String errorMsg){
@@ -83,6 +83,7 @@ public class ParseParameters {
      * @param errorMsg
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     public static String parseStringQueryParam(final Request request, final JsonResult result, String id, String defaultValue, Predicate<String> validation, String errorMsg){
         String x=defaultValue;
         String param = request.queryParams(id);
@@ -191,8 +192,6 @@ public class ParseParameters {
      */
     public static boolean tokenCheck(Request request){
         String token = request.headers("token");
-        if(token==null || !token.equals("yttresearch2016"))
-            return false;
-        return true;
+        return !(token == null || !token.equals("yttresearch2016"));
     }
 }

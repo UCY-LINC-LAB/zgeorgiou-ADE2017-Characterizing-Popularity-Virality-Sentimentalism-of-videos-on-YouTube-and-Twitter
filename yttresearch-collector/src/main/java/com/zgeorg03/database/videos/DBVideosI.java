@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by zgeorg03 on 3/1/17.
@@ -49,7 +48,7 @@ public interface DBVideosI {
      * The duration is the period that has to pass in order to set a video for dynamic update
      * @return List of id's
      */
-    List<String> getVideosThatNeedDynamicUpdate(long duration, TimeUnit unit);
+    List<String> getVideosThatNeedDynamicUpdate();
 
     /**
      *

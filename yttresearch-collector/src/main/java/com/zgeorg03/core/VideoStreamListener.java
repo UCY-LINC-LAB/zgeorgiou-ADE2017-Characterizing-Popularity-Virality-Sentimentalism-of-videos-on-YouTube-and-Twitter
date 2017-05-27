@@ -14,7 +14,6 @@ public class VideoStreamListener implements StatusListener {
     private static final Logger logger = LoggerFactory.getLogger(VideoStreamListener.class);
     private final StatusMonitor monitor;
     private int limitbefore;
-    private int limit;
 
     public VideoStreamListener(StatusMonitor monitor) {
         this.monitor = monitor;
@@ -34,8 +33,8 @@ public class VideoStreamListener implements StatusListener {
     @Override
     public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
 
-        limit=numberOfLimitedStatuses;
-        if(Math.abs(limit-limitbefore)>200){
+        int limit = numberOfLimitedStatuses;
+        if(Math.abs(limit -limitbefore)>200){
             logger.info("LIMIT:"+numberOfLimitedStatuses);
         }
         limitbefore=numberOfLimitedStatuses;

@@ -23,15 +23,15 @@ import static com.mongodb.client.model.Projections.include;
 /**
  * Created by zgeorg03 on 3/1/17.
  */
+@SuppressWarnings("ALL")
 public class DBVideosService implements DBVideosI {
     private final Logger logger = LoggerFactory.getLogger(DBVideosService.class);
 
-    private final DBConnection dbConnection;
     private final MongoCollection videos;
 
 
     public DBVideosService(DBConnection dbConnection, MongoCollection videos) {
-        this.dbConnection = dbConnection;
+        DBConnection dbConnection1 = dbConnection;
         this.videos = videos;
     }
 
@@ -55,6 +55,7 @@ public class DBVideosService implements DBVideosI {
         meta.put("monitored",false);
 
         video.put("meta",meta);
+        //noinspection unchecked
         videos.replaceOne(eq("_id",video_id),video);
         return true;
     }
@@ -92,8 +93,8 @@ public class DBVideosService implements DBVideosI {
     }
 
     @Override
-    public List<String> getVideosThatNeedDynamicUpdate(long duration, TimeUnit unit) {
-        long durationInMillis = unit.toMillis(duration);
+    public List<String> getVideosThatNeedDynamicUpdate() {
+        long durationInMillis = TimeUnit.HOURS.toMillis(24);
         long time = System.currentTimeMillis();
 
         Document projection = new Document("meta",1).append("_id",1);
@@ -141,7 +142,7 @@ public class DBVideosService implements DBVideosI {
             Document document  = cursor.next();
             String id= document.getString("_id");
             Document meta = (Document) document.get("meta");
-            List<Document> days = (List<Document>) document.get("days");
+            @SuppressWarnings("unchecked") List<Document> days = (List<Document>) document.get("days");
             if(days.isEmpty())
                 continue;
             long comments = days.get(days.size()-1).getLong("comment_count");
@@ -204,6 +205,7 @@ public class DBVideosService implements DBVideosI {
             document.append("topics",topics);
             document.append("days",new LinkedList<>());
             document.append("meta",meta);
+            //noinspection unchecked
             videos.insertOne(document);
             return true;
         } catch(NullPointerException ex){
@@ -211,9 +213,6 @@ public class DBVideosService implements DBVideosI {
             return  false;
         } catch(MongoWriteException we){
             logger.error(we.getError().getMessage());
-            return false;
-        } catch(MongoException ex) {
-            logger.error(ex.getLocalizedMessage());
             return false;
         } catch(Exception ex) {
         logger.error(ex.getLocalizedMessage());

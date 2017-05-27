@@ -26,11 +26,11 @@ public class DynamicInfoMonitor implements Runnable {
 
         int count=1;
         while(true){
-            List<String> videos = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS);
+            List<String> videos = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate();
 
             if(videos.size()==0){
                 try {
-                    TimeUnit.MINUTES.sleep(1*count);
+                    TimeUnit.MINUTES.sleep(count);
                     if(count<10)
                         count++;
                 } catch (InterruptedException e) { e.printStackTrace(); }

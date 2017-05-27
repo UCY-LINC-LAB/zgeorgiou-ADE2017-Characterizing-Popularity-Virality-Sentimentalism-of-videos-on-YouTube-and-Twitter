@@ -15,8 +15,6 @@ public class JsonResult {
     public JsonResult addError(String error){ errors.add(error); return this;}
     public JsonResult addElement(String key, JsonElement value){ data.add(key,value); return this; }
     public JsonResult addString(String key, String value){ data.addProperty(key,value); return this; }
-    public JsonResult addNumber(String key, Number value){ data.addProperty(key,value); return this; }
-    public JsonResult addBoolean(String key, Boolean value){ data.addProperty(key,value); return this; }
 
     public void setData(JsonObject data){
         this.data=data;
@@ -27,10 +25,6 @@ public class JsonResult {
         result.add("data", data);
         return gson.toJson(result);
 
-    }
-
-    public static class JsonUtil {
-        public static String toJson(Object object) { return gson.toJson(object); }
     }
 
     public boolean hasError(){

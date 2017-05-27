@@ -5,10 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -375,12 +373,6 @@ public class YouTubeRequests {
             return new JsonParser().parse(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
 
 
-        } catch (MalformedURLException e) {
-            result = new JsonObject();
-            result.addProperty("error", e.getLocalizedMessage());
-        } catch (IOException e) {
-            result = new JsonObject();
-            result.addProperty("error", e.getLocalizedMessage());
         } catch (Exception e) {
             result = new JsonObject();
             result.addProperty("error", e.getLocalizedMessage());

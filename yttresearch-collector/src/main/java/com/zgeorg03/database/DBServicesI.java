@@ -2,11 +2,8 @@ package com.zgeorg03.database;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 /**
+ * Interface for Database services
  * Created by zgeorg03 on 2/25/17.
  */
 public interface DBServicesI {
@@ -16,15 +13,15 @@ public interface DBServicesI {
 
     /**
      * Add video comments
-     * @param comments
-     * @return
+     * @param comments Comments
+     * @return Number of comments added
      */
     int addComments(String video_id,JsonObject comments);
 
     /**
      * Delete comments from a video
-     * @param video_id
-     * @return
+     * @param video_id Video Id
+     * @return Number of comments deleted
      */
     int deleteComments(String  video_id);
 
@@ -34,6 +31,7 @@ public interface DBServicesI {
      * @param tweet The tweet object
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     boolean addTweet(long video_id,JsonObject tweet);
 
     /**
@@ -41,84 +39,78 @@ public interface DBServicesI {
      * @param video_id
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     int deleteTweets(String  video_id);
 
     /**
      * Add a new YouTubeAPIKey.
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     boolean addYouTubeAPIKey(String key);
 
     /**
      * Get the key that has the least cost.
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     String getYouTubeAPIKey();
 
     /**
      * Get total number of youtube API keys in the database
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     int getTotalYouTubeAPIKeys();
 
     /**
      * Get a twitter app and set it to being used. It contains the 4 keys
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     JsonObject getTwitterAppForUse();
 
     /**
      * Release a twitter app that is currently in use
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     boolean releaseTwitterApp(String name);
 
     /**
      * Get the total number of twitter applications
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     int getTotalTwitterApps();
 
-    /**
-     * Get the total number of twitter applications that are free
-     * @return
-     */
-    int getTotalFreeTwitterApps();
 
     /**
      * Add a new twitter application.
      * We need to specify if it is used
-     * @return
+     * @return True if added
      */
     boolean addTwitterApp(String name, String consumer_key,String consumer_secret,String token,String token_secret);
-
-
-
-    JsonObject getStatistics();
-    /**
-     * Configuration
-     */
-
-    JsonObject getConfiguration();
 
 
     /**
      * Set the max number of videos being monitored
      * @param max
-     * @return
+     * @return True if set
      */
+    @SuppressWarnings("JavaDoc")
     boolean setMaxVideosBeingMonitored(int max);
 
     /**
      * Get max number of videos to monitor
-     * @return
+     * @return Max videos
      */
     int getMaxVideosBeingMonitored();
 
 
     /**
      * Get max comments per video
-     * @return
+     * @return max comments
      */
     int getMaxCommentsPerVideo();
 
@@ -127,19 +119,13 @@ public interface DBServicesI {
      * @param max
      * @return
      */
+    @SuppressWarnings("JavaDoc")
     boolean setMaxCommentsPerVideo(int max);
 
 
-
-
-    /**
-     * Set statistics of status monitoring
-     */
-    void setStatusMonitorStats();
-
     /**
      * Get total number of tweets in the database
-     * @return
+     * @return Total tweets
      */
     int getTotalTweets();
 

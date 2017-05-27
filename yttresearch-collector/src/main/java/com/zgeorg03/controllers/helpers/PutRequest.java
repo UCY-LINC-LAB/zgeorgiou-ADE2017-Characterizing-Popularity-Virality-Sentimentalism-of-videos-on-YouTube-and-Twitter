@@ -13,15 +13,13 @@ public abstract class PutRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(PutRequest.class);
 
-    private final String url;
-
     @Parameter(description = "Request help")
     public int help;
 
     protected PutRequest(String url) {
-        this.url = url;
+        String url1 = url;
 
-        Spark.put(url, (req,res) -> request(req,res));
+        Spark.put(url, this::request);
     }
     protected Object request(Request request,Response response){
         logger.info("Request from:" + request.ip());

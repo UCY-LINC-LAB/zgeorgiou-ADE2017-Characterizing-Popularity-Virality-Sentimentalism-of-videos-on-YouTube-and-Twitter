@@ -80,7 +80,7 @@ public class StatusMonitor implements Runnable {
 
             URLEntity urls[] = status.getURLEntities();
 
-            /**TODO Fix  Favorites count
+            /*TODO Fix  Favorites count
             Status status = twitter.showStatus(Long.parseLong(tweetID));
             int favorites = (status.isRetweet()) ?
                     status.getRetweetedStatus().getFavoriteCount() :

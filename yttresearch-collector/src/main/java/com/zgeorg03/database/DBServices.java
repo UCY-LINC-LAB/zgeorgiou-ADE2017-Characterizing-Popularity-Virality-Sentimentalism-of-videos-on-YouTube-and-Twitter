@@ -7,28 +7,23 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Updates;
 import com.zgeorg03.database.videos.DBVideosService;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.util.List;
 
-import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
 
 /**
  * Created by zgeorg03 on 2/25/17.
  */
+@SuppressWarnings("ALL")
 public  class DBServices implements DBServicesI{
     private final Logger logger  = LoggerFactory.getLogger(DBServices.class);
-    private final int default_max_videos_being_monitored= 100;
-    private final int default_max_comments_per_video= 100;
 
     private final String databaseName;
     private final MongoCollection videos;
@@ -62,6 +57,7 @@ public  class DBServices implements DBServicesI{
 
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public int addComments(String video_id, JsonObject comments) {
         int count =0 ;
@@ -82,6 +78,7 @@ public  class DBServices implements DBServicesI{
                    .append("text",obj.get("text").getAsString())
                    .append("like_count",obj.get("like_count").getAsLong()) ;
             try{
+                //noinspection unchecked
                 this.comments.insertOne(document);
                 count++;
                 Document doc = new Document("$inc",new Document("meta.comments_collected",1));
@@ -219,6 +216,10 @@ public  class DBServices implements DBServicesI{
         return (int) youtubeKeys.count();
     }
 
+    /**
+     * Get the next available Twitter application
+     * @return Twitter keys
+     */
     @Override
     public JsonObject getTwitterAppForUse() {
         Document document = (Document) twitterApps.find(eq("is_used",false)).first();
@@ -279,11 +280,6 @@ public  class DBServices implements DBServicesI{
         return (int) twitterApps.count();
     }
 
-    @Override
-    public int getTotalFreeTwitterApps() {
-        //TODO getTotalFreeTwitterApps
-        return 0;
-    }
 
     @Override
     public boolean addTwitterApp(String name,String consumer_key, String consumer_secret, String token, String token_secret) {
@@ -307,18 +303,6 @@ public  class DBServices implements DBServicesI{
             return false;
         }
         return true;
-    }
-
-    @Override
-    public JsonObject getStatistics() {
-        //TODO
-        return null;
-    }
-
-    @Override
-    public JsonObject getConfiguration() {
-        //TODO
-        return null;
     }
 
     @Override
@@ -410,11 +394,6 @@ public  class DBServices implements DBServicesI{
 
 
     @Override
-    public void setStatusMonitorStats() {
-        //TODO setStatusMonitorStats()
-    }
-
-    @Override
     public int getTotalTweets() {
         return (int)tweets.count();
     }
@@ -427,8 +406,10 @@ public  class DBServices implements DBServicesI{
 
     public Document createDefaultConfiguration(){
         Document document = new Document("_id","config");
-        document.append("max_videos_being_monitored",default_max_videos_being_monitored);
-        document.append("max_comments_per_video",default_max_comments_per_video);
+        int default_max_videos_being_monitored = 100;
+        document.append("max_videos_being_monitored", default_max_videos_being_monitored);
+        int default_max_comments_per_video = 100;
+        document.append("max_comments_per_video", default_max_comments_per_video);
         return document;
     }
 

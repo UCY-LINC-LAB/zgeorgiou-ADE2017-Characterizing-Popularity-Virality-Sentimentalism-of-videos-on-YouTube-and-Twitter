@@ -1,6 +1,8 @@
 # Yttresearch
+This project contains all the tools developed for the purposes of my bachelor thesis on
+_Characterizing the Popularity, Virality and Sentimentalism of Video Content Categories on YouTube and Twitter_
 
-**Deadline:** End of March
+
 
 ## Tasks:
 * Collect YouTube & Twitter data

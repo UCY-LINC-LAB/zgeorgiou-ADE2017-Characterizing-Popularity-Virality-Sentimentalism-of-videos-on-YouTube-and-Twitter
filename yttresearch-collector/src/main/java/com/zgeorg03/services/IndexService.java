@@ -1,11 +1,8 @@
 package com.zgeorg03.services;
 
 import com.google.gson.JsonObject;
-import com.mongodb.DBCollection;
 import com.zgeorg03.core.StatusMonitor;
 import com.zgeorg03.database.DBServices;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by zgeorg03 on 2/25/17.
@@ -18,6 +15,10 @@ public class IndexService extends Service {
         this.monitor = monitor;
     }
 
+    /**
+     * Retrieve various stats for about collection process
+     * @return
+     */
     public JsonObject getStats(){
         JsonObject object = new JsonObject();
         String databaseName = dbServices.getDatabaseName();
@@ -30,7 +31,7 @@ public class IndexService extends Service {
         int monitoredVideos = dbServices.getDbVideosService().getTotalMonitoredVideosAndNotFinished();
         int totalTweets = dbServices.getTotalTweets();
 
-        int videos_need_update = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate(1, TimeUnit.DAYS).size();
+        int videos_need_update = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate().size();
 
         JsonObject info = new JsonObject();
         info.addProperty("youtube_keys",youtubeKeys);

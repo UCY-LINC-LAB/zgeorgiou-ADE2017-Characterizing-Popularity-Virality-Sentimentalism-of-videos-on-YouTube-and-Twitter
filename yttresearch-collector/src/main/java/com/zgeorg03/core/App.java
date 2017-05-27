@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 import static spark.Spark.*;
 
 /**
+ * Main Class, Collector Entry Point
  * Created by zgeorg03 on 2/24/17.
  */
 public class App {

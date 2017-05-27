@@ -1,7 +1,5 @@
 package com.zgeorg03.core;
 
-import com.google.gson.JsonObject;
-import com.zgeorg03.controllers.helpers.Parameter;
 import com.zgeorg03.database.DBServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

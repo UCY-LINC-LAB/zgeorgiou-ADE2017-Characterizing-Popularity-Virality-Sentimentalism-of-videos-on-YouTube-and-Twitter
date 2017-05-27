@@ -27,28 +27,28 @@ public class ParameterController {
 
                 String name = field.getName();
                 param.addProperty("name",name);
-                sb.append("| "+ name );
+                sb.append("| ").append(name);
 
                 String type = field.getType().getSimpleName();
                 param.addProperty("type",type);
-                sb.append(" | "+ type );
+                sb.append(" | ").append(type);
 
                 String required = (p.required())?"yes":"no";
                 param.addProperty("required", required);
-                sb.append(" | "+ required );
+                sb.append(" | ").append(required);
 
                 String deafult = p.defaultValue();
                 param.addProperty("default", deafult);
-                sb.append(" | "+ deafult );
+                sb.append(" | ").append(deafult);
 
                 if(p.description().isEmpty()) {
                     JsonArray desc = new JsonArray();
-                    Arrays.stream(p.extendedDescription()).forEach(e->desc.add(e));
-                    sb.append(" |" +Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))+" |");
+                    Arrays.stream(p.extendedDescription()).forEach(desc::add);
+                    sb.append(" |").append(Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))).append(" |");
                     param.add("description",desc);
                 }else
                     param.addProperty("description",p.description());
-                sb.append(" | "+ p.description()+" |" );
+                sb.append(" | ").append(p.description()).append(" |");
 
                 array.add(param);
                 arrayMd.add(sb.toString());
@@ -75,28 +75,28 @@ public class ParameterController {
 
                 String name = field.getName();
                 param.addProperty("name",name);
-                sb.append("| "+ name );
+                sb.append("| ").append(name);
 
                 String type = field.getType().getSimpleName();
                 param.addProperty("type",type);
-                sb.append(" | "+ type );
+                sb.append(" | ").append(type);
 
                 String required = (p.required())?"yes":"no";
                 param.addProperty("required", required);
-                sb.append(" | "+ required );
+                sb.append(" | ").append(required);
 
                 String deafult = p.defaultValue();
                 param.addProperty("default", deafult);
-                sb.append(" | "+ deafult );
+                sb.append(" | ").append(deafult);
 
                 if(p.description().isEmpty()) {
                     JsonArray desc = new JsonArray();
-                    Arrays.stream(p.extendedDescription()).forEach(e->desc.add(e));
-                    sb.append(" |" +Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))+" |");
+                    Arrays.stream(p.extendedDescription()).forEach(desc::add);
+                    sb.append(" |").append(Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))).append(" |");
                     param.add("description",desc);
                 }else
                     param.addProperty("description",p.description());
-                sb.append(" | "+ p.description()+" |" );
+                sb.append(" | ").append(p.description()).append(" |");
 
                 array.add(param);
                 arrayMd.add(sb.toString());

@@ -13,15 +13,13 @@ public abstract class GetRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(GetRequest.class);
 
-    private final String url;
-
     @Parameter(description = "Request help")
     public int help;
 
     protected GetRequest(String url) {
-        this.url = url;
+        String url1 = url;
 
-        Spark.get(url, (req,res) -> request(req,res));
+        Spark.get(url, this::request);
     }
     protected Object request(Request request,Response response){
         logger.info("Request from:" + request.ip());
