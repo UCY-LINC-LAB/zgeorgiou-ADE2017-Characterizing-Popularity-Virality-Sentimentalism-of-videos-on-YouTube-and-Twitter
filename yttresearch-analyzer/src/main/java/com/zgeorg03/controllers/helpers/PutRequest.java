@@ -21,7 +21,7 @@ public abstract class PutRequest {
     protected PutRequest(String url) {
         this.url = url;
 
-        Spark.put(url, (req,res) -> request(req,res));
+        Spark.put(url, this::request);
     }
     protected Object request(Request request,Response response){
         logger.info("Request from:" + request.ip());

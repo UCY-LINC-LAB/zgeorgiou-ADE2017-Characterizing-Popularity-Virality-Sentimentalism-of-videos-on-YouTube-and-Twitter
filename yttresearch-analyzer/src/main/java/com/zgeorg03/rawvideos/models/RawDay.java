@@ -157,10 +157,10 @@ public class RawDay implements BsonModel{
         result.append("tweets_favorited_added",tweets_favorites_added);
         result.append("tweets_possibly_sensitive_added",tweets_possibly_sensitive_added);
         result.append("tweets_hashtags_added",hashtags.values().stream().mapToLong(i->i).sum());
-        result.append("tweets_in_english_added",(long)language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("en")).mapToInt(x->x.getValue()).sum());
-        result.append("tweets_in_spanish_added",(long)language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("es")).mapToInt(x->x.getValue()).sum());
-        result.append("users_in_english_added",(long)users_language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("en")).mapToInt(x->x.getValue()).sum());
-        result.append("users_in_spanish_added",(long)users_language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("es")).mapToInt(x->x.getValue()).sum());
+        result.append("tweets_in_english_added",(long)language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("en")).mapToInt(Map.Entry::getValue).sum());
+        result.append("tweets_in_spanish_added",(long)language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("es")).mapToInt(Map.Entry::getValue).sum());
+        result.append("users_in_english_added",(long)users_language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("en")).mapToInt(Map.Entry::getValue).sum());
+        result.append("users_in_spanish_added",(long)users_language.entrySet().stream().filter(e->e.getKey().equalsIgnoreCase("es")).mapToInt(Map.Entry::getValue).sum());
         result.append("users_verified_count",users_verified_count);
 
         double avg_user_days_created_before_video = Calculations.averageInt(list_user_days_created_before_video);

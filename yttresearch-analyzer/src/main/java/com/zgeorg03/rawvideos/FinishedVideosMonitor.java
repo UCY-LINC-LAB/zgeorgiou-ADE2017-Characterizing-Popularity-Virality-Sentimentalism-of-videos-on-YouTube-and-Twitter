@@ -34,7 +34,7 @@ public class FinishedVideosMonitor implements Runnable {
 
             if (notProcessed.isEmpty()) {
                 logger.info("All videos are processed. Going to sleep...");
-                try { TimeUnit.HOURS.sleep(6); } catch (InterruptedException e) { }
+                try { TimeUnit.HOURS.sleep(6); } catch (InterruptedException e) { logger.error("Interrupted");}
             }
 
             notProcessed.forEach(videoId -> {
@@ -49,7 +49,7 @@ public class FinishedVideosMonitor implements Runnable {
                 }
             });
 
-            try { TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) { }
+            try { TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) { logger.error("Interrupted");}
         }
     }
 }

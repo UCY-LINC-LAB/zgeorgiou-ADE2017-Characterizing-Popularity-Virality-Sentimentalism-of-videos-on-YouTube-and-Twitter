@@ -192,8 +192,8 @@ public class VideosController {
 
                 Groups groups = new Groups(true,offset,lbl_wnd,videosService.getProcessVideoDBService(),videos, experiment);
 
-                Set<String> mostPopular = groups.getPopular().stream().map(v->v.getVideo_id()).collect(Collectors.toSet());
-                Set<String> mostViral = groups.getViral().stream().map(v->v.getVideo_id()).collect(Collectors.toSet());
+                Set<String> mostPopular = groups.getPopular().stream().map(Video::getVideo_id).collect(Collectors.toSet());
+                Set<String> mostViral = groups.getViral().stream().map(Video::getVideo_id).collect(Collectors.toSet());
 
                 JsonObject object = new JsonObject();
                 object.addProperty("experiment_id",experiment);

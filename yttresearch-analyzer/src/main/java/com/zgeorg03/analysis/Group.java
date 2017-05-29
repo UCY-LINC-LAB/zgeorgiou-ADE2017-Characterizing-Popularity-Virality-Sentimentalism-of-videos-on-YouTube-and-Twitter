@@ -2,6 +2,7 @@ package com.zgeorg03.analysis;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.models.Day;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.utils.Calculations;
@@ -37,19 +38,19 @@ public class Group extends LinkedList<Video> implements JsonModel{
     }
 
     private List<Long> totalViewsList(){
-        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getViews_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(Day::getViews_added).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalTweetsList(){
-        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getTweets_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(Day::getTweets_added).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalLikesList(){
-        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getLikes_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(Day::getLikes_added).sum()).collect(Collectors.toList());
     }
 
     private List<Long> totalDislikesList(){
-        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(y->y.getDislikes_added()).sum()).collect(Collectors.toList());
+        return this.stream().map(x->x.getDays().stream().skip(offset).limit(lbl_wnd-offset).mapToLong(Day::getDislikes_added).sum()).collect(Collectors.toList());
     }
     private List<Integer> durationList(){
         return this.stream().map(x->((int)x.getDuration()/1000)).collect(Collectors.toList());
@@ -116,7 +117,7 @@ public class Group extends LinkedList<Video> implements JsonModel{
             int day = (int) (diff/DateUtil.dayInMillis);
             freq.compute(day,(k,v)->(v==null)?1:v+1);
         }
-        int sum = freq.entrySet().stream().mapToInt(x->x.getValue()).sum();
+        int sum = freq.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
         Map<Integer,Double> normalized = new HashMap<>();
         freq.entrySet().stream().forEach(x-> normalized.put(x.getKey(),x.getValue()/((double) sum)));
         return normalized.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList());

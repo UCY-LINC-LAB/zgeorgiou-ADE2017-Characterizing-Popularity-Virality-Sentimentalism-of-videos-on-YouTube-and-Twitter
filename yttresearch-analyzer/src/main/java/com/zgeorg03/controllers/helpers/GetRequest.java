@@ -21,7 +21,7 @@ public abstract class GetRequest {
     protected GetRequest(String url) {
         this.url = url;
 
-        Spark.get(url, (req,res) -> request(req,res));
+        Spark.get(url, this::request);
     }
     protected Object request(Request request,Response response){
         logger.info("Request from:" + request.ip());

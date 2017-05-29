@@ -23,10 +23,7 @@ public class Stat<T> implements JsonModel,BsonModel{
         this.average = average;
         this.median = median;
         this.std = std;
-        if(average.isInfinite()||average.isNaN()||std.isNaN()||std.isInfinite())
-            error=true;
-        else
-            error =false;
+        error = average.isInfinite() || average.isNaN() || std.isNaN() || std.isInfinite();
     }
     public Stat(T type,Document document){
 
@@ -43,10 +40,7 @@ public class Stat<T> implements JsonModel,BsonModel{
             }
         this.std = document.getDouble("std");
 
-        if(average.isInfinite()||average.isNaN()||std.isNaN()||std.isInfinite())
-            error=true;
-        else
-            error =false;
+        error = average.isInfinite() || average.isNaN() || std.isNaN() || std.isInfinite();
     }
 
     @Override
@@ -99,8 +93,6 @@ public class Stat<T> implements JsonModel,BsonModel{
     public boolean isNotANumber() {
         if(average.isInfinite()||average.isNaN())
             return true;
-        if(std.isInfinite()||average.isNaN())
-            return true;
-        return false;
+        return std.isInfinite() || average.isNaN();
     }
 }

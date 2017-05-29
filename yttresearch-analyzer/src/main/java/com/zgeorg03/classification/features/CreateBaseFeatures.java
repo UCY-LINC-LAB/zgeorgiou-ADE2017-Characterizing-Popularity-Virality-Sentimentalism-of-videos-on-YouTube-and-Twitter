@@ -21,15 +21,11 @@ public class CreateBaseFeatures {
 
     private Map<String, VideoData> videosMap;
     private int t_window;
-    private int offset;
-    private int l_window;
     private PrintWriter pw;
     private PrintWriter pw_twitter;
-    private boolean recent;
-    private float labPer;
 
     public CreateBaseFeatures(File path, boolean recent, int t, int o, int l){
-        this.recent=recent;
+        boolean recent1 = recent;
         l-=o;
         o-=t;
         try {
@@ -63,7 +59,7 @@ public class CreateBaseFeatures {
     }
 
     public void setLabPer(float labPer) {
-        this.labPer = labPer;
+        float labPer1 = labPer;
     }
 
     public void setVideosMap(Map<String, VideoData> videosMap) {
@@ -75,10 +71,10 @@ public class CreateBaseFeatures {
     }
 
     public void setOffset(int offset) {
-        this.offset = offset;
+        int offset1 = offset;
     }
 
     public void setL_window(int l_window) {
-        this.l_window = l_window;
+        int l_window1 = l_window;
     }
 }

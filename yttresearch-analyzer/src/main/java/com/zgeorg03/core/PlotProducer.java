@@ -277,7 +277,7 @@ public class PlotProducer {
 
 
     private String convertAndProduceGroupsPlot(String experimentId, String fileName, String titleBar, String xlabel, String ylabel, boolean logscale, Map<String,List<Double>> data){
-        int min = data.values().stream().map(x->x.size()).mapToInt(x->x).min().getAsInt();
+        int min = data.values().stream().map(List::size).mapToInt(x->x).min().getAsInt();
 
         String x_axis = IntStream.range(1,min+1).boxed().map(x->x+"").collect(Collectors.joining(",","[","]"));
         String popular = data.get("popular").stream().limit(min).map(x -> x+"") .collect(Collectors.joining(",","[","]"));
@@ -516,12 +516,12 @@ public class PlotProducer {
     }
     private String producePointsGraph3(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x1,List<Double>y1,List<Double> x2,List<Double>y2,
                                        List<Double> x3,List<Double> y3,boolean logX,boolean logY) {
-        String xx1 = x1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy1 = y1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String xx2 = x2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy2 = y2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String xx3 = x3.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy3 = y3.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx1 = x1.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy1 = y1.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String xx2 = x2.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy2 = y2.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String xx3 = x3.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy3 = y3.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
 
         String logy = (logY)?"plt.yscale('log')":"";
         String logx = (logX)?"plt.xscale('log')":"";
@@ -555,10 +555,10 @@ public class PlotProducer {
     }
 
     private String producePointsGraph2(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x1,List<Double>y1,List<Double> x2,List<Double>y2,boolean logY) {
-        String xx1 = x1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy1 = y1.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String xx2 = x2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy2 = y2.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx1 = x1.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy1 = y1.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String xx2 = x2.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy2 = y2.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
 
         String log = (logY)?"plt.yscale('log')":"";
         List<String> input = Arrays.asList(
@@ -587,8 +587,8 @@ public class PlotProducer {
     }
 
     private String producePointsGraph(String experimentId, String fileName, String titleBar, String xlabel, String ylabel,List<Double>x,List<Double>y,boolean logY) {
-        String xx = x.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
-        String yy = y.stream().map(p -> p.toString()).collect(Collectors.joining(",", "[", "]"));
+        String xx = x.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
+        String yy = y.stream().map(Object::toString).collect(Collectors.joining(",", "[", "]"));
 
         String log = (logY)?"plt.yscale('log')":"";
         List<String> input = Arrays.asList(

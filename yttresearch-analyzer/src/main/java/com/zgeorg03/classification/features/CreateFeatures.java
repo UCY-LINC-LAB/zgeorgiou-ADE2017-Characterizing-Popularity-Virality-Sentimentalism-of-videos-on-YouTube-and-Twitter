@@ -23,18 +23,14 @@ public class CreateFeatures {
     private final Set<String> mostViral;
 
     private int t_window;
-    private int offset;
-    private int l_window;
-    private boolean recent;
     private PrintWriter pw;
     private PrintWriter lab;
     private PrintWriter pw_twitter;
-    private float labPer;
     private String ytBinary;
     private String twBinary;
 
     public CreateFeatures(File path, boolean recent, int t, int o, int l, Map<String, VideoData> videosMap, Set<String> mostPopular, Set<String> mostViral){
-        this.recent = recent;
+        boolean recent1 = recent;
         this.videosMap = videosMap;
         this.mostPopular = mostPopular;
         this.mostViral = mostViral;
@@ -57,7 +53,7 @@ public class CreateFeatures {
     }
 
     public void setLabPer(float labPer) {
-        this.labPer = labPer;
+        float labPer1 = labPer;
     }
 
     public void create(){
@@ -96,11 +92,11 @@ public class CreateFeatures {
     }
 
     public void setOffset(int offset) {
-        this.offset = offset;
+        int offset1 = offset;
     }
 
     public void setL_window(int l_window) {
-        this.l_window = l_window;
+        int l_window1 = l_window;
     }
 
     public void setYtBinary(String ytBinary) {

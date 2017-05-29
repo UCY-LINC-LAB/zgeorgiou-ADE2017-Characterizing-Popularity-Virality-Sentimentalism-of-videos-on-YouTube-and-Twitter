@@ -1,6 +1,7 @@
 package com.zgeorg03.classification;
 
 import com.zgeorg03.analysis.Groups;
+import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.classification.features.CreateBaseFeatures;
 import com.zgeorg03.classification.features.CreateFeatures;
 import com.zgeorg03.classification.records.*;
@@ -174,13 +175,13 @@ public class FeatureManager implements Runnable {
         //Initialize Maps
         Map<String,VideoData> videoDataList  = groups.getVideoData(this);
 
-        mostPopular = groups.getPopular().stream().map(v->v.getVideo_id()).collect(Collectors.toSet());
-        mostViral = groups.getViral().stream().map(v->v.getVideo_id()).collect(Collectors.toSet());
+        mostPopular = groups.getPopular().stream().map(Video::getVideo_id).collect(Collectors.toSet());
+        mostViral = groups.getViral().stream().map(Video::getVideo_id).collect(Collectors.toSet());
 
         Predicate<VideoData> splitPredicate = (v) -> ((v.getCollected_at()-v.getYoutubeFeatures().getYt_uploaded())/ DateUtil.dayInMillis < split_days);
         Map<Boolean, List<VideoData>> splittedVideos = videoDataList.values().stream().collect(Collectors.partitioningBy(splitPredicate)) ;
-        videosMap = splittedVideos.get(false).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
-        videosMapRecent = splittedVideos.get(true).stream().collect(Collectors.toMap(x->x.getVideo_id(),v->v));
+        videosMap = splittedVideos.get(false).stream().collect(Collectors.toMap(VideoData::getVideo_id, v->v));
+        videosMapRecent = splittedVideos.get(true).stream().collect(Collectors.toMap(VideoData::getVideo_id, v->v));
         createFeatures();
 
         System.out.println("T.W: "+t_window);

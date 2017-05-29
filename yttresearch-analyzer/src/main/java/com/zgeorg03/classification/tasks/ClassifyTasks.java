@@ -15,17 +15,16 @@ import java.util.stream.Collectors;
 public class ClassifyTasks implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(ClassifyTasks.class);
 
-    private final ExecutorService executorService;
     private final ExecutorCompletionService<List<String>> executorCompletionService;
-    private final File path;
     private final File gbdt;
+    @SuppressWarnings("unchecked")
     public ClassifyTasks(String path){
-        executorService = Executors.newFixedThreadPool(8);
+        ExecutorService executorService = Executors.newFixedThreadPool(8);
         executorCompletionService = new ExecutorCompletionService(executorService);
-        this.path = Paths.get(path).toFile();
+        File path1 = Paths.get(path).toFile();
         this.gbdt = Paths.get(path,"classify","GBDT.py").toFile();
         if(!gbdt.exists())
-            logger.error("Classifer: GBDT.py doesn't exist in"+this.path.getAbsolutePath());
+            logger.error("Classifer: GBDT.py doesn't exist in"+ path1.getAbsolutePath());
 
 
     }

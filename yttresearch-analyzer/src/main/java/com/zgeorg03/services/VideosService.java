@@ -103,7 +103,7 @@ public class VideosService extends Service {
                 })
                 .limit(comments).collect(Collectors.toList());
         JsonArray array = new JsonArray();
-        documentList.stream().forEach(x -> array.add(x));
+        documentList.stream().forEach(array::add);
         return array;
     }
 
@@ -158,7 +158,7 @@ public class VideosService extends Service {
 
     public List<Stat<Double>> proccessSentimentBuckets(List<SentimentVideo> videos,int n) throws IOException {
         PrintWriter pw1 = new PrintWriter(new FileWriter(new File("/tmp/thesis/t.txt")));
-        double max =videos.stream().mapToDouble(x->x.getTweets()).max().getAsDouble();
+        double max =videos.stream().mapToDouble(SentimentVideo::getTweets).max().getAsDouble();
         int buckets= (int) Math.ceil(max/n);
         Double negativeArray[]=new Double[buckets];
         Double stds[]=new Double[buckets];

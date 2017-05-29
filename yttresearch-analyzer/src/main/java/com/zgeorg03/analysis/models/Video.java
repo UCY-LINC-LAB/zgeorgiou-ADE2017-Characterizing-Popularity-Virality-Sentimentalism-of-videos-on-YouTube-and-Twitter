@@ -56,7 +56,7 @@ public class Video implements JsonModel{
                 + "comments_sentiment_neu\t"
                 + "comments_sentiment_pos\t"
                 + "comments_sentiment_compound\t"
-                + days.stream().map(d->d.getCsvTitle()).collect(Collectors.joining("\t"))
+                + days.stream().map(Day::getCsvTitle).collect(Collectors.joining("\t"))
                 ;
     }
     public String getCsvForm(boolean isPopular,boolean isViral) {
@@ -73,23 +73,23 @@ public class Video implements JsonModel{
                         String.format("%.4f",comments_sentiment.getCompound().getAverage()))
                 :
                 ("0\t0\t0\t0"))
-                + "\t"+ days.stream().map(d->d.getCsvForm()).collect(Collectors.joining("\t"))
+                + "\t"+ days.stream().map(Day::getCsvForm).collect(Collectors.joining("\t"))
                 +"\t"+ ((isPopular)?1:0)
                 +"\t"+ ((isViral)?1:0)
                 ;
     }
 
     public double getAverageViewsPerDay() {
-        return days.stream().skip(1).mapToLong(x->x.getViews_added()).average().getAsDouble();
+        return days.stream().skip(1).mapToLong(Day::getViews_added).average().getAsDouble();
     }
     public double getAverageTweetsPerDay() {
-        return days.stream().skip(1).mapToLong(x->x.getTweets_added()).average().getAsDouble();
+        return days.stream().skip(1).mapToLong(Day::getTweets_added).average().getAsDouble();
     }
     public double getAverageRetweetsPerDay() {
-        return days.stream().skip(1).mapToLong(x->x.getRetweets_added()).average().getAsDouble();
+        return days.stream().skip(1).mapToLong(Day::getRetweets_added).average().getAsDouble();
     }
     public double getAverageLikesPerDay() {
-        return days.stream().skip(1).mapToLong(x->x.getLikes_added()).average().getAsDouble();
+        return days.stream().skip(1).mapToLong(Day::getLikes_added).average().getAsDouble();
     }
     public double getAverageFollowersPerDay() {
         return days.stream().skip(1).mapToDouble(x->x.getUser_followers_count().getAverage()).average().getAsDouble();
@@ -207,7 +207,7 @@ public class Video implements JsonModel{
         result.add("comments_sentiment",comments_sentiment.toJson());
 
         JsonArray jsonDays = new JsonArray();
-        days.stream().map(day-> day.toJson()).forEach(x->jsonDays.add(x));
+        days.stream().map(Day::toJson).forEach(jsonDays::add);
         result.add("days",jsonDays);
         return result;
     }

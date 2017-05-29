@@ -43,7 +43,7 @@ public class ParameterController {
 
                 if(p.description().isEmpty()) {
                     JsonArray desc = new JsonArray();
-                    Arrays.stream(p.extendedDescription()).forEach(e->desc.add(e));
+                    Arrays.stream(p.extendedDescription()).forEach(desc::add);
                     sb.append(" |" +Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))+" |");
                     param.add("description",desc);
                 }else
@@ -91,7 +91,7 @@ public class ParameterController {
 
                 if(p.description().isEmpty()) {
                     JsonArray desc = new JsonArray();
-                    Arrays.stream(p.extendedDescription()).forEach(e->desc.add(e));
+                    Arrays.stream(p.extendedDescription()).forEach(desc::add);
                     sb.append(" |" +Arrays.stream(p.extendedDescription()).collect(Collectors.joining(","))+" |");
                     param.add("description",desc);
                 }else

@@ -25,10 +25,16 @@ import static spark.Spark.before;
 
 import static spark.Spark.*;
 /**
+ * Entry Point
  * Created by zgeorg03 on 3/2/17.
  */
 public class App {
 
+    /**
+     * Entry Point
+     * @param args Command line arguments
+     * @throws Exception Exception
+     */
     public static void main(String args[]) throws Exception {
         String workingPath="/tmp/thesis";
         String scripts="./scripts/";
