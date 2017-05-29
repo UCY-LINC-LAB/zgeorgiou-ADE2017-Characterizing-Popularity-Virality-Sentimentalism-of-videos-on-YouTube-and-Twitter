@@ -307,7 +307,7 @@ public class Groups implements JsonModel{
             VideoRecord vr = video.getAsVideoRecord();
             return new VideoData(video, featureManager.mapYouTubeFeatures(vr,minDays),featureManager.mapTwitterFeatures(vr,minDays));
                 }
-        ).collect(Collectors.toMap(k->k.getVideo_id(),v->v));
+        ).collect(Collectors.toMap(VideoData::getVideo_id, v->v));
     }
 
 

@@ -22,10 +22,7 @@ public class SentimentJson implements JsonModel {
         this.pos = pos;
         this.neu = neu;
         this.compound = compound;
-        if(neg.isNotANumber()||pos.isNotANumber()||neu.isNotANumber()||compound.isNotANumber())
-            notEnoughData=true;
-        else
-            notEnoughData = false;
+        notEnoughData = neg.isNotANumber() || pos.isNotANumber() || neu.isNotANumber() || compound.isNotANumber();
     }
     public SentimentJson(boolean notEnoughData) {
         this.neg = null;

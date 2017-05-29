@@ -17,7 +17,7 @@ public class TwitterFeatures {
     public TwitterFeatures() {
         this.tw_user_followers = 0;
         this.tw_user_verified = 0;
-        this.tw_user_friends = tw_user_friends;
+        this.tw_user_friends = 0;
         days = new HashMap<>();
     }
 

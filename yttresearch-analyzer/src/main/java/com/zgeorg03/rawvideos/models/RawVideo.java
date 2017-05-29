@@ -211,7 +211,7 @@ public class RawVideo implements BsonModel{
             logger.error(e.getLocalizedMessage());
             result.append("comments_sentiment","Couldn't be calculated");
         }
-        List<Document> array = rawDays.stream().map(rawDay -> rawDay.toBson()).collect(Collectors.toList());
+        List<Document> array = rawDays.stream().map(RawDay::toBson).collect(Collectors.toList());
         result.append("days",array);
         return result;
     }
