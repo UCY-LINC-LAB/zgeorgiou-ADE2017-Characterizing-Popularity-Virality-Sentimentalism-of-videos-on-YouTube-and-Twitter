@@ -1,7 +1,9 @@
-package com.zgeorg03.core;
+package com.zgeorg03.test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.test.VideoStreamListener;
+import com.zgeorg03.core.YouTubeRequests;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.utils.YoutubeTool;
 import org.slf4j.Logger;
@@ -41,6 +43,8 @@ public class StatusMonitor implements Runnable {
     @Override
     public void run() {
         JsonObject app;
+
+        /**SKIp for now
         while(true){
             app = dbServices.getTwitterAppForUse();
             if(app.get("error")!=null) {
@@ -53,16 +57,24 @@ public class StatusMonitor implements Runnable {
             }else {
                 break;
             }
-        }
+        }*/
 
 
 
-        String name = app.get("name").getAsString();
-        String consumer_key = app.get("consumer_key").getAsString();
-        String consumer_secret = app.get("consumer_secret").getAsString();
-        String token = app.get("token").getAsString();
-        String token_secret = app.get("token_secret").getAsString();
-        apps.put(name,true);
+        //String name = app.get("name").getAsString();
+        //String consumer_key = app.get("consumer_key").getAsString();
+        //String consumer_secret = app.get("consumer_secret").getAsString();
+        //String token = app.get("token").getAsString();
+        //String token_secret = app.get("token_secret").getAsString();
+
+        //TEST
+        String consumer_key = "PY0bCZZ9xwHSKWyHwZodq5Fyz";
+        String consumer_secret = "IJibNf3lckPHcnoG6ece29LEaocaJbnyXNJ9Nj501c5VpCLC8v";
+        String token = "724557665578287105-LDXQEcFbkczxses2og35a8U0vQhRZNY";
+        String token_secret="ZmTVm8UQSfGwdrqWRuvpOdd0E5iSOGRxMpnKVjRJB7JMT";
+
+
+        //apps.put(name,true);
         twitterStream.setOAuthConsumer(consumer_key, consumer_secret);
         twitterStream.setOAuthAccessToken(new AccessToken(token,token_secret));
         twitterStream.addListener(videoStreamListener);
@@ -70,6 +82,7 @@ public class StatusMonitor implements Runnable {
 
         startedTime = System.currentTimeMillis();
         long sleepTime=100;
+
         while(true){
             Status status;
             status = statusQueue.poll();

@@ -131,6 +131,9 @@ public class DBVideosService implements DBVideosI {
         return videos;
     }
 
+    /**
+     * //TODO When a video is finished add its top comments
+     */
     @Override
     public Map<String,Integer> getVideosThatNeedComments(int maxComments) {
         Map<String,Integer> ids = new HashMap<>();
