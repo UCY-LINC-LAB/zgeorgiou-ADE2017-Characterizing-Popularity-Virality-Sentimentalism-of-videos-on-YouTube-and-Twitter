@@ -1,7 +1,7 @@
 package com.zgeorg03.services;
 
-import com.zgeorg03.core.CsvProducer;
-import com.zgeorg03.core.PlotProducer;
+import com.zgeorg03.CsvProducer;
+import com.zgeorg03.PlotProducer;
 
 /**
  * Created by zgeorg03 on 3/11/17.

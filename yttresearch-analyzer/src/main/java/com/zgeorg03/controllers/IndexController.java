@@ -1,7 +1,5 @@
 package com.zgeorg03.controllers;
 
-import com.zgeorg03.controllers.helpers.GetRequest;
-import com.zgeorg03.controllers.helpers.JsonResult;
 import com.zgeorg03.services.IndexService;
 import spark.Request;
 import spark.Response;

@@ -1,9 +1,5 @@
 package com.zgeorg03.controllers;
 
-import com.zgeorg03.controllers.helpers.GetRequest;
-import com.zgeorg03.controllers.helpers.JsonResult;
-import com.zgeorg03.controllers.helpers.Parameter;
-import com.zgeorg03.controllers.helpers.ParseParameters;
 import com.zgeorg03.services.PlotsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

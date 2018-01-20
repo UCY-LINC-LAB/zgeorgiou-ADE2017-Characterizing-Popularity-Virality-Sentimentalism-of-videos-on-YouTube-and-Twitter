@@ -8,7 +8,7 @@ import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.ClassificationManager;
 import com.zgeorg03.classification.tasks.ClassifyTasks;
-import com.zgeorg03.core.CsvProducer;
+import com.zgeorg03.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.database.services.ProcessVideoDBService;
 import com.zgeorg03.services.helpers.Service;

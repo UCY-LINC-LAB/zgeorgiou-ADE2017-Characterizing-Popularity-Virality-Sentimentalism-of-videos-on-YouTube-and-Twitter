@@ -1,12 +1,9 @@
 package com.zgeorg03.services;
 
-import com.zgeorg03.core.CsvProducer;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.services.helpers.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * Created by zgeorg03 on 3/2/17.

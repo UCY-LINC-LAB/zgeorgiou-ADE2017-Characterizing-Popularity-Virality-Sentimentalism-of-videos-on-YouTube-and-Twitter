@@ -1,0 +1,6 @@
+service_port : 8001
+remote_host : localhost
+database : "yttresearch"
+debug_mode : false
+max_videos : 1000
+max_comments : 100

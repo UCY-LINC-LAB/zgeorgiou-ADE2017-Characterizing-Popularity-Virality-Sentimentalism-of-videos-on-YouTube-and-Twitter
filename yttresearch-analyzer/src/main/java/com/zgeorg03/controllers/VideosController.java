@@ -2,13 +2,12 @@ package com.zgeorg03.controllers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.PlotProducer;
 import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.classification.FeatureManager;
-import com.zgeorg03.controllers.helpers.*;
-import com.zgeorg03.core.PlotProducer;
 import com.zgeorg03.services.VideosService;
 import com.zgeorg03.utils.Categories;
 import spark.Request;

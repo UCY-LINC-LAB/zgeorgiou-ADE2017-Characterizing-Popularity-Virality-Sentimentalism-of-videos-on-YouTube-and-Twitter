@@ -25,22 +25,26 @@ public class IndexService extends Service {
         int youtubeKeys = dbServices.getTotalYouTubeAPIKeys();
         int twitterKeys = dbServices.getTotalTwitterApps();
         int finishedVideos = dbServices.getDbVideosService().getTotalFinishedVideos();
+        int totallyFinishedVideos = dbServices.getDbVideosService().getTotalTotallyFinishedVideos();
         int incompleteVideos = dbServices.getDbVideosService().getTotalIncompleteVideos();
         int maxVideosBeingMonitored = dbServices.getMaxVideosBeingMonitored();
         int maxCommentsPerVideo = dbServices.getMaxCommentsPerVideo();
         int monitoredVideos = dbServices.getDbVideosService().getTotalMonitoredVideosAndNotFinished();
         int totalTweets = dbServices.getTotalTweets();
+        int totalComments = dbServices.getTotalComments();
 
         int videos_need_update = dbServices.getDbVideosService().getVideosThatNeedDynamicUpdate().size();
 
         JsonObject info = new JsonObject();
         info.addProperty("youtube_keys",youtubeKeys);
         info.addProperty("twitter_keys",twitterKeys);
+        info.addProperty("videos_totally_finished",totallyFinishedVideos);
         info.addProperty("videos_finished",finishedVideos);
         info.addProperty("videos_incomplete",incompleteVideos);
         info.addProperty("videos_monitored",monitoredVideos);
         info.addProperty("videos_need_update",videos_need_update);
         info.addProperty("total_tweets",totalTweets);
+        info.addProperty("total_comments",totalComments);
 
         JsonObject configurations = new JsonObject();
         info.addProperty("database_name",databaseName);
@@ -49,8 +53,7 @@ public class IndexService extends Service {
 
         JsonObject currentSession = new JsonObject();
         currentSession.addProperty("duration",monitor.getDuration()/1000);
-        currentSession.addProperty("videos_added",monitor.getVideosAdded());
-        currentSession.addProperty("tweets_added",monitor.getTweetsAdded());
+        object.add("stats",monitor.getStats().toJson());
 
         object.add("info",info);
         object.add("configurations",configurations);

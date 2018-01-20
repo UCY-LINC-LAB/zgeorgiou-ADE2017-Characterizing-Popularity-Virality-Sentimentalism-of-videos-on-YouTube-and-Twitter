@@ -32,5 +32,6 @@
     <modules>
         <module>yttresearch-analyzer</module>
         <module>yttresearch-collector</module>
+        <module>yttresearch-collector-v2</module>
     </modules>
 </project>
