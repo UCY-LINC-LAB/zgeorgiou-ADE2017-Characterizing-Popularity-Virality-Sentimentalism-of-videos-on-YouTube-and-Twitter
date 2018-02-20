@@ -56,8 +56,10 @@ public class DynamicInfoMonitor implements Runnable {
                     //Checking if a video reached 15th day
                     if (dbServices.getDbVideosService().checkVideoIsFinished(video)) {
 
-                        if (dbServices.getDbVideosService().setVideoAsFinished(video))
+                        if (dbServices.getDbVideosService().setVideoAsFinished(video)) {
                             logger.info("Video:" + video + " has finished!");
+                            statusMonitor.setReachedMonitorCapacity(false);
+                        }
 
                         if (dbServices.getDbVideosService().addDynamicData(video, dynamicData))
                             logger.info("Dynamic data added for " + video);

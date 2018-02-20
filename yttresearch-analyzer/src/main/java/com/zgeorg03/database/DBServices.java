@@ -73,6 +73,7 @@ public class DBServices {
     /**
      * Get a list of videos that are finished but not processed
      * @param max Max number of videos to return
+     *            //TODO add the meta.comments_finished = true
      * @return
      */
     public List<String> getFinishedButNotProcessedVideos(int max){
