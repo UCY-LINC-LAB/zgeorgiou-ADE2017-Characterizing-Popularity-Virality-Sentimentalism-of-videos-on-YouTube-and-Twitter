@@ -1,13 +1,15 @@
 package com.zgeorg03;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.zgeorg03.analysis.models.Video;
+import org.bson.json.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,6 +85,38 @@ public class CsvProducer {
             }
 
             return "/"+experimentId+"/videos_features.csv";
+        }
+    }
+    public class WriteJsonInfo implements Callable<String>{
+
+        private final String experimentId;
+        private final JsonElement object;
+
+        public WriteJsonInfo(String experimentId, JsonObject object) {
+            this.experimentId = experimentId;
+            this.object = object;
+        }
+
+        @Override
+        public String call() throws Exception {
+            File dir = Paths.get(root.getAbsolutePath(),experimentId).toFile();
+            if(!dir.exists()){
+                if(dir.mkdirs())
+                    logger.info("Creating dir:"+dir.getAbsolutePath());
+            }
+            File file = Paths.get(root.getAbsolutePath(),experimentId,"info.json").toFile();
+            try {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                Writer writer = new FileWriter(file);
+                gson.toJson(object,writer);
+                writer.close();
+                logger.info("Successful write to info.json");
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage());
+                return "Failed to write to json";
+            }
+
+            return "/"+experimentId+"/info.json";
         }
     }
 }

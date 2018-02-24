@@ -57,6 +57,7 @@ public class Video implements JsonModel{
                 + "comments_sentiment_pos\t"
                 + "comments_sentiment_compound\t"
                 + days.stream().map(Day::getCsvTitle).collect(Collectors.joining("\t"))
+                + "popular\t"+"viral"
                 ;
     }
     public String getCsvForm(boolean isPopular,boolean isViral) {

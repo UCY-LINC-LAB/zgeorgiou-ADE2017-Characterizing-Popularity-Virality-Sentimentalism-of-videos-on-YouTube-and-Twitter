@@ -109,11 +109,11 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
 
-                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<14,"train_wnd should in the range of the collected data");
+                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<15,"train_wnd should in the range of the collected data");
 
-                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x+train_wnd<=14,"offset should be in the range of the collected data");
+                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x+train_wnd<=15,"offset should be in the range of the collected data");
 
-                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>1&&x+train_wnd+offset<=15,"lbl_wnd should be in the range of the collected data");
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>=1&&x+train_wnd+offset<=16,"lbl_wnd should be in the range of the collected data");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
 
@@ -158,7 +158,6 @@ public class VideosController {
                 JsonArray viral = videosService.getViralVideos(category,offset,lbl_wnd,useLimit);
                 JsonArray recent = videosService.getRecentVideos(category,2,useLimit);
                 JsonArray random = videosService.getRandomVideos(category,useLimit);
-
 
 
 
@@ -218,8 +217,8 @@ public class VideosController {
 
                 object.add("groups",groups.toJson());
 
+                object.addProperty("info",videosService.produceInfo(groups,object));
                 result.setData(object);
-
                 return result.build();
             }
 
@@ -228,11 +227,11 @@ public class VideosController {
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
 
-                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<14,"train_wnd should in the range of the collected data");
+                train_wnd = ParseParameters.parseIntegerQueryParam(request,result,"train_wnd",1,x->x>=1&&x<15,"train_wnd should in the range of the collected data");
 
-                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x+train_wnd<=14,"offset should be in the range of the collected data");
+                offset = ParseParameters.parseIntegerQueryParam(request,result,"offset",0, x->x+train_wnd<=15,"offset should be in the range of the collected data");
 
-                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>=1&&x+train_wnd+offset<=15,"lbl_wnd should be in the range of the collected data");
+                lbl_wnd = ParseParameters.parseIntegerQueryParam(request,result,"lbl_wnd",3,x->x>=1&&x+train_wnd+offset<=16,"lbl_wnd should be in the range of the collected data");
 
                 percentage = ParseParameters.parseFloatQueryParam(request,result,"percentage",0.025f,x->x>0&&x<1,"Percentage must be between 0 and 1");
 

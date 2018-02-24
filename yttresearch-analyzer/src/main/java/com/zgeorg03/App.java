@@ -39,7 +39,7 @@ public class App {
         String workingPath="/tmp/thesis";
         String scripts="./scripts/";
         scripts="./yttresearch-analyzer/scripts/";
-        String db="yttresearch1";
+        String db="yttresearch120K-test";
 
 
         if(args.length==1)
@@ -57,6 +57,7 @@ public class App {
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
         DBConnection dbConnection = new DBConnection(db,new ServerAddress("10.16.3.12"));
+        //DBConnection dbConnection = new DBConnection(db,new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
         FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);

@@ -37,6 +37,7 @@ public class FinishedVideosMonitor implements Runnable {
                 try { TimeUnit.HOURS.sleep(6); } catch (InterruptedException e) { logger.error("Interrupted");}
             }
 
+            logger.info("Processing +"+notProcessed.size()+" videos");
             notProcessed.forEach(videoId -> {
                 try {
                     ProcessVideo processVideo = new ProcessVideo(dbServices, videoId, sentimentAnalysis);

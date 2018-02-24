@@ -2,6 +2,7 @@ package com.zgeorg03.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zgeorg03.analysis.Group;
 import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
@@ -117,6 +118,14 @@ public class VideosService extends Service {
         return "/"+groups.getExperimentId()+"/videos_features";
     }
 
+    public String produceInfo(Groups groups, JsonObject object) {
+        String experimentId= groups.getExperimentId();
+        CsvProducer.WriteJsonInfo analysis =  csvProducer.new WriteJsonInfo(experimentId,object);
+        executorService.submit(analysis);
+        return "/"+groups.getExperimentId()+"/info.json";
+
+
+    }
 
     public ExecutorService getExecutorService() {
         return executorService;
