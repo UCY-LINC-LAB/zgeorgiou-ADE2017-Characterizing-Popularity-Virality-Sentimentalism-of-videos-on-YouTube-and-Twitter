@@ -4,11 +4,7 @@ import com.mongodb.ServerAddress;
 import com.zgeorg03.analysis.SentimentAnalysis;
 import com.zgeorg03.classification.ClassificationManager;
 import com.zgeorg03.classification.tasks.ClassifyTasks;
-import com.zgeorg03.controllers.ClassificationController;
-import com.zgeorg03.controllers.IndexController;
-import com.zgeorg03.controllers.PlotsController;
-import com.zgeorg03.controllers.VideosController;
-import com.zgeorg03.controllers.JsonResult;
+import com.zgeorg03.controllers.*;
 import com.zgeorg03.database.DBConnection;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.FinishedVideosMonitor;
@@ -19,9 +15,6 @@ import com.zgeorg03.services.VideosService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static spark.Spark.after;
-import static spark.Spark.before;
 
 import static spark.Spark.*;
 /**
@@ -39,14 +32,16 @@ public class App {
         String workingPath="/tmp/thesis";
         String scripts="./scripts/";
         scripts="./yttresearch-analyzer/scripts/";
-        String db="yttresearch120K-test";
+        String db="yttresearch120K";
 
 
         if(args.length==1)
             db= args[0];
         port(8000);
+        int executors= 16;
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
+        ExecutorService tasks = Executors.newFixedThreadPool(executors);
         PlotProducer plotProducer = new PlotProducer(workingPath);
         CsvProducer csvProducer = new CsvProducer(workingPath);
         ClassifyTasks classifyTasks = new ClassifyTasks(scripts);
@@ -56,12 +51,13 @@ public class App {
 
         SentimentAnalysis sentimentAnalysis = new SentimentAnalysis(scripts);
 
-        DBConnection dbConnection = new DBConnection(db,new ServerAddress("10.16.3.12"));
-        //DBConnection dbConnection = new DBConnection(db,new ServerAddress("localhost"));
+        //DBConnection dbConnection = new DBConnection(db,new ServerAddress("10.16.3.12"));
+        DBConnection dbConnection = new DBConnection(db,new ServerAddress("localhost"));
         DBServices dbServices = new DBServices(dbConnection);
 
-        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,500, sentimentAnalysis);
+        FinishedVideosMonitor finishedVideosMonitor = new FinishedVideosMonitor(dbServices,1024, tasks, sentimentAnalysis);
         executorService.execute(finishedVideosMonitor);
+
 
 
         //Services

@@ -6,7 +6,11 @@ import com.zgeorg03.rawvideos.models.RawVideo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,10 +23,13 @@ public class FinishedVideosMonitor implements Runnable {
     private int maxVideos;
 
     private final SentimentAnalysis sentimentAnalysis;
-    public FinishedVideosMonitor(DBServices dbServices, int maxVideos, SentimentAnalysis sentimentAnalysis) {
+    private final ExecutorService executorService;
+
+    public FinishedVideosMonitor(DBServices dbServices, int maxVideos, ExecutorService executors, SentimentAnalysis sentimentAnalysis) {
         this.dbServices = dbServices;
         this.maxVideos = maxVideos;
         this.sentimentAnalysis = sentimentAnalysis;
+        this.executorService = executors;
     }
 
 
@@ -34,21 +41,27 @@ public class FinishedVideosMonitor implements Runnable {
 
             if (notProcessed.isEmpty()) {
                 logger.info("All videos are processed. Going to sleep...");
-                try { TimeUnit.HOURS.sleep(6); } catch (InterruptedException e) { logger.error("Interrupted");}
+                try { TimeUnit.HOURS.sleep(3); } catch (InterruptedException e) { logger.error("Interrupted");}
             }
 
-            logger.info("Processing +"+notProcessed.size()+" videos");
-            notProcessed.forEach(videoId -> {
+            List<Future<Integer>> results = new LinkedList<Future<Integer>>();
+            for(String video:notProcessed){
+                ProcessVideoTask task = new ProcessVideoTask(dbServices,video,sentimentAnalysis);
+                results.add(executorService.submit(task));
+            }
+            int count =0;
+            for(Future<Integer> future:results){
                 try {
-                    ProcessVideo processVideo = new ProcessVideo(dbServices, videoId, sentimentAnalysis);
-                    RawVideo rawVideo = processVideo.getVideo();
-                    dbServices.getProcessVideoDBService().addOrReplaceProcessedVideo(rawVideo);
-                    dbServices.getProcessVideoDBService().setVideoAsProcessed(videoId);
-                } catch (Exception e) {
-                    logger.error(e.getLocalizedMessage());
+                    int i = future.get();
+                    count++;
+                    if(count%100==0)
+                    logger.info("Finished Videos batch:"+count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
-            });
+            }
 
             try { TimeUnit.SECONDS.sleep(60); } catch (InterruptedException e) { logger.error("Interrupted");}
         }
