@@ -82,7 +82,6 @@ public class DBServices {
         try( MongoCursor cursor = videos.find(
                 and(
                         eq("meta.finished",true),
-                        eq("meta.comments_finished",true),
                         eq("meta.processed",false)
                 )
         ).projection(include("_id")).limit(max).iterator()){

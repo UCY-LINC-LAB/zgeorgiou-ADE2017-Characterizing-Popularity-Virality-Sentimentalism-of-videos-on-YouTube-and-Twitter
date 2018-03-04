@@ -54,8 +54,8 @@ public class PlotProducer {
         Map<String, SentimentVideo> sentimentVideos = groups.toSentimentVideos();
         JsonObject object = new JsonObject();
 
-        object.add("popular_viral_graphs",
-                produce3GroupsSentiment(groups.getPopular_not_viral(),groups.getViral_not_popular(),groups.getPopular_viral(),sentimentVideos));
+        //object.add("popular_viral_graphs",
+         //       produce3GroupsSentiment(groups.getPopular_not_viral(),groups.getViral_not_popular(),groups.getPopular_viral(),sentimentVideos));
 
         object.addProperty("groups_venn",
                 produceVenn(groups.getExperimentId(),
@@ -69,11 +69,23 @@ public class PlotProducer {
                         "Average daily increase in View count","Time(Days)","View Increase",
                         true,groups.getViewsAverageDailyIncrease()));
 
+        object.addProperty("views_median_daily_increase",
+                convertAndProduceGroupsPlot(groups.getExperimentId(),
+                        "views_median_daily_increase",
+                        "Median daily increase in View count","Time(Days)","View Increase",
+                        true,groups.getViewsMedianDailyIncrease()));
+
         object.addProperty("tweets_average_daily_increase",
                 convertAndProduceGroupsPlot(groups.getExperimentId(),
                         "tweets_average_daily_increase",
                         "Average number of tweet mentions","Time(Days)","Count",
                         false,groups.getTweetsAverageDailyIncrease()));
+
+        object.addProperty("tweets_median_daily_increase",
+                convertAndProduceGroupsPlot(groups.getExperimentId(),
+                        "tweets_median_daily_increase",
+                        "Median number of tweet mentions","Time(Days)","Count",
+                        false,groups.getTweetsMedianDailyIncrease()));
 
         object.addProperty("ratio_original_total_tweets",
                 convertAndProduceGroupsPlot(groups.getExperimentId(),
@@ -86,6 +98,12 @@ public class PlotProducer {
                         "average_possible_users_reached",
                         "Average number of (possible)users reached per day","Time(Days)","Ratio",
                         false,groups.getAverageUsersReached()));
+
+        object.addProperty("median_possible_users_reached",
+                convertAndProduceGroupsPlot(groups.getExperimentId(),
+                        "median_possible_users_reached",
+                        "Median number of (possible)users reached per day","Time(Days)","Ratio",
+                        false,groups.getMedianUsersReached()));
 
         object.addProperty("videos_age_distribution",
                 produceVideoDistributionGraph(groups.getExperimentId(),

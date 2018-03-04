@@ -95,9 +95,12 @@ public class Group extends LinkedList<Video> implements JsonModel{
     }
 
     public List<Double> getViewsAverageDailyIncrease(int skip) { return daysStats.getViewsAverageDailyIncrease(skip); }
+    public List<Double> getViewsMedianDailyIncrease(int skip) { return daysStats.getViewsMedianDailyIncrease(skip); }
     public List<Double> getTweetsAverageDailyIncrease(int skip) { return daysStats.getTweetsAverageDailyIncrease(skip); }
+    public List<Double> getTweetsMedianDailyIncrease(int skip) { return daysStats.getTweetsMedianDailyIncrease(skip); }
     public List<Double> getRatioOriginalTotalTweets(int skip) { return daysStats.getRatioOriginalTotalTweets(skip); }
     public List<Double> getAverageUsersReached(int skip) { return daysStats.getAverageUsersReached(skip); }
+    public List<Double> getMedianUsersReached(int skip) { return daysStats.getMedianUsersReached(skip); }
 
     public Stat<Integer> getAverageDuration() { return Calculations.getStatsInt(durationList()); }
     public Stat<Double> getAverageNegativeSentiment() {

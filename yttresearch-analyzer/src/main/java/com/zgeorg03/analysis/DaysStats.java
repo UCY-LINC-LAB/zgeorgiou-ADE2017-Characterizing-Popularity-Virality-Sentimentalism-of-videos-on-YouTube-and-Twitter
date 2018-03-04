@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
 
 
+    private final static int MAX_DAYS = 15;
     public DaysStats() {
     }
 
@@ -54,31 +55,54 @@ public class DaysStats extends HashMap<Integer, DayStat> implements JsonModel{
 
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(skip)
-                .limit(14)
+                .limit(MAX_DAYS)
                 .map(entry-> Calculations.averageLong(entry.getValue().view_added))
+                .collect(Collectors.toList());
+    }
+    public List<Double> getViewsMedianDailyIncrease(int skip) {
+
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(skip)
+                .limit(MAX_DAYS)
+                .map(entry->(double) Calculations.medianLong(entry.getValue().view_added))
                 .collect(Collectors.toList());
     }
 
     public List<Double> getTweetsAverageDailyIncrease(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
-                .limit(14)
+                .limit(MAX_DAYS)
                 .map(entry-> Calculations.averageLong(entry.getValue().tweets_added))
+                .collect(Collectors.toList());
+    }
+
+    public List<Double> getTweetsMedianDailyIncrease(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .limit(MAX_DAYS)
+                .map(entry-> (double)Calculations.medianLong(entry.getValue().tweets_added))
                 .collect(Collectors.toList());
     }
 
     public List<Double> getRatioOriginalTotalTweets(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
-                .limit(14)
+                .limit(MAX_DAYS)
                 .map(entry-> Calculations.averageDouble(entry.getValue().ratio_original_tweets_total_tweets))
                 .collect(Collectors.toList());
     }
     public List<Double> getAverageUsersReached(int lbl_wnd) {
         return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
                 .skip(lbl_wnd)
-                .limit(14)
+                .limit(MAX_DAYS)
                 .map(entry-> Calculations.averageDouble(entry.getValue().user_followers))
+                .collect(Collectors.toList());
+    }
+    public List<Double> getMedianUsersReached(int lbl_wnd) {
+        return this.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
+                .skip(lbl_wnd)
+                .limit(MAX_DAYS)
+                .map(entry-> Calculations.medianDouble(entry.getValue().user_followers))
                 .collect(Collectors.toList());
     }
 }

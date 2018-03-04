@@ -121,6 +121,18 @@ public class Groups implements JsonModel{
         return map;
     }
 
+    public Map<String,List<Double>> getViewsMedianDailyIncrease() {
+        Map<String,List<Double>> map = new HashMap<>();
+        map.put("popular",this.popular.getViewsMedianDailyIncrease(1));
+        map.put("viral",this.viral.getViewsMedianDailyIncrease(1));
+        map.put("recent",this.recent.getViewsMedianDailyIncrease(1));
+        map.put("random",this.random.getViewsMedianDailyIncrease(1));
+        map.put("popular_viral",this.popular_viral.getViewsMedianDailyIncrease(1));
+        map.put("popular_not_viral",this.popular_not_viral.getViewsMedianDailyIncrease(1));
+        map.put("viral_not_popular",this.viral_not_popular.getViewsMedianDailyIncrease(1));
+        return map;
+    }
+
     public Map<String,List<Double>> getTweetsAverageDailyIncrease() {
         Map<String,List<Double>> map = new HashMap<>();
         map.put("popular",this.popular.getTweetsAverageDailyIncrease(1));
@@ -130,6 +142,18 @@ public class Groups implements JsonModel{
         map.put("popular_viral",this.popular_viral.getTweetsAverageDailyIncrease(1));
         map.put("popular_not_viral",this.popular_not_viral.getTweetsAverageDailyIncrease(1));
         map.put("viral_not_popular",this.viral_not_popular.getTweetsAverageDailyIncrease(1));
+        return map;
+    }
+
+    public Map<String,List<Double>> getTweetsMedianDailyIncrease() {
+        Map<String,List<Double>> map = new HashMap<>();
+        map.put("popular",this.popular.getTweetsMedianDailyIncrease(1));
+        map.put("viral",this.viral.getTweetsMedianDailyIncrease(1));
+        map.put("recent",this.recent.getTweetsMedianDailyIncrease(1));
+        map.put("random",this.random.getTweetsMedianDailyIncrease(1));
+        map.put("popular_viral",this.popular_viral.getTweetsMedianDailyIncrease(1));
+        map.put("popular_not_viral",this.popular_not_viral.getTweetsMedianDailyIncrease(1));
+        map.put("viral_not_popular",this.viral_not_popular.getTweetsMedianDailyIncrease(1));
         return map;
     }
     public Map<String,List<Double>> getRatioOriginalTotalTweets() {
@@ -153,6 +177,17 @@ public class Groups implements JsonModel{
         map.put("popular_viral",this.popular_viral.getAverageUsersReached(1));
         map.put("popular_not_viral",this.popular_not_viral.getAverageUsersReached(1));
         map.put("viral_not_popular",this.viral_not_popular.getAverageUsersReached(1));
+        return map;
+    }
+    public Map<String,List<Double>> getMedianUsersReached() {
+        Map<String,List<Double>> map = new HashMap<>();
+        map.put("popular",this.popular.getMedianUsersReached(1));
+        map.put("viral",this.viral.getMedianUsersReached(1));
+        map.put("recent",this.recent.getMedianUsersReached(1));
+        map.put("random",this.random.getMedianUsersReached(1));
+        map.put("popular_viral",this.popular_viral.getMedianUsersReached(1));
+        map.put("popular_not_viral",this.popular_not_viral.getMedianUsersReached(1));
+        map.put("viral_not_popular",this.viral_not_popular.getMedianUsersReached(1));
         return map;
     }
     public Map<String,List<Map.Entry<Integer,Double>>> getVideosDistribution(){
