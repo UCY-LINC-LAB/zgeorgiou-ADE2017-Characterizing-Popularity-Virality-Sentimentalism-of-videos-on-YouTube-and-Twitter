@@ -2,7 +2,6 @@ package com.zgeorg03.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.zgeorg03.analysis.Group;
 import com.zgeorg03.analysis.Groups;
 import com.zgeorg03.analysis.models.Stat;
 import com.zgeorg03.analysis.models.Video;
@@ -83,10 +82,16 @@ public class VideosService extends Service {
         return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,offset,lbl_wnd,limit);
     }
 
+    public JsonArray getRecentVideos(int artificial_category,int days, int limit,int seed){
+        return dbServices.getProcessVideoDBService().getRecentVideosSeed(days,artificial_category,limit,seed);
+    }
     public JsonArray getRecentVideos(int artificial_category,int days, int limit){
         return dbServices.getProcessVideoDBService().getRecentVideos(days,artificial_category,limit);
     }
 
+    public JsonArray getRandomVideos(int artificial_category, int limit,int seed){
+        return dbServices.getProcessVideoDBService().getRandomVideosSeed(artificial_category,limit,seed);
+    }
     public JsonArray getRandomVideos(int artificial_category, int limit){
         return dbServices.getProcessVideoDBService().getRandomVideos(artificial_category,limit);
     }

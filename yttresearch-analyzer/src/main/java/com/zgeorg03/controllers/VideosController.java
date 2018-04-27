@@ -124,6 +124,8 @@ public class VideosController {
 
             }
         };
+
+        //We are using this
         new GetRequest("/videos/classify"){
 
             @Parameter(description = "Specify the category",defaultValue = "0")
@@ -138,8 +140,17 @@ public class VideosController {
             @Parameter(description = "Offset, indicates the number of days we don't measure stats",defaultValue = "0")
             private int offset;
 
+            @Parameter(description = "Seed, indicates the random seed",defaultValue = "1")
+            private int seed;
+
             @Parameter(description = "Return a percentage of the total videos as popular",defaultValue = "0.025")
             private float percentage;
+
+            @Parameter(description = "YouTube Features",defaultValue ="1111111111111111111111111111111")
+            private String yt;
+
+            @Parameter(description = "Twitter Features",defaultValue ="1111111111111111111111111111111111111111111")
+            private String tw;
 
             private String experiment;
             private int useLimit;
@@ -156,8 +167,8 @@ public class VideosController {
                 }
                 JsonArray popular = videosService.getPopularVideos(category,offset,lbl_wnd, useLimit);
                 JsonArray viral = videosService.getViralVideos(category,offset,lbl_wnd,useLimit);
-                JsonArray recent = videosService.getRecentVideos(category,2,useLimit);
-                JsonArray random = videosService.getRandomVideos(category,useLimit);
+                JsonArray recent = videosService.getRecentVideos(category,2,useLimit,seed);
+                JsonArray random = videosService.getRandomVideos(category,useLimit,seed);
 
 
 
@@ -207,9 +218,9 @@ public class VideosController {
 
 
                 //Classification
-                String ytFeatures = "1111111111111111111111111111111";
-                String twFeatures = "1111111111111111111111111111111111111111111";
-                int split_days = 10000;
+                String ytFeatures = yt;
+                String twFeatures = tw;
+                int split_days = 14;
                 FeatureManager featureManager = new FeatureManager(plotProducer.getPath(),experiment, videosService.getClassifyTasks(), groups,train_wnd, offset, lbl_wnd, split_days, percentage, ytFeatures, twFeatures);
                 videosService.getExecutorService().execute(featureManager);
 
@@ -224,6 +235,12 @@ public class VideosController {
 
             @Override
             public void handleParams(Request request, Response response, JsonResult result) {
+
+                yt = ParseParameters.parseStringQueryParam(request,result,"yt","1111111111111111111111111111111",x->x.length()==31,"Length should be 31");
+
+                tw = ParseParameters.parseStringQueryParam(request,result,"tw","1111111111111111111111111111111111111111111",x->x.length()==43,"Length should be 43");
+
+                seed = ParseParameters.parseIntegerQueryParam(request,result,"seed",1, x->x>0,"Seed should be positive");
 
                 category = ParseParameters.parseIntegerQueryParam(request,result,"category",0,x->x>=0&&x<=6,"Category should be from 0 to 6");
 
@@ -245,6 +262,7 @@ public class VideosController {
 
             }
         };
+
         new GetRequest("/videos/groups"){
 
             @Parameter(description = "Specify the category",defaultValue = "0")

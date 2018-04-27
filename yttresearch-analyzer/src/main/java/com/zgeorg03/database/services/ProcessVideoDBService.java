@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -243,6 +245,100 @@ public class ProcessVideoDBService {
                 new Document("$sort",new Document("total_views",-1)),
                 new Document("$limit", limit*2),
                 new Document("$sample", new Document("size",limit))
+        );
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while(cursor.hasNext()){
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_views = document.getLong("total_views");
+            long total_tweets = document.getLong("total_tweets");
+            object.addProperty("video_id",video_id);
+            object.addProperty("total_views",total_views);
+            object.addProperty("total_tweets",total_tweets);
+            object.addProperty("url","/videos/"+video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
+    public JsonArray getRecentVideosSeed(int days, int artificial_category, int limit,int seed){
+        long daysInMillis = DateUtil.dayInMillis*days;
+
+        if(limit==0)
+            return new JsonArray();
+
+        int max = (int) (processedDBVideos.count()-1);
+        Random random = new Random(seed);
+
+        List<Integer> docs = random.ints(0,max).limit(limit).boxed().collect(Collectors.toList());
+
+        Document match;
+
+        if(artificial_category!=0)
+            match = new Document("$and", Arrays.asList(
+                    new Document("artificial_category", artificial_category),
+                    new Document("diff",
+                            new Document("$lte", daysInMillis))
+            ));
+        else
+            match = new Document("diff", new Document("$lte", daysInMillis));
+
+        Document match1 = new Document("$in",docs);
+
+        List<Document> query = Arrays.asList(
+                new Document("$match",match1),
+                new Document("$addFields",
+                        new Document("a","$collected_at_timestamp").append("b","$published_at_timestamp")),
+                new Document("$addFields",
+                        new Document("diff", new Document("$subtract",Arrays.asList("$a","$b")))),
+
+                new Document("$match",match),
+                new Document("$project",
+                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets"))
+        );
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while(cursor.hasNext()){
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_views = document.getLong("total_views");
+            long total_tweets = document.getLong("total_tweets");
+            object.addProperty("video_id",video_id);
+            object.addProperty("total_views",total_views);
+            object.addProperty("total_tweets",total_tweets);
+            object.addProperty("url","/videos/"+video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
+    public JsonArray getRandomVideosSeed(int artificial_category, int limit,int seed){
+
+        if(limit==0)
+            return new JsonArray();
+
+        int max = (int) (processedDBVideos.count()-1);
+        Random random = new Random(seed);
+
+        List<Integer> docs = random.ints(0,max).limit(limit).boxed().collect(Collectors.toList());
+        Document match;
+        if(artificial_category!=0)
+            match = new Document("artificial_category", artificial_category) ;
+        else
+            match = new Document("artificial_category", new Document("$gt",0)) ;
+
+        Document match1 = new Document("$in",docs);
+
+        List<Document> query = Arrays.asList(
+                new Document("$match",match1),
+                new Document("$match",match),
+                new Document("$project",
+                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets"))
         );
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
