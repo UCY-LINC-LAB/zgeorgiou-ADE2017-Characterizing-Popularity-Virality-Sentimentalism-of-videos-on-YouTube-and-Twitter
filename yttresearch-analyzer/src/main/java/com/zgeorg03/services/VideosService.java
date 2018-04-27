@@ -81,16 +81,22 @@ public class VideosService extends Service {
     public JsonArray getViralVideos(int artificial_category,int offset,int lbl_wnd,int limit){
         return dbServices.getProcessVideoDBService().getVideosWithTheMostTweets(artificial_category,offset,lbl_wnd,limit);
     }
+    public List<Integer> getRandInts(int artificial_category){
+      return  dbServices.getProcessVideoDBService().getRandIds(artificial_category);
+    }
+    public List<Integer> getRandInts(int artificial_category,int days){
+        return  dbServices.getProcessVideoDBService().getRandRecentIds(artificial_category,days);
+    }
 
-    public JsonArray getRecentVideos(int artificial_category,int days, int limit,int seed){
-        return dbServices.getProcessVideoDBService().getRecentVideosSeed(days,artificial_category,limit,seed);
+    public JsonArray getRecentVideos(int artificial_category,int days, int limit,int seed,List<Integer> chooseFrom){
+        return dbServices.getProcessVideoDBService().getRecentVideosSeed(days,artificial_category,limit,seed,chooseFrom);
     }
     public JsonArray getRecentVideos(int artificial_category,int days, int limit){
         return dbServices.getProcessVideoDBService().getRecentVideos(days,artificial_category,limit);
     }
 
-    public JsonArray getRandomVideos(int artificial_category, int limit,int seed){
-        return dbServices.getProcessVideoDBService().getRandomVideosSeed(artificial_category,limit,seed);
+    public JsonArray getRandomVideos(int artificial_category, int limit,int seed,List<Integer>chooseFrom){
+        return dbServices.getProcessVideoDBService().getRandomVideosSeed(artificial_category,limit,seed,chooseFrom);
     }
     public JsonArray getRandomVideos(int artificial_category, int limit){
         return dbServices.getProcessVideoDBService().getRandomVideos(artificial_category,limit);

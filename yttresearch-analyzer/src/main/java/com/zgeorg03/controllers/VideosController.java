@@ -165,10 +165,55 @@ public class VideosController {
                 if(videosService.exists(experiment)){
                     return result.addString("msg","Experiment already exists...").build();
                 }
+
+                long time =System.currentTimeMillis();
+                //TODO REMEMBER
+                //JsonArray popular = new JsonArray();
                 JsonArray popular = videosService.getPopularVideos(category,offset,lbl_wnd, useLimit);
+                time = (System.currentTimeMillis() - time)/1000;
+
+                System.out.println("Popular videos collected in "+ time +"s");
+                time = System.currentTimeMillis();
+
+                //TODO REMEMBER
                 JsonArray viral = videosService.getViralVideos(category,offset,lbl_wnd,useLimit);
-                JsonArray recent = videosService.getRecentVideos(category,2,useLimit,seed);
-                JsonArray random = videosService.getRandomVideos(category,useLimit,seed);
+                //JsonArray viral = new JsonArray();
+                time = (System.currentTimeMillis() - time)/1000;
+                System.out.println("Viral videos collected in "+ time +"s");
+
+                JsonArray recent;
+                JsonArray random;
+                if(category!=0) {
+
+                    time = System.currentTimeMillis();
+                    List<Integer> rands = videosService.getRandInts(category,2);
+                    time = (System.currentTimeMillis() - time)/1000;
+                    System.out.println("RandInts collected in "+ time +"s");
+                    System.out.println("Total Rand Ints collected:"+rands.size());
+
+                    time = System.currentTimeMillis();
+                    recent = videosService.getRecentVideos(category,2,useLimit,seed,rands);
+                    time = (System.currentTimeMillis() - time)/1000;
+                    System.out.println("Recent Videos collected in "+ time +"s");
+
+                    time = System.currentTimeMillis();
+                    rands = videosService.getRandInts(category);
+                    time = (System.currentTimeMillis() - time)/1000;
+                    System.out.println("RandInts collected in "+ time +"s");
+                    System.out.println("Total Rand Ints collected:"+rands.size());
+
+                    time = System.currentTimeMillis();
+                    random = videosService.getRandomVideos(category, useLimit,seed,rands);
+                    time = (System.currentTimeMillis() - time)/1000;
+                    System.out.println("Random Videos collected in "+ time +"s");
+                }else{
+                    time = System.currentTimeMillis();
+                    recent = videosService.getRecentVideos(category,2,useLimit,seed,null);
+                    System.out.println("Recent Videos collected in "+ time +"s");
+                    time = System.currentTimeMillis();
+                    random = videosService.getRandomVideos(category, useLimit,seed,null);
+                    System.out.println("Random Videos collected in "+ time +"s");
+                }
 
 
 

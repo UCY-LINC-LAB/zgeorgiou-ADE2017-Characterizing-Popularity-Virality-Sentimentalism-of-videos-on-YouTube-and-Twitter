@@ -6,19 +6,16 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.zgeorg03.analysis.models.Video;
 import com.zgeorg03.analysis.sentiment.SentimentVideo;
 import com.zgeorg03.database.DBServices;
 import com.zgeorg03.rawvideos.models.RawVideo;
 import com.zgeorg03.utils.DateUtil;
-import com.zgeorg03.analysis.models.Video;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -41,14 +38,9 @@ public class ProcessVideoDBService {
         this.processedDBVideos = processedVideos;
     }
 
-    public JsonArray getVideosWithTheMostViews(int artificial_category,int offset, int lbl_wnd, int limit){
-        if(limit==0)
+    public JsonArray getVideosWithTheMostViews(int artificial_category, int offset, int lbl_wnd, int limit) {
+        if (limit == 0)
             return new JsonArray();
-        Document categoryMatch=null;
-
-        if(artificial_category!=0)
-            categoryMatch = new Document("artificial_category", artificial_category);
-
 
         Document matchDays = new Document("$and",
                 Arrays.asList(
@@ -56,142 +48,173 @@ public class ProcessVideoDBService {
                         new Document("days.day", new Document("$lte", lbl_wnd))
                 )
         );
-        List<Document> query = Arrays.asList(
-                new Document("$unwind", "$days"),
-                new Document("$match",matchDays),
-                new Document("$group",
-                        new Document("_id", "$_id")
-                                .append("sum",
-                                        new Document("$sum", "$days.views_added"))),
-                new Document("$sort",
-                        new Document("sum", -1)),
-                new Document("$limit", limit),
-                new Document("$project",
-                        new Document("total_views", "$sum"))
-        );
+        List<Document> query;
+        if (artificial_category == 0) {
+            query = Arrays.asList(
+                    new Document("$unwind", "$days"),
+                    new Document("$match", matchDays),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("sum",
+                                            new Document("$sum", "$days.views_added"))),
+                    new Document("$sort",
+                            new Document("sum", -1)),
+                    new Document("$limit", limit),
+                    new Document("$project",
+                            new Document("total_views", "$sum"))
 
-        if(artificial_category!=0)
-            query.add(0,categoryMatch);
 
+            );
+        } else {
+            Document categoryMatch = new Document("artificial_category", artificial_category);
+            query = Arrays.asList(
+                    new Document("$match", categoryMatch),
+                    new Document("$unwind", "$days"),
+                    new Document("$match", matchDays),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("sum",
+                                            new Document("$sum", "$days.views_added"))),
+                    new Document("$sort",
+                            new Document("sum", -1)),
+                    new Document("$limit", limit),
+                    new Document("$project",
+                            new Document("total_views", "$sum"))
+            );
+        }
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
 
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_views = document.getLong("total_views");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
 
-    public JsonArray getVideosWithTheMostViews(int artificial_category, int limit){
+    public JsonArray getVideosWithTheMostViews(int artificial_category, int limit) {
 
-        if(limit==0)
+        if (limit == 0)
             return new JsonArray();
         Document match;
-        if(artificial_category!=0)
-            match = new Document("artificial_category", artificial_category) ;
-        else
-            match = new Document("artificial_category", new Document("$gt",0)) ;
-
-        List<Document> query = Arrays.asList(
-                new Document("$unwind", "$days"),
-                new Document("$match",match),
-                new Document("$group",
-                        new Document("_id", "$_id")
-                                .append("sum",
-                                        new Document("$sum", "$days.views_added"))),
-                new Document("$sort",
-                        new Document("sum", -1)),
-                new Document("$limit", limit),
-                new Document("$project",
-                        new Document("total_views", "$sum"))
-        );
-
-        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
-        JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
-            JsonObject object = new JsonObject();
-            Document document = (Document) cursor.next();
-            String video_id = document.getString("_id");
-            long total_views = document.getLong("total_views");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("url","/videos/"+video_id);
-            array.add(object);
-        }
-        return array;
-
-    }
-    public JsonArray getVideosWithTheMostTweets(int artificial_category,int offset, int lbl_wnd, int limit){
-
-        if(limit==0)
-            return new JsonArray();
-        Document categoryMatch=null;
-
-        if(artificial_category!=0)
-            categoryMatch = new Document("artificial_category", artificial_category);
-
-
-        Document matchDays = new Document("$and",
-                Arrays.asList(
-                        new Document("days.day", new Document("$gt", offset)),
-                        new Document("days.day", new Document("$lte", lbl_wnd))
-                )
-        );
-
-        List<Document> query = Arrays.asList(
-                new Document("$unwind", "$days"),
-                new Document("$match",matchDays),
-                new Document("$group",
-                        new Document("_id", "$_id")
-                                .append("sum",
-                                        new Document("$sum", "$days.tweets_added"))),
-                new Document("$sort",
-                        new Document("sum", -1)),
-                new Document("$limit", limit),
-                new Document("$project",
-                        new Document("total_tweets", "$sum"))
-        );
-
-        if(artificial_category!=0)
-            query.add(0,categoryMatch);
-
-        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
-        JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
-            JsonObject object = new JsonObject();
-            Document document = (Document) cursor.next();
-            String video_id = document.getString("_id");
-            long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
-            array.add(object);
-        }
-        return array;
-
-    }
-
-    public JsonArray getVideosWithTheMostTweets(int artificial_category, int limit){
-
-        if(limit==0)
-            return new JsonArray();
-        Document match;
-        if(artificial_category!=0)
+        if (artificial_category != 0)
             match = new Document("artificial_category", artificial_category);
         else
-            match = new Document("artificial_category", new Document("$gt",0)) ;
+            match = new Document("artificial_category", new Document("$gt", 0));
 
         List<Document> query = Arrays.asList(
                 new Document("$unwind", "$days"),
-                new Document("$match",match),
+                new Document("$match", match),
+                new Document("$group",
+                        new Document("_id", "$_id")
+                                .append("sum",
+                                        new Document("$sum", "$days.views_added"))),
+                new Document("$sort",
+                        new Document("sum", -1)),
+                new Document("$limit", limit),
+                new Document("$project",
+                        new Document("total_views", "$sum"))
+        );
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while (cursor.hasNext()) {
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_views = document.getLong("total_views");
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("url", "/videos/" + video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
+
+    public JsonArray getVideosWithTheMostTweets(int artificial_category, int offset, int lbl_wnd, int limit) {
+
+        if (limit == 0)
+            return new JsonArray();
+
+
+        Document matchDays = new Document("$and",
+                Arrays.asList(
+                        new Document("days.day", new Document("$gt", offset)),
+                        new Document("days.day", new Document("$lte", lbl_wnd))
+                )
+        );
+
+        List<Document> query;
+        if (artificial_category == 0) {
+            query = Arrays.asList(
+                    new Document("$unwind", "$days"),
+                    new Document("$match", matchDays),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("sum",
+                                            new Document("$sum", "$days.tweets_added"))),
+                    new Document("$sort",
+                            new Document("sum", -1)),
+                    new Document("$limit", limit),
+                    new Document("$project",
+                            new Document("total_tweets", "$sum"))
+            );
+        } else {
+            Document categoryMatch = new Document("artificial_category", artificial_category);
+            query = Arrays.asList(
+                    new Document("$match", categoryMatch),
+                    new Document("$unwind", "$days"),
+                    new Document("$match", matchDays),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("sum",
+                                            new Document("$sum", "$days.tweets_added"))),
+                    new Document("$sort",
+                            new Document("sum", -1)),
+                    new Document("$limit", limit),
+                    new Document("$project",
+                            new Document("total_tweets", "$sum"))
+            );
+        }
+
+
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        JsonArray array = new JsonArray();
+        while (cursor.hasNext()) {
+            JsonObject object = new JsonObject();
+            Document document = (Document) cursor.next();
+            String video_id = document.getString("_id");
+            long total_tweets = document.getLong("total_tweets");
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
+            array.add(object);
+        }
+        return array;
+
+    }
+
+    public JsonArray getVideosWithTheMostTweets(int artificial_category, int limit) {
+
+        if (limit == 0)
+            return new JsonArray();
+        Document match;
+        if (artificial_category != 0)
+            match = new Document("artificial_category", artificial_category);
+        else
+            match = new Document("artificial_category", new Document("$gt", 0));
+
+        List<Document> query = Arrays.asList(
+                new Document("$unwind", "$days"),
+                new Document("$match", match),
                 new Document("$group",
                         new Document("_id", "$_id")
                                 .append("sum",
@@ -205,25 +228,26 @@ public class ProcessVideoDBService {
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
-    public JsonArray getRecentVideos(int days, int artificial_category, int limit){
-        long daysInMillis = DateUtil.dayInMillis*days;
-        if(limit==0)
+
+    public JsonArray getRecentVideos(int days, int artificial_category, int limit) {
+        long daysInMillis = DateUtil.dayInMillis * days;
+        if (limit == 0)
             return new JsonArray();
         Document match;
-        if(artificial_category!=0)
+        if (artificial_category != 0)
             match = new Document("$and", Arrays.asList(
                     new Document("artificial_category", artificial_category),
                     new Document("diff",
@@ -234,49 +258,61 @@ public class ProcessVideoDBService {
 
         List<Document> query = Arrays.asList(
                 new Document("$addFields",
-                        new Document("a","$collected_at_timestamp").append("b","$published_at_timestamp")),
+                        new Document("a", "$collected_at_timestamp").append("b", "$published_at_timestamp")),
                 new Document("$addFields",
-                        new Document("diff", new Document("$subtract",Arrays.asList("$a","$b")))),
+                        new Document("diff", new Document("$subtract", Arrays.asList("$a", "$b")))),
 
-                new Document("$match",match),
+                new Document("$match", match),
                 new Document("$project",
-                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
-                new Document("$sort",new Document("total_views",-1)),
-                new Document("$limit", limit*2),
-                new Document("$sample", new Document("size",limit))
+                        new Document("total_views", "$total_views").append("total_tweets", "$total_tweets")),
+                new Document("$sort", new Document("total_views", -1)),
+                new Document("$limit", limit * 2),
+                new Document("$sample", new Document("size", limit))
         );
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_views = document.getLong("total_views");
             long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
-    public JsonArray getRecentVideosSeed(int days, int artificial_category, int limit,int seed){
-        long daysInMillis = DateUtil.dayInMillis*days;
 
-        if(limit==0)
+    public JsonArray getRecentVideosSeed(int days, int artificial_category, int limit, int seed,List<Integer> chooseFrom) {
+
+        long daysInMillis = DateUtil.dayInMillis * days;
+
+        if (limit == 0)
             return new JsonArray();
 
-        int max = (int) (processedDBVideos.count()-1);
         Random random = new Random(seed);
 
-        List<Integer> docs = random.ints(0,max).limit(limit).boxed().collect(Collectors.toList());
+        List<Integer> rands;
 
+        if(chooseFrom==null && artificial_category!=0)
+            throw new RuntimeException("Not allowed");
+
+        if(chooseFrom!=null) {
+            Collections.shuffle(chooseFrom, random);
+            rands = chooseFrom.stream().limit(limit).collect(Collectors.toList());
+        }else{
+            int max = (int) (processedDBVideos.count()- 1);
+            rands = random.ints(0, max).limit(limit).boxed().collect(Collectors.toList());
+        }
+        System.out.println("Choosing from "+rands.size());
         Document match;
 
-        if(artificial_category!=0)
+        if (artificial_category != 0)
             match = new Document("$and", Arrays.asList(
                     new Document("artificial_category", artificial_category),
                     new Document("diff",
@@ -285,155 +321,222 @@ public class ProcessVideoDBService {
         else
             match = new Document("diff", new Document("$lte", daysInMillis));
 
-        Document match1 = new Document("rand",new Document("$in",docs));
-
-        List<Document> query = Arrays.asList(
-                new Document("$match",match1),
+        Document match1 = new Document("rand", new Document("$in", rands));
+        List<Document>query = Arrays.asList(
+                new Document("$match", match1),
                 new Document("$addFields",
-                        new Document("a","$collected_at_timestamp").append("b","$published_at_timestamp")),
+                        new Document("a", "$collected_at_timestamp").append("b", "$published_at_timestamp")),
                 new Document("$addFields",
-                        new Document("diff", new Document("$subtract",Arrays.asList("$a","$b")))),
-
-                new Document("$match",match),
+                        new Document("diff", new Document("$subtract", Arrays.asList("$a", "$b")))),
+                new Document("$match", match),
                 new Document("$project",
-                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets"))
+                        new Document("total_views", "$total_views").append("total_tweets", "$total_tweets"))
         );
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_views = document.getLong("total_views");
             long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
-    public JsonArray getRandomVideosSeed(int artificial_category, int limit,int seed){
 
-        if(limit==0)
+    public List<Integer> getRandIds(int artificial_category) {
+        Document match = new Document("artificial_category", artificial_category);
+        List<Document> query = Arrays.asList(
+                new Document("$match", match),
+                new Document("$sort",
+                        new Document("rand", 1)),
+                new Document("$project", new Document("v", "$rand"))
+        );
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        List<Integer> result = new LinkedList<>();
+        while (cursor.hasNext()) {
+            Document document = (Document) cursor.next();
+            int total_views = document.getInteger("v");
+            result.add(total_views);
+        }
+        return result;
+
+    }
+    public List<Integer> getRandRecentIds(int artificial_category,int days) {
+
+        long daysInMillis = DateUtil.dayInMillis * days;
+
+        Document match1 = new Document("artificial_category", artificial_category);
+
+        Document match2 = new Document("$and",
+                Arrays.asList(
+                        new Document("artificial_category", artificial_category),
+                        new Document("diff",
+                                new Document("$lte", daysInMillis))
+                ));
+
+        List<Document> query = Arrays.asList(
+                new Document("$match", match1),
+                new Document("$addFields",
+                        new Document("a", "$collected_at_timestamp").append("b", "$published_at_timestamp")),
+                new Document("$addFields",
+                        new Document("diff", new Document("$subtract", Arrays.asList("$a", "$b")))),
+                new Document("$match", match2),
+                new Document("$sort",
+                        new Document("rand", 1)),
+                new Document("$project", new Document("v", "$rand"))
+        );
+        MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+        List<Integer> result = new LinkedList<>();
+        while (cursor.hasNext()) {
+            Document document = (Document) cursor.next();
+            int total_views = document.getInteger("v");
+            result.add(total_views);
+        }
+        return result;
+
+    }
+    public JsonArray getRandomVideosSeed(int artificial_category, int limit, int seed,List<Integer>chooseFrom) {
+
+        if (limit == 0)
             return new JsonArray();
 
-        int max = (int) (processedDBVideos.count()-1);
         Random random = new Random(seed);
+        List<Integer> rands;
 
-        List<Integer> docs = random.ints(0,max).limit(limit).boxed().collect(Collectors.toList());
+        if(chooseFrom==null && artificial_category!=0)
+            throw new RuntimeException("Not allowed");
+
+        if(chooseFrom!=null) {
+            Collections.shuffle(chooseFrom, random);
+            rands = chooseFrom.stream().limit(limit).collect(Collectors.toList());
+        }else{
+            int max = (int) (processedDBVideos.count() - 1);
+            rands = random.ints(0, max).limit(limit).boxed().collect(Collectors.toList());
+        }
+
         Document match;
-        if(artificial_category!=0)
-            match = new Document("artificial_category", artificial_category) ;
-        else
-            match = new Document("artificial_category", new Document("$gt",0)) ;
 
-        Document match1 = new Document("rand",new Document("$in",docs));
+        if (artificial_category != 0)
+            match = new Document("artificial_category", artificial_category);
+        else
+            match = new Document("artificial_category", new Document("$gt", 0));
+
+        Document match1 = new Document("rand", new Document("$in", rands));
 
         List<Document> query = Arrays.asList(
-                new Document("$match",match1),
-                new Document("$match",match),
+                new Document("$match", match1),
+                new Document("$match", match),
                 new Document("$project",
-                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets"))
+                        new Document("total_views", "$total_views").append("total_tweets", "$total_tweets"))
         );
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_views = document.getLong("total_views");
             long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
 
-    public JsonArray getRandomVideos(int artificial_category, int limit){
-        if(limit==0)
+    public JsonArray getRandomVideos(int artificial_category, int limit) {
+        if (limit == 0)
             return new JsonArray();
         Document match;
-        if(artificial_category!=0)
-            match = new Document("artificial_category", artificial_category) ;
+        if (artificial_category != 0)
+            match = new Document("artificial_category", artificial_category);
         else
-            match = new Document("artificial_category", new Document("$gt",0)) ;
+            match = new Document("artificial_category", new Document("$gt", 0));
 
         List<Document> query = Arrays.asList(
-                new Document("$match",match),
+                new Document("$match", match),
                 new Document("$project",
-                        new Document("total_views", "$total_views").append("total_tweets","$total_tweets")),
-                new Document("$sample", new Document("size",limit))
+                        new Document("total_views", "$total_views").append("total_tweets", "$total_tweets")),
+                new Document("$sample", new Document("size", limit))
         );
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             JsonObject object = new JsonObject();
             Document document = (Document) cursor.next();
             String video_id = document.getString("_id");
             long total_views = document.getLong("total_views");
             long total_tweets = document.getLong("total_tweets");
-            object.addProperty("video_id",video_id);
-            object.addProperty("total_views",total_views);
-            object.addProperty("total_tweets",total_tweets);
-            object.addProperty("url","/videos/"+video_id);
+            object.addProperty("video_id", video_id);
+            object.addProperty("total_views", total_views);
+            object.addProperty("total_tweets", total_tweets);
+            object.addProperty("url", "/videos/" + video_id);
             array.add(object);
         }
         return array;
 
     }
+
     /**
      * Add a processedVideo
+     *
      * @param rawVideo
      * @return
      */
-    public boolean addOrReplaceProcessedVideo(RawVideo rawVideo){
-       Document document = rawVideo.toBson();
-        try{
-            if(processedDBVideos.count(eq("_id", rawVideo.getVideo_id()))==1)
-                processedDBVideos.replaceOne(eq("_id", rawVideo.getVideo_id()),document);
+    public boolean addOrReplaceProcessedVideo(RawVideo rawVideo) {
+        Document document = rawVideo.toBson();
+        try {
+            if (processedDBVideos.count(eq("_id", rawVideo.getVideo_id())) == 1)
+                processedDBVideos.replaceOne(eq("_id", rawVideo.getVideo_id()), document);
             else
                 processedDBVideos.insertOne(document);
             return true;
-        } catch(NullPointerException ex){
+        } catch (NullPointerException ex) {
             logger.error("Missing fields from the object");
-            return  false;
-        } catch(MongoWriteException we){
+            return false;
+        } catch (MongoWriteException we) {
             logger.error(we.getError().getMessage());
             return false;
-        } catch(MongoException ex) {
+        } catch (MongoException ex) {
             logger.error(ex.getLocalizedMessage());
             return false;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             logger.error(ex.getLocalizedMessage());
             return false;
         }
     }
+
     /**
      * Set a processedVideo processed
+     *
      * @param videoId
      * @return
      */
-    public boolean setVideoAsProcessed(String videoId ){
-        try{
-            videos.updateOne(eq("_id",videoId),new Document("$set",new Document("meta.processed",true)));
+    public boolean setVideoAsProcessed(String videoId) {
+        try {
+            videos.updateOne(eq("_id", videoId), new Document("$set", new Document("meta.processed", true)));
             return true;
-        } catch(MongoWriteException we){
+        } catch (MongoWriteException we) {
             logger.error(we.getError().getMessage());
             return false;
-        } catch(MongoException ex) {
+        } catch (MongoException ex) {
             logger.error(ex.getLocalizedMessage());
             return false;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             logger.error(ex.getLocalizedMessage());
             return false;
         }
@@ -441,85 +544,90 @@ public class ProcessVideoDBService {
 
     /**
      * Get total number of videos ready for analysis
+     *
      * @return
      */
-    public int getTotalVideos(int artificial_category){
-        if(artificial_category==0)
+    public int getTotalVideos(int artificial_category) {
+        if (artificial_category == 0)
             return (int) processedDBVideos.count();
         else
-            return (int) processedDBVideos.count(eq("artificial_category",artificial_category));
+            return (int) processedDBVideos.count(eq("artificial_category", artificial_category));
     }
 
     /**
      * Get total number of videos ready for analysis
+     *
      * @return
      */
-    public int getTotalVideosBaseCategory(int category){
-        if(category==0)
+    public int getTotalVideosBaseCategory(int category) {
+        if (category == 0)
             return (int) processedDBVideos.count();
         else
-            return (int) processedDBVideos.count(eq("category",category));
+            return (int) processedDBVideos.count(eq("category", category));
     }
 
     /**
      * Retrieve video
+     *
      * @param videoId
      * @return
      */
-    public Video getVideo(String videoId){
+    public Video getVideo(String videoId) {
 
-        Document document =  (Document) processedDBVideos.find(eq("_id",videoId)).first();
-        if(document ==null)
+        Document document = (Document) processedDBVideos.find(eq("_id", videoId)).first();
+        if (document == null)
             return null;
 
         return new Video.Builder().create(document);
 
     }
+
     /**
      * Retrieve videos
+     *
      * @param
      * @return
      */
-    public List<SentimentVideo> getVideos(int n,int category){
+    public List<SentimentVideo> getVideos(int n, int category) {
         List<SentimentVideo> videos = new LinkedList<>();
         //Iterator<Document> iterator =  processedDBVideos.find().iterator();
 
         Document match;
-        if(category!=0)
+        if (category != 0)
             match = new Document("$and", Arrays.asList(
                     new Document("artificial_category", category),
                     new Document("comments_sentiment",
                             new Document("$not",
-                                    new Document("$eq","Not enough comments")))
+                                    new Document("$eq", "Not enough comments")))
             ));
         else
             match = new Document("$and", Arrays.asList(
-                    new Document("artificial_category", new Document("$gt",0)),
+                    new Document("artificial_category", new Document("$gt", 0)),
                     new Document("comments_sentiment",
                             new Document("$not",
-                                    new Document("$eq","Not enough comments")))
+                                    new Document("$eq", "Not enough comments")))
             ));
 
         List<Document> query = Arrays.asList(
-                new Document("$match",match),
-                new Document("$sample", new Document("size",n))
+                new Document("$match", match),
+                new Document("$sample", new Document("size", n))
         );
         MongoCursor iterator = processedDBVideos.aggregate(query).iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Document document = (Document) iterator.next();
             Video video = new Video.Builder().create(document);
-            double views=video.getAverageViewsPerDay();
-            double tweets=video.getAverageTweetsPerDay();
-            double retweets=video.getAverageRetweetsPerDay();
-            double likes=video.getAverageLikesPerDay();
-            double friends=video.getAverageFriendsPerDay();
-            double followers=video.getAverageFollowersPerDay();
-            SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(),views
-                    ,tweets,retweets
-                    ,video.getComments_sentiment().getNeg().getAverage()
-                    ,video.getComments_sentiment().getPos().getAverage()
-                    ,video.getComments_sentiment().getNeg().getAverage()
-                    ,video.getComments_sentiment().getCompound().getAverage(),
+            double views = video.getAverageViewsPerDay();
+            double tweets = video.getAverageTweetsPerDay();
+            double retweets = video.getAverageRetweetsPerDay();
+            double likes = video.getAverageLikesPerDay();
+            double friends = video.getAverageFriendsPerDay();
+            double followers = video.getAverageFollowersPerDay();
+            SentimentVideo sentimentVideo = new SentimentVideo(video.getVideo_id(), views
+                    , tweets, retweets
+                    , video.getComments_sentiment().getNeg().getAverage()
+                    , video.getComments_sentiment().getPos().getAverage()
+                    , video.getComments_sentiment().getNeg().getAverage()
+                    , video.getComments_sentiment().getCompound().getAverage(),
                     likes, friends, followers);
             videos.add(sentimentVideo);
         }
@@ -530,28 +638,30 @@ public class ProcessVideoDBService {
 
     /**
      * Get all tweets from the specified video
+     *
      * @param videoId
      * @return
      */
-    public List<Document> getTweets(String videoId){
-        MongoCursor cursor =  tweets.find(eq("video_id",videoId)).iterator();
+    public List<Document> getTweets(String videoId) {
+        MongoCursor cursor = tweets.find(eq("video_id", videoId)).iterator();
         List<Document> list = new LinkedList<>();
-        while(cursor.hasNext()){
-           Document tweet = (Document) cursor.next();
-           list.add(tweet);
+        while (cursor.hasNext()) {
+            Document tweet = (Document) cursor.next();
+            list.add(tweet);
         }
         return list;
     }
 
     /**
      * Get all comments from the specified video
+     *
      * @param videoId
      * @return
      */
-    public List<Document> getComments(String videoId){
-        MongoCursor cursor =  comments.find(eq("video_id",videoId)).iterator();
+    public List<Document> getComments(String videoId) {
+        MongoCursor cursor = comments.find(eq("video_id", videoId)).iterator();
         List<Document> list = new LinkedList<>();
-        while(cursor.hasNext()){
+        while (cursor.hasNext()) {
             Document tweet = (Document) cursor.next();
             list.add(tweet);
         }
@@ -560,21 +670,22 @@ public class ProcessVideoDBService {
 
     /**
      * Retrieve a list of videos  with the specified number of comments
+     *
      * @param
      * @return
      */
-    public List<String> getVideosWithComments(int n){
+    public List<String> getVideosWithComments(int n) {
         List<String> videos = new LinkedList<>();
         List<Document> query = Arrays.asList(
                 new Document("$group",
-                        new Document("_id","$video_id")
-                                .append("sum",new Document("$sum",1) )
+                        new Document("_id", "$video_id")
+                                .append("sum", new Document("$sum", 1))
                 ),
-                new Document("$match", new Document("sum",n)),
-                new Document("$project",new Document("_id",1))
+                new Document("$match", new Document("sum", n)),
+                new Document("$project", new Document("_id", 1))
         );
         MongoCursor iterator = comments.aggregate(query).iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Document document = (Document) iterator.next();
             String videoId = document.getString("_id");
             videos.add(videoId);
