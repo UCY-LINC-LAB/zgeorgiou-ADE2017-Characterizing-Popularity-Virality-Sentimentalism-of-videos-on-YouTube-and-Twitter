@@ -34,10 +34,31 @@ public class App {
         scripts="./yttresearch-analyzer/scripts/";
         String db="yttresearch120K";
 
+        int port = 8000;
 
         if(args.length==1)
             db= args[0];
-        port(8000);
+
+        for(int i=0;i<args.length;i++){
+            if(args[i].equalsIgnoreCase("--path")){
+                if(i+1<args.length ){
+                    workingPath = args[i+1];
+                }
+            }
+            if(args[i].equalsIgnoreCase("--db")){
+                if(i+1<args.length ){
+                    db = args[i+1];
+                }
+            }
+            if(args[i].equalsIgnoreCase("--port")){
+                if(i+1<args.length ){
+                    port = Integer.parseInt(args[i+1]);
+                }
+            }
+
+        }
+        port(port);
+
         int executors= 16;
 
         ExecutorService executorService = Executors.newFixedThreadPool(6);

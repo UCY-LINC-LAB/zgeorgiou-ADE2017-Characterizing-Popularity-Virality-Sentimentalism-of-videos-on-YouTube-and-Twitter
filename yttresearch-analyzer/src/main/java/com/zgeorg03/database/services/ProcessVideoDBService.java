@@ -44,26 +44,21 @@ public class ProcessVideoDBService {
     public JsonArray getVideosWithTheMostViews(int artificial_category,int offset, int lbl_wnd, int limit){
         if(limit==0)
             return new JsonArray();
-        Document match;
-        if(artificial_category!=0)
-            match = new Document("$and",
-                    Arrays.asList(
-                            new Document("artificial_category", artificial_category),
-                            new Document("days.day", new Document("$gt", offset)),
-                            new Document("days.day", new Document("$lte", lbl_wnd))
-                    )
-            );
-        else
-            match = new Document("$and",
-                    Arrays.asList(
-                            new Document("days.day", new Document("$gt", offset)),
-                            new Document("days.day", new Document("$lte", lbl_wnd))
-                    )
-            );
+        Document categoryMatch=null;
 
+        if(artificial_category!=0)
+            categoryMatch = new Document("artificial_category", artificial_category);
+
+
+        Document matchDays = new Document("$and",
+                Arrays.asList(
+                        new Document("days.day", new Document("$gt", offset)),
+                        new Document("days.day", new Document("$lte", lbl_wnd))
+                )
+        );
         List<Document> query = Arrays.asList(
                 new Document("$unwind", "$days"),
-                new Document("$match",match),
+                new Document("$match",matchDays),
                 new Document("$group",
                         new Document("_id", "$_id")
                                 .append("sum",
@@ -75,7 +70,11 @@ public class ProcessVideoDBService {
                         new Document("total_views", "$sum"))
         );
 
+        if(artificial_category!=0)
+            query.add(0,categoryMatch);
+
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
+
         JsonArray array = new JsonArray();
         while(cursor.hasNext()){
             JsonObject object = new JsonObject();
@@ -134,25 +133,22 @@ public class ProcessVideoDBService {
 
         if(limit==0)
             return new JsonArray();
-        Document match;
+        Document categoryMatch=null;
+
         if(artificial_category!=0)
-            match = new Document("$and",
-                    Arrays.asList(
-                            new Document("artificial_category", artificial_category),
-                            new Document("days.day", new Document("$gt", offset)),
-                            new Document("days.day", new Document("$lte", lbl_wnd))
-                    )
-            );
-        else
-            match = new Document("$and",
-                    Arrays.asList(
-                            new Document("days.day", new Document("$gt", offset)),
-                            new Document("days.day", new Document("$lte", lbl_wnd))
-                    )
-            );
+            categoryMatch = new Document("artificial_category", artificial_category);
+
+
+        Document matchDays = new Document("$and",
+                Arrays.asList(
+                        new Document("days.day", new Document("$gt", offset)),
+                        new Document("days.day", new Document("$lte", lbl_wnd))
+                )
+        );
+
         List<Document> query = Arrays.asList(
                 new Document("$unwind", "$days"),
-                new Document("$match",match),
+                new Document("$match",matchDays),
                 new Document("$group",
                         new Document("_id", "$_id")
                                 .append("sum",
@@ -163,6 +159,9 @@ public class ProcessVideoDBService {
                 new Document("$project",
                         new Document("total_tweets", "$sum"))
         );
+
+        if(artificial_category!=0)
+            query.add(0,categoryMatch);
 
         MongoCursor cursor = processedDBVideos.aggregate(query).iterator();
         JsonArray array = new JsonArray();
@@ -286,7 +285,7 @@ public class ProcessVideoDBService {
         else
             match = new Document("diff", new Document("$lte", daysInMillis));
 
-        Document match1 = new Document("$in",docs);
+        Document match1 = new Document("rand",new Document("$in",docs));
 
         List<Document> query = Arrays.asList(
                 new Document("$match",match1),
@@ -332,7 +331,7 @@ public class ProcessVideoDBService {
         else
             match = new Document("artificial_category", new Document("$gt",0)) ;
 
-        Document match1 = new Document("$in",docs);
+        Document match1 = new Document("rand",new Document("$in",docs));
 
         List<Document> query = Arrays.asList(
                 new Document("$match",match1),
